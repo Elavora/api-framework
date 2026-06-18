@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
-use Bifrost\Framework\Application;
-use Bifrost\Framework\Attributes\Method;
-use Bifrost\Framework\Attributes\RequiredFields;
-use Bifrost\Framework\Attributes\RequiredParams;
-use Bifrost\Framework\Contracts\Extension;
-use Bifrost\Framework\Exceptions\HttpException;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Application;
+use Elavora\Framework\Attributes\Method;
+use Elavora\Framework\Attributes\RequiredFields;
+use Elavora\Framework\Attributes\RequiredParams;
+use Elavora\Framework\Contracts\Extension;
+use Elavora\Framework\Exceptions\HttpException;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase
@@ -66,13 +66,13 @@ final class ApplicationTest extends TestCase
     {
         $application = Application::create();
         $application->middleware(
-            fn (Request $request, callable $next): Response => $next($request)->withHeader('X-Framework', 'Bifrost')
+            fn (Request $request, callable $next): Response => $next($request)->withHeader('X-Framework', 'Elavora')
         );
         $application->get('/', fn (): string => 'ok');
 
         $response = $application->handle(new Request(method: 'GET', path: '/'));
 
-        self::assertSame('Bifrost', $response->headers()['X-Framework']);
+        self::assertSame('Elavora', $response->headers()['X-Framework']);
         self::assertSame('ok', $response->body());
     }
 
@@ -156,7 +156,7 @@ final class ApplicationTest extends TestCase
             method: 'POST',
             path: '/users',
             query: ['page' => '1'],
-            body: ['name' => 'Bifrost']
+            body: ['name' => 'Elavora']
         ));
 
         self::assertSame(400, $response->status());
@@ -172,7 +172,7 @@ final class ApplicationTest extends TestCase
             method: 'POST',
             path: '/users',
             query: ['page' => '1'],
-            body: ['name' => 'Bifrost', 'email' => 'team@bifrost.dev']
+            body: ['name' => 'Elavora', 'email' => 'team@Elavora.dev']
         ));
 
         self::assertSame(201, $response->status());
@@ -202,3 +202,4 @@ final class AttributeControllerStub
         return Response::json(['created' => true], status: 201);
     }
 }
+

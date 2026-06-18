@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
  * Contrato minimo para controle transacional usado por attributes e extensoes.
@@ -24,3 +24,5 @@ interface TransactionManager
      */
     public function rollback(): bool;
 }
+
+

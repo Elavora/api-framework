@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
-use Bifrost\Framework\Application;
-use Bifrost\Framework\Attributes\Method;
-use Bifrost\Framework\Http\HttpMethod;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Application;
+use Elavora\Framework\Attributes\Method;
+use Elavora\Framework\Http\HttpMethod;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -50,3 +50,4 @@ final class HttpMethodTest extends TestCase
         new Request(method: 'TRACE', path: '/users');
     }
 }
+

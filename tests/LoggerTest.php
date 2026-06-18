@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
-use Bifrost\Framework\Contracts\LogWriter;
-use Bifrost\Framework\Logging\Logger;
+use Elavora\Framework\Contracts\LogWriter;
+use Elavora\Framework\Logging\Logger;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -60,3 +60,4 @@ final class RecordingLogWriter implements LogWriter
         $this->entries[] = $entry;
     }
 }
+

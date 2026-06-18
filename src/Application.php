@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework;
+namespace Elavora\Framework;
 
-use Bifrost\Framework\Contracts\Extension;
-use Bifrost\Framework\Http\HttpKernel;
-use Bifrost\Framework\Http\HttpMethod;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
-use Bifrost\Framework\Http\ResponseEmitter;
-use Bifrost\Framework\Routing\ControllerResolver;
-use Bifrost\Framework\Routing\ConventionRouteResolver;
-use Bifrost\Framework\Routing\Router;
+use Elavora\Framework\Contracts\Extension;
+use Elavora\Framework\Http\HttpKernel;
+use Elavora\Framework\Http\HttpMethod;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
+use Elavora\Framework\Http\ResponseEmitter;
+use Elavora\Framework\Routing\ControllerResolver;
+use Elavora\Framework\Routing\ConventionRouteResolver;
+use Elavora\Framework\Routing\Router;
 
 /**
- * Ponto principal de configuracao e execucao de uma aplicacao Bifrost.
+ * Ponto principal de configuracao e execucao de uma aplicacao Elavora.
  *
  * Registra rotas, middlewares, extensoes e despacha requests para o kernel HTTP.
  */
@@ -40,7 +40,7 @@ final class Application
     }
 
     /**
-     * Cria uma aplicacao Bifrost.
+     * Cria uma aplicacao Elavora.
      *
      * @param bool $debug Quando true, respostas 500 podem expor a mensagem da excecao.
      */
@@ -159,3 +159,5 @@ final class Application
         $this->emitter->emit($response);
     }
 }
+
+

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Http;
+namespace Elavora\Framework\Http;
 
 /**
- * Representa a request HTTP normalizada pelo Bifrost.
+ * Representa a request HTTP normalizada pelo Elavora.
  *
  * Fornece acesso ao metodo, path, query string, corpo da request, headers e request-id.
  * Controllers recebem esta classe como entrada principal.
@@ -166,3 +166,5 @@ final class Request
         return bin2hex(random_bytes(16));
     }
 }
+
+

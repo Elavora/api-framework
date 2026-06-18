@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
  * Contrato base para attributes HTTP que expõem metadados do endpoint.
@@ -14,3 +14,5 @@ interface HttpAttribute
      */
     public function options(): array;
 }
+
+

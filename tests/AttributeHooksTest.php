@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
-use Bifrost\Framework\Application;
-use Bifrost\Framework\Attributes\Cache;
-use Bifrost\Framework\Attributes\Transaction;
-use Bifrost\Framework\Contracts\CacheStore;
-use Bifrost\Framework\Contracts\TransactionManager;
-use Bifrost\Framework\Http\HttpStatusCode;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Application;
+use Elavora\Framework\Attributes\Cache;
+use Elavora\Framework\Attributes\Transaction;
+use Elavora\Framework\Contracts\CacheStore;
+use Elavora\Framework\Contracts\TransactionManager;
+use Elavora\Framework\Http\HttpStatusCode;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 final class AttributeHooksTest extends TestCase
@@ -142,3 +142,4 @@ final class RecordingTransactionManager implements TransactionManager
         return true;
     }
 }
+

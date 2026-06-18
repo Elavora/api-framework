@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 
 /**
  * Contrato para attributes que validam uma request antes da action do controller.
@@ -19,3 +19,5 @@ interface RequestValidatorAttribute extends HttpAttribute
      */
     public function validate(Request $request): ?Response;
 }
+
+

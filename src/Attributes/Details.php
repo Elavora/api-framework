@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Attributes;
+namespace Elavora\Framework\Attributes;
 
 use Attribute;
-use Bifrost\Framework\Contracts\HttpAttribute;
+use Elavora\Framework\Contracts\HttpAttribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 /**
@@ -33,3 +33,5 @@ final class Details implements HttpAttribute
         return $this->details;
     }
 }
+
+

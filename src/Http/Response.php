@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Http;
+namespace Elavora\Framework\Http;
 
-use Bifrost\Framework\Contracts\Responseable;
+use Elavora\Framework\Contracts\Responseable;
 use JsonException;
 
 /**
@@ -180,3 +180,5 @@ final class Response
         return $this->headers;
     }
 }
+
+

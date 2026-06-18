@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
-use Bifrost\Framework\Application;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Application;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/Fixtures/App/Http/Controller/HealthController.php';
@@ -62,3 +62,4 @@ final class ConventionRouteTest extends TestCase
         self::assertSame(404, $response->status());
     }
 }
+

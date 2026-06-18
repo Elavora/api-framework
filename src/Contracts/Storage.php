@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 use DateTimeImmutable;
 
@@ -47,3 +47,5 @@ interface Storage
         array $options = []
     ): string;
 }
+
+

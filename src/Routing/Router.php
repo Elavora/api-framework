@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Routing;
+namespace Elavora\Framework\Routing;
 
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\HttpMethod;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\HttpMethod;
 
 /**
  * Registro e busca de rotas HTTP.
@@ -64,3 +64,5 @@ final class Router
         return $path !== '/' ? rtrim($path, '/') : $path;
     }
 }
+
+

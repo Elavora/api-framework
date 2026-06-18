@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
  * Contrato para objetos de valor com validacao propria.
@@ -27,3 +27,5 @@ interface DataType
      */
     public function value(): mixed;
 }
+
+

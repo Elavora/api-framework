@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Http;
+namespace Elavora\Framework\Http;
 
 use InvalidArgumentException;
 
@@ -35,3 +35,5 @@ enum HttpMethod: string
             ?? throw new InvalidArgumentException(sprintf('Metodo HTTP invalido: %s.', $method));
     }
 }
+
+

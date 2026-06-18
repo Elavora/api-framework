@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
-use Bifrost\Framework\Container;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Container;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 
 /**
  * Contrato para attributes executados depois da action do controller.
@@ -20,3 +20,5 @@ interface AfterResponseAttribute extends HttpAttribute
      */
     public function after(Request $request, Response $response, Container $container): ?Response;
 }
+
+

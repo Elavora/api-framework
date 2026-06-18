@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controller;
 
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 
 final class HealthController
 {
@@ -24,3 +24,4 @@ final class HealthController
         return Response::json(['action' => 'internal']);
     }
 }
+

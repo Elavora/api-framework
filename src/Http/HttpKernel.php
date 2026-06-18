@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Http;
+namespace Elavora\Framework\Http;
 
-use Bifrost\Framework\Exceptions\HttpException;
-use Bifrost\Framework\Routing\ConventionRouteResolver;
-use Bifrost\Framework\Routing\ControllerResolver;
-use Bifrost\Framework\Routing\Router;
+use Elavora\Framework\Exceptions\HttpException;
+use Elavora\Framework\Routing\ConventionRouteResolver;
+use Elavora\Framework\Routing\ControllerResolver;
+use Elavora\Framework\Routing\Router;
 use JsonException;
 use Throwable;
 
@@ -167,3 +167,5 @@ final class HttpKernel
         return false;
     }
 }
+
+

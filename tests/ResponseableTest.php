@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
 use Attribute;
-use Bifrost\Framework\Application;
-use Bifrost\Framework\Container;
-use Bifrost\Framework\Contracts\AfterResponseAttribute;
-use Bifrost\Framework\Contracts\Responseable;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Application;
+use Elavora\Framework\Container;
+use Elavora\Framework\Contracts\AfterResponseAttribute;
+use Elavora\Framework\Contracts\Responseable;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 final class ResponseableTest extends TestCase
@@ -98,3 +98,4 @@ final class MarkResponseable implements AfterResponseAttribute
         return [];
     }
 }
+

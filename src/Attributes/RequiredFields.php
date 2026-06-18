@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Attributes;
+namespace Elavora\Framework\Attributes;
 
 use Attribute;
-use Bifrost\Framework\Contracts\RequestValidatorAttribute;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
-use Bifrost\Framework\Validation\ValidationRule;
+use Elavora\Framework\Contracts\RequestValidatorAttribute;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
+use Elavora\Framework\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 /**
@@ -85,3 +85,5 @@ final class RequiredFields implements RequestValidatorAttribute
         return $fields;
     }
 }
+
+

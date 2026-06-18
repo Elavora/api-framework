@@ -149,3 +149,4 @@ jobs:
           git checkout -b latest-release || git checkout latest-release
           git reset --hard origin/main
           git push --force origin latest-release
+
