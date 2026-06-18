@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
- * Contrato para stores de cache usados por extensoes do Bifrost.
+ * Contrato para stores de cache usados por extensoes do Elavora.
  */
 interface CacheStore
 {
@@ -26,3 +26,5 @@ interface CacheStore
      */
     public function delete(string $key): void;
 }
+
+

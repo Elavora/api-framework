@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework;
+namespace Elavora\Framework;
 
 use RuntimeException;
 
@@ -72,3 +72,5 @@ final class Container
         return $this->instances[$id] = $instance;
     }
 }
+
+

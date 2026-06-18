@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
  * Contrato para adaptadores de fila.
@@ -23,3 +23,5 @@ interface Queue
      */
     public function pop(string $queue): ?array;
 }
+
+

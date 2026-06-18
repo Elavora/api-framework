@@ -4,8 +4,9 @@
          colors="true"
          failOnWarning="true">
     <testsuites>
-        <testsuite name="Bifrost Framework">
+        <testsuite name="Elavora Framework">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
+

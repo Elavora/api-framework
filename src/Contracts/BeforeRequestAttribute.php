@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
-use Bifrost\Framework\Container;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Container;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 
 /**
  * Contrato para attributes executados antes da action do controller.
@@ -20,3 +20,5 @@ interface BeforeRequestAttribute extends HttpAttribute
      */
     public function before(Request $request, Container $container): ?Response;
 }
+
+

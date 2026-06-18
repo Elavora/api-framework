@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Routing;
+namespace Elavora\Framework\Routing;
 
 /**
  * Representa uma rota HTTP registrada no router.
@@ -45,3 +45,5 @@ final class Route
         return $this->handler;
     }
 }
+
+

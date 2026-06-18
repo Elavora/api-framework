@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
  * Contrato generico para escritores de log.
@@ -16,3 +16,5 @@ interface LogWriter
      */
     public function write(array $entry): void;
 }
+
+

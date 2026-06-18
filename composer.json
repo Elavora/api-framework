@@ -1,6 +1,6 @@
 {
   "name": "elavora/api-framework",
-  "description": "Nucleo HTTP modular do framework Bifrost",
+  "description": "Nucleo HTTP modular do framework Elavora",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -37,3 +37,4 @@
     }
   }
 }
+

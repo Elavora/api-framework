@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 /**
  * Contrato para valores tipados que podem ser persistidos no banco.
@@ -14,3 +14,5 @@ interface Insertable
      */
     public function value(): string|int|bool|float|null;
 }
+
+

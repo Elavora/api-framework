@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Attributes;
+namespace Elavora\Framework\Attributes;
 
 use Attribute;
-use Bifrost\Framework\Contracts\RequestValidatorAttribute;
-use Bifrost\Framework\Http\HttpMethod;
-use Bifrost\Framework\Http\Request;
-use Bifrost\Framework\Http\Response;
+use Elavora\Framework\Contracts\RequestValidatorAttribute;
+use Elavora\Framework\Http\HttpMethod;
+use Elavora\Framework\Http\Request;
+use Elavora\Framework\Http\Response;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 /**
@@ -63,3 +63,5 @@ final class Method implements RequestValidatorAttribute
         return ['methods' => array_map(static fn (HttpMethod $method): string => $method->value, $this->methods)];
     }
 }
+
+

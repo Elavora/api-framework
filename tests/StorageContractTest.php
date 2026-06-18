@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Tests;
+namespace Elavora\Framework\Tests;
 
-use Bifrost\Framework\Contracts\Storage;
+use Elavora\Framework\Contracts\Storage;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -46,3 +46,4 @@ final class StorageContractTest extends TestCase
         );
     }
 }
+

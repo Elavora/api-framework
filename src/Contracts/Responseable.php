@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Contracts;
+namespace Elavora\Framework\Contracts;
 
 use JsonSerializable;
 
@@ -22,3 +22,5 @@ interface Responseable extends JsonSerializable
      */
     public function jsonSerialize(): mixed;
 }
+
+

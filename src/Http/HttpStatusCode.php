@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Http;
+namespace Elavora\Framework\Http;
 
 /**
  * Codigos HTTP comuns usados pelo framework.
@@ -85,3 +85,5 @@ enum HttpStatusCode: int
         return $this->value >= 500;
     }
 }
+
+

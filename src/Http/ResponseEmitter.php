@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Framework\Http;
+namespace Elavora\Framework\Http;
 
 /**
  * Envia uma Response para o runtime HTTP do PHP.
@@ -22,3 +22,5 @@ final class ResponseEmitter
         echo $response->body();
     }
 }
+
+
