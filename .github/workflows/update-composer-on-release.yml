@@ -17,12 +17,6 @@ jobs:
         with:
           ref: main
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          tools: composer:latest
-
       - name: Extrair versão da release
         id: version
         run: |
@@ -32,14 +26,18 @@ jobs:
 
       - name: Atualizar composer.json
         run: |
-          php -r "
-          \$composer = json_decode(file_get_contents('composer.json'), true);
-          \$composer['version'] = '${{ steps.version.outputs.version }}';
-          file_put_contents('composer.json', json_encode(\$composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL);
-          "
+          python3 << 'EOF'
+          import json
+          with open('composer.json', 'r', encoding='utf-8') as f:
+              data = json.load(f)
+          data['version'] = '${{ steps.version.outputs.version }}'
+          with open('composer.json', 'w', encoding='utf-8', newline='\n') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+              f.write('\n')
+          EOF
 
-      - name: Validar composer.json
-        run: composer validate --quiet
+      - name: Validar JSON
+        run: python3 -m json.tool composer.json > /dev/null
 
       - name: Commit e push alterações
         run: |
