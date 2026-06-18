@@ -56,6 +56,10 @@ $app->get('/users/me', 'ProfileController@current');  // Executado
 $app->get('/users/{id}', 'UserController@show');      // Nunca alcançado para /users/me
 ```
 
+## Fluxo de Roteamento
+
+![Routing Flow Diagram](assets/routing-flow.svg)
+
 ## Roteamento por Convenção
 
 Se nenhuma rota explícita corresponde, o framework tenta usar convenção automática:

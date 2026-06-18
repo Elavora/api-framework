@@ -6,21 +6,7 @@ Middleware são componentes que executam **antes** ou **depois** da lógica do s
 
 Middleware funciona como um "filtro" em torno da requisição:
 
-```
-Request
-  ↓
-[Middleware 1 - ANTES]
-  ↓
-[Middleware 2 - ANTES]
-  ↓
-Controller
-  ↓
-[Middleware 2 - DEPOIS]
-  ↓
-[Middleware 1 - DEPOIS]
-  ↓
-Response
-```
+![Middleware Flow Diagram](assets/middleware-flow.svg)
 
 ## Dois Tipos de Middleware
 

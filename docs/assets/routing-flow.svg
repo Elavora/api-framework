@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 550" width="600" height="550">
+  <!-- Define styles -->
+  <defs>
+    <style>
+      .box { fill: #e8f4f8; stroke: #0288d1; stroke-width: 2; }
+      .decision { fill: #fff9c4; stroke: #f57f17; stroke-width: 2; }
+      .success { fill: #c8e6c9; stroke: #388e3c; stroke-width: 2; }
+      .error { fill: #ffccbc; stroke: #d84315; stroke-width: 2; }
+      .text-bold { font-weight: bold; font-size: 12px; }
+      .text-normal { font-size: 11px; }
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrow-error { stroke: #d32f2f; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#d32f2f" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="300" y="30" text-anchor="middle" font-weight="bold" font-size="18">Routing Flow</text>
+
+  <!-- Request -->
+  <rect x="200" y="50" width="200" height="40" class="box" rx="5"/>
+  <text x="300" y="75" text-anchor="middle" class="text-bold">GET /users/123</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="90" x2="300" y2="120" class="arrow"/>
+
+  <!-- Decision: Explicit Route? -->
+  <polygon points="300,120 380,160 300,200 220,160" class="decision"/>
+  <text x="300" y="160" text-anchor="middle" class="text-normal">Rota</text>
+  <text x="300" y="172" text-anchor="middle" class="text-normal">Explícita?</text>
+
+  <!-- YES - Left branch -->
+  <line x1="220" y1="160" x2="120" y2="160" class="arrow"/>
+  <text x="170" y="155" class="text-normal">SIM</text>
+
+  <!-- Execute explicit route -->
+  <rect x="20" y="140" width="200" height="40" class="success" rx="5"/>
+  <text x="120" y="165" text-anchor="middle" class="text-bold">Execute Rota Explícita</text>
+
+  <!-- Arrow down -->
+  <line x1="120" y1="180" x2="120" y2="240" class="arrow"/>
+
+  <!-- Result box (left) -->
+  <rect x="20" y="240" width="200" height="40" class="success" rx="5"/>
+  <text x="120" y="265" text-anchor="middle" class="text-bold">Response</text>
+
+  <!-- NO - Right branch -->
+  <line x1="380" y1="160" x2="480" y2="160" class="arrow"/>
+  <text x="430" y="155" class="text-normal">NÃO</text>
+
+  <!-- Convention Router -->
+  <rect x="380" y="140" width="200" height="40" class="box" rx="5"/>
+  <text x="480" y="165" text-anchor="middle" class="text-bold">Convention Router</text>
+
+  <!-- Arrow down -->
+  <line x1="480" y1="180" x2="480" y2="210" class="arrow"/>
+
+  <!-- Decision: Convention Found? -->
+  <polygon points="480,210 560,250 480,290 400,250" class="decision"/>
+  <text x="480" y="250" text-anchor="middle" class="text-normal">Convenção</text>
+  <text x="480" y="262" text-anchor="middle" class="text-normal">Encontrada?</text>
+
+  <!-- YES - Execute convention -->
+  <line x1="560" y1="250" x2="620" y2="250" class="arrow"/>
+  <text x="590" y="245" class="text-normal">SIM</text>
+
+  <!-- Execute convention (off canvas, indicated) -->
+  <rect x="620" y="230" width="150" height="40" class="success" rx="5" opacity="0.5"/>
+  <text x="695" y="255" text-anchor="middle" class="text-bold" opacity="0.5">Execute Controller</text>
+
+  <!-- NO - 404 -->
+  <line x1="480" y1="290" x2="480" y2="320" class="arrow-error"/>
+  <text x="510" y="310" class="text-normal">NÃO</text>
+
+  <!-- 404 Error -->
+  <rect x="380" y="320" width="200" height="40" class="error" rx="5"/>
+  <text x="480" y="345" text-anchor="middle" class="text-bold">404 Not Found</text>
+
+  <!-- Arrow down -->
+  <line x1="480" y1="360" x2="480" y2="420" class="arrow-error"/>
+
+  <!-- Final Response -->
+  <rect x="380" y="420" width="200" height="40" class="error" rx="5"/>
+  <text x="480" y="445" text-anchor="middle" class="text-bold">Error Response</text>
+
+  <!-- Merge path from convention to main response -->
+  <line x1="620" y1="270" x2="620" y2="380" class="arrow" opacity="0.5"/>
+  <line x1="620" y1="380" x2="300" y2="380" class="arrow" opacity="0.5"/>
+  <line x1="300" y1="380" x2="300" y2="420" class="arrow" opacity="0.5"/>
+
+</svg>

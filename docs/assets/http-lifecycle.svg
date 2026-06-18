@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" width="600" height="900">
+  <!-- Define styles -->
+  <defs>
+    <style>
+      .box { fill: #e8f4f8; stroke: #0288d1; stroke-width: 2; }
+      .step { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+      .middleware { fill: #f3e5f5; stroke: #7b1fa2; stroke-width: 2; }
+      .text-bold { font-weight: bold; font-size: 14px; }
+      .text-normal { font-size: 12px; }
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .label { font-size: 11px; fill: #666; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="300" y="30" text-anchor="middle" class="text-bold" font-size="18">HTTP Request Lifecycle</text>
+
+  <!-- Step 1: Request::fromGlobals() -->
+  <rect x="50" y="60" width="500" height="60" class="box" rx="5"/>
+  <text x="300" y="85" text-anchor="middle" class="text-bold">1. Request::fromGlobals()</text>
+  <text x="300" y="105" text-anchor="middle" class="text-normal">Converte $_GET, $_POST, $_SERVER em objeto Request</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="120" x2="300" y2="150" class="arrow"/>
+
+  <!-- Step 2: Application::handle() -->
+  <rect x="50" y="150" width="500" height="60" class="box" rx="5"/>
+  <text x="300" y="175" text-anchor="middle" class="text-bold">2. Application::handle()</text>
+  <text x="300" y="195" text-anchor="middle" class="text-normal">Inicia o kernel de processamento</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="210" x2="300" y2="240" class="arrow"/>
+
+  <!-- Step 3: HttpKernel::handle() -->
+  <rect x="50" y="240" width="500" height="60" class="box" rx="5"/>
+  <text x="300" y="265" text-anchor="middle" class="text-bold">3. HttpKernel::handle()</text>
+  <text x="300" y="285" text-anchor="middle" class="text-normal">Núcleo do processamento HTTP</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="300" x2="300" y2="330" class="arrow"/>
+
+  <!-- Step 4: Middleware BEFORE -->
+  <rect x="50" y="330" width="500" height="60" class="middleware" rx="5"/>
+  <text x="300" y="355" text-anchor="middle" class="text-bold">4. Middleware BEFORE</text>
+  <text x="300" y="375" text-anchor="middle" class="text-normal">Autenticação, validação, autorização</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="390" x2="300" y2="420" class="arrow"/>
+
+  <!-- Step 5: Router::match() -->
+  <rect x="50" y="420" width="500" height="60" class="step" rx="5"/>
+  <text x="300" y="445" text-anchor="middle" class="text-bold">5. Router::match()</text>
+  <text x="300" y="465" text-anchor="middle" class="text-normal">Busca rota que corresponde à requisição</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="480" x2="300" y2="510" class="arrow"/>
+
+  <!-- Step 6: ControllerResolver::resolve() -->
+  <rect x="50" y="510" width="500" height="60" class="step" rx="5"/>
+  <text x="300" y="535" text-anchor="middle" class="text-bold">6. ControllerResolver::resolve()</text>
+  <text x="300" y="555" text-anchor="middle" class="text-normal">Resolve e executa controller/closure</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="570" x2="300" y2="600" class="arrow"/>
+
+  <!-- Step 7: Execução da Ação -->
+  <rect x="50" y="600" width="500" height="60" class="step" rx="5"/>
+  <text x="300" y="625" text-anchor="middle" class="text-bold">7. Execução da Ação</text>
+  <text x="300" y="645" text-anchor="middle" class="text-normal">Seu código executa e retorna Response</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="660" x2="300" y2="690" class="arrow"/>
+
+  <!-- Step 8: Middleware AFTER -->
+  <rect x="50" y="690" width="500" height="60" class="middleware" rx="5"/>
+  <text x="300" y="715" text-anchor="middle" class="text-bold">8. Middleware AFTER</text>
+  <text x="300" y="735" text-anchor="middle" class="text-normal">Adicionar headers, modificar status code</text>
+
+  <!-- Arrow down -->
+  <line x1="300" y1="750" x2="300" y2="780" class="arrow"/>
+
+  <!-- Step 9: ResponseEmitter::emit() -->
+  <rect x="50" y="780" width="500" height="60" class="box" rx="5"/>
+  <text x="300" y="805" text-anchor="middle" class="text-bold">9. ResponseEmitter::emit()</text>
+  <text x="300" y="825" text-anchor="middle" class="text-normal">Envia resposta ao cliente</text>
+
+</svg>

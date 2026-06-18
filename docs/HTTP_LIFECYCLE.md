@@ -4,17 +4,18 @@ O framework processa toda requisição HTTP através de um ciclo bem definido. E
 
 ## O Ciclo Completo
 
-```
-1. Request::fromGlobals()          ← Cria objeto Request
-2. Application::handle()           ← Inicia o kernel
-3. HttpKernel::handle()            ← Núcleo do processamento
-4. Middleware BEFORE               ← Executado antes
-5. Router::match()                 ← Busca rota
-6. ControllerResolver::resolve()   ← Resolve controller/closure
-7. Execução da ação                ← Seu código
-8. Middleware AFTER                ← Executado depois
-9. ResponseEmitter::emit()         ← Envia resposta
-```
+![HTTP Lifecycle Diagram](assets/http-lifecycle.svg)
+
+Passos:
+1. **Request::fromGlobals()** - Cria objeto Request
+2. **Application::handle()** - Inicia o kernel
+3. **HttpKernel::handle()** - Núcleo do processamento
+4. **Middleware BEFORE** - Executado antes
+5. **Router::match()** - Busca rota
+6. **ControllerResolver::resolve()** - Resolve controller/closure
+7. **Execução da ação** - Seu código
+8. **Middleware AFTER** - Executado depois
+9. **ResponseEmitter::emit()** - Envia resposta
 
 ## Detalhes de Cada Etapa
 
