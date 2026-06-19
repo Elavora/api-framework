@@ -1,4 +1,4 @@
-name: Publicar no Composer
+name: Publicar no Composer e GitHub Packages
 
 on:
   repository_dispatch:
@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   publish-release:
@@ -30,6 +31,21 @@ jobs:
             echo "::error::composer.json ausente"
             exit 1
           }
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: Configurar credenciais GitHub Packages
+        run: |
+          composer config --global --auth github-oauth.github.com ${{ github.token }}
+
+      - name: Publicar no GitHub Packages
+        run: |
+          composer publish
+        continue-on-error: true
 
       - name: Notificar Packagist
         if: vars.PACKAGIST_WEBHOOK_URL != ''
