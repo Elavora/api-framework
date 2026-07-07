@@ -41,21 +41,25 @@ jobs:
             const labels = ${{ steps.get_labels.outputs.result }};
             const tags = (await github.rest.repos.listTags({ owner, repo, per_page: 100 })).data.map(tag => tag.name);
 
+            function normalizeTag(tag) {
+              return tag.match(/^v?(\d+\.\d+\.\d+)(?:-\d+)?$/)?.[1] || null;
+            }
+
             function compareTags(a, b) {
               const parseTag = tag => tag.split('.').map(Number);
-              const aParts = parseTag(a.split('-')[0]);
-              const bParts = parseTag(b.split('-')[0]);
+              const aParts = parseTag(a);
+              const bParts = parseTag(b);
               for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
                 const diff = (aParts[i] || 0) - (bParts[i] || 0);
                 if (diff !== 0) return diff;
               }
-              return (parseInt(a.split('-')[1] || '0')) - (parseInt(b.split('-')[1] || '0'));
+              return 0;
             }
 
-            tags.sort(compareTags);
-            const lastTag = tags.pop() || '0.0.0-0';
-            const parts = lastTag.split('-')[0].split('.').map(Number);
-            const lastTagNumber = parseInt(lastTag.match(/-(\d+)$/)?.[1] || '0');
+            const versions = tags.map(normalizeTag).filter(Boolean);
+            versions.sort(compareTags);
+            const lastVersion = versions.pop() || '0.0.0';
+            const parts = lastVersion.split('.').map(Number);
 
             if (labels.includes('upgrade')) {
               parts[0]++;
@@ -67,7 +71,7 @@ jobs:
               parts[2]++;
             }
 
-            const newTag = `${parts.join('.')}-${lastTagNumber + 1}`;
+            const newTag = `v${parts.join('.')}`;
             core.setOutput('new_tag', newTag);
 
             await github.rest.git.createRef({
