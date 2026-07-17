@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
-use Elavora\Framework\Application;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Application;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/Fixtures/App/Http/Controller/HealthController.php';

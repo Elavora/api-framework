@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Http;
+namespace Elavora\Api\Framework\Http;
 
-use Elavora\Framework\Exceptions\HttpException;
-use Elavora\Framework\Routing\ConventionRouteResolver;
-use Elavora\Framework\Routing\ControllerResolver;
-use Elavora\Framework\Routing\Router;
+use Elavora\Api\Framework\Exceptions\HttpException;
+use Elavora\Api\Framework\Routing\ConventionRouteResolver;
+use Elavora\Api\Framework\Routing\ControllerResolver;
+use Elavora\Api\Framework\Routing\Router;
 use JsonException;
 use Throwable;
 

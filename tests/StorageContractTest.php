@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
-use Elavora\Framework\Contracts\Storage;
+use Elavora\Api\Framework\Contracts\Storage;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
-use Elavora\Framework\Application;
-use Elavora\Framework\Attributes\Method;
-use Elavora\Framework\Attributes\RequiredFields;
-use Elavora\Framework\Attributes\RequiredParams;
-use Elavora\Framework\Contracts\Extension;
-use Elavora\Framework\Exceptions\HttpException;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Application;
+use Elavora\Api\Framework\Attributes\Method;
+use Elavora\Api\Framework\Attributes\RequiredFields;
+use Elavora\Api\Framework\Attributes\RequiredParams;
+use Elavora\Api\Framework\Contracts\Extension;
+use Elavora\Api\Framework\Exceptions\HttpException;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase

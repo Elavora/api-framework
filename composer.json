@@ -9,12 +9,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Elavora\\Api\\": "src/"
+      "Elavora\\Api\\Framework\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Elavora\\Api\\Tests\\": "tests/"
+      "Elavora\\Api\\Framework\\Tests\\": "tests/"
     }
   },
   "require-dev": {

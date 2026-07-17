@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Logging;
+namespace Elavora\Api\Framework\Logging;
 
-use Elavora\Framework\Contracts\LogWriter;
+use Elavora\Api\Framework\Contracts\LogWriter;
 use Closure;
 use Throwable;
 

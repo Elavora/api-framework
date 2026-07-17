@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
-use Elavora\Framework\Contracts\LogWriter;
-use Elavora\Framework\Logging\Logger;
+use Elavora\Api\Framework\Contracts\LogWriter;
+use Elavora\Api\Framework\Logging\Logger;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

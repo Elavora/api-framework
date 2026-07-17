@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Http;
+namespace Elavora\Api\Framework\Http;
 
-use Elavora\Framework\Contracts\Responseable;
+use Elavora\Api\Framework\Contracts\Responseable;
 use JsonException;
 
 /**

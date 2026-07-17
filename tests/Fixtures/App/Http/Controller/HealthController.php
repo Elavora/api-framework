@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controller;
 
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 
 final class HealthController
 {

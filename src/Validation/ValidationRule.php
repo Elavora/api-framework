@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Validation;
+namespace Elavora\Api\Framework\Validation;
 
-use Elavora\Framework\Contracts\DataType;
+use Elavora\Api\Framework\Contracts\DataType;
 
 /**
  * Valida valores usados pelos attributes de request.
