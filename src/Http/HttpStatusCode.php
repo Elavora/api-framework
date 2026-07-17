@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Http;
+namespace Elavora\Api\Framework\Http;
 
 /**
  * Codigos HTTP comuns usados pelo framework.

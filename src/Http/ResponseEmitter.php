@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Http;
+namespace Elavora\Api\Framework\Http;
 
 /**
  * Envia uma Response para o runtime HTTP do PHP.

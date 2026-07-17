@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Attributes;
+namespace Elavora\Api\Framework\Attributes;
 
 use Attribute;
-use Elavora\Framework\Contracts\RequestValidatorAttribute;
-use Elavora\Framework\Http\HttpMethod;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Contracts\RequestValidatorAttribute;
+use Elavora\Api\Framework\Http\HttpMethod;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 /**

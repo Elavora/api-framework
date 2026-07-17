@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Contracts;
+namespace Elavora\Api\Framework\Contracts;
 
 /**
  * Contrato base para attributes HTTP que expõem metadados do endpoint.

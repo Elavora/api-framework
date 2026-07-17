@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Exceptions;
+namespace Elavora\Api\Framework\Exceptions;
 
 use RuntimeException;
 

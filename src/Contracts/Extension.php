@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Contracts;
+namespace Elavora\Api\Framework\Contracts;
 
-use Elavora\Framework\Application;
+use Elavora\Api\Framework\Application;
 
 /**
  * Contrato para pacotes que registram servicos, rotas ou configuracoes na aplicacao.

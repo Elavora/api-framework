@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Contracts;
+namespace Elavora\Api\Framework\Contracts;
 
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 
 /**
  * Contrato para attributes que validam uma request antes da action do controller.

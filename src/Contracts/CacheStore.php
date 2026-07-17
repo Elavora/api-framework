@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Contracts;
+namespace Elavora\Api\Framework\Contracts;
 
 /**
  * Contrato para stores de cache usados por extensoes do Elavora.

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
-use Elavora\Framework\Application;
-use Elavora\Framework\Attributes\Method;
-use Elavora\Framework\Http\HttpMethod;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Application;
+use Elavora\Api\Framework\Attributes\Method;
+use Elavora\Api\Framework\Http\HttpMethod;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

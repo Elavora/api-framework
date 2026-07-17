@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
-use Elavora\Framework\Application;
-use Elavora\Framework\Attributes\Cache;
-use Elavora\Framework\Attributes\Transaction;
-use Elavora\Framework\Contracts\CacheStore;
-use Elavora\Framework\Contracts\TransactionManager;
-use Elavora\Framework\Http\HttpStatusCode;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Application;
+use Elavora\Api\Framework\Attributes\Cache;
+use Elavora\Api\Framework\Attributes\Transaction;
+use Elavora\Api\Framework\Contracts\CacheStore;
+use Elavora\Api\Framework\Contracts\TransactionManager;
+use Elavora\Api\Framework\Http\HttpStatusCode;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 final class AttributeHooksTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Routing;
+namespace Elavora\Api\Framework\Routing;
 
 /**
  * Representa uma rota HTTP registrada no router.

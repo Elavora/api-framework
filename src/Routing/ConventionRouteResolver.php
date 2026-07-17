@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Routing;
+namespace Elavora\Api\Framework\Routing;
 
-use Elavora\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Request;
 use ReflectionMethod;
 
 /**

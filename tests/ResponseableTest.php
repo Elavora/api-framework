@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Tests;
+namespace Elavora\Api\Framework\Tests;
 
 use Attribute;
-use Elavora\Framework\Application;
-use Elavora\Framework\Container;
-use Elavora\Framework\Contracts\AfterResponseAttribute;
-use Elavora\Framework\Contracts\Responseable;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Application;
+use Elavora\Api\Framework\Container;
+use Elavora\Api\Framework\Contracts\AfterResponseAttribute;
+use Elavora\Api\Framework\Contracts\Responseable;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 final class ResponseableTest extends TestCase

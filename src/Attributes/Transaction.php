@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Attributes;
+namespace Elavora\Api\Framework\Attributes;
 
 use Attribute;
-use Elavora\Framework\Container;
-use Elavora\Framework\Contracts\AfterResponseAttribute;
-use Elavora\Framework\Contracts\BeforeRequestAttribute;
-use Elavora\Framework\Contracts\TransactionManager;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
+use Elavora\Api\Framework\Container;
+use Elavora\Api\Framework\Contracts\AfterResponseAttribute;
+use Elavora\Api\Framework\Contracts\BeforeRequestAttribute;
+use Elavora\Api\Framework\Contracts\TransactionManager;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
 use RuntimeException;
 
 #[Attribute(Attribute::TARGET_METHOD)]

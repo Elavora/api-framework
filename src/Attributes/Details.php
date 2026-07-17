@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework\Attributes;
+namespace Elavora\Api\Framework\Attributes;
 
 use Attribute;
-use Elavora\Framework\Contracts\HttpAttribute;
+use Elavora\Api\Framework\Contracts\HttpAttribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 /**

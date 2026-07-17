@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Elavora\Framework;
+namespace Elavora\Api\Framework;
 
-use Elavora\Framework\Contracts\Extension;
-use Elavora\Framework\Http\HttpKernel;
-use Elavora\Framework\Http\HttpMethod;
-use Elavora\Framework\Http\Request;
-use Elavora\Framework\Http\Response;
-use Elavora\Framework\Http\ResponseEmitter;
-use Elavora\Framework\Routing\ControllerResolver;
-use Elavora\Framework\Routing\ConventionRouteResolver;
-use Elavora\Framework\Routing\Router;
+use Elavora\Api\Framework\Contracts\Extension;
+use Elavora\Api\Framework\Http\HttpKernel;
+use Elavora\Api\Framework\Http\HttpMethod;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
+use Elavora\Api\Framework\Http\ResponseEmitter;
+use Elavora\Api\Framework\Routing\ControllerResolver;
+use Elavora\Api\Framework\Routing\ConventionRouteResolver;
+use Elavora\Api\Framework\Routing\Router;
 
 /**
  * Ponto principal de configuracao e execucao de uma aplicacao Elavora.
