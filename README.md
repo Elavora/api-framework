@@ -1,5 +1,10 @@
 # Elavora API Framework
 
+[![Packagist Version](https://img.shields.io/packagist/v/elavora/api-framework.svg?style=flat-square)](https://packagist.org/packages/elavora/api-framework)
+[![PHP Version](https://img.shields.io/packagist/php-v/elavora/api-framework.svg?style=flat-square)](https://packagist.org/packages/elavora/api-framework)
+[![Composer Quality](https://github.com/Elavora/api-framework/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/Elavora/api-framework/actions/workflows/quality.yml)
+[![CodeQL](https://github.com/Elavora/api-framework/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/Elavora/api-framework/actions/workflows/codeql.yml)
+[![License](https://img.shields.io/packagist/l/elavora/api-framework.svg?style=flat-square)](LICENSE)
 Nucleo HTTP modular do framework Elavora para criar APIs pequenas, testaveis e extensiveis.
 
 O pacote fornece roteamento, request/response, middleware, container simples, atributos de controller e contratos para modulos opcionais como cache, banco, filas, logs e storage.
