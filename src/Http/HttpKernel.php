@@ -152,8 +152,12 @@ final class HttpKernel
      */
     private function finalizeResponse(Request $request, Response $response): Response
     {
-        return $this->withRequestIdPayload($request, $response)
+        $response = $this->withRequestIdPayload($request, $response)
             ->withHeader('X-Request-Id', $request->requestId());
+
+        return $request->httpMethod() === HttpMethod::Head
+            ? $response->withBody('')
+            : $response;
     }
 
     /**

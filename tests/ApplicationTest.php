@@ -35,7 +35,7 @@ final class ApplicationTest extends TestCase
         $response = $application->handle(new Request(method: 'POST', path: '/health'));
 
         self::assertSame(405, $response->status());
-        self::assertSame('GET', $response->headers()['Allow']);
+        self::assertSame('GET, HEAD', $response->headers()['Allow']);
     }
 
     public function testPreservesIncomingRequestIdInResponseHeader(): void

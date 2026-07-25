@@ -34,7 +34,13 @@ final class Router
      */
     public function match(Request $request): ?Route
     {
-        return $this->routes[$request->path()][$request->method()] ?? null;
+        $routes = $this->routes[$request->path()] ?? [];
+        $route = $routes[$request->method()] ?? null;
+        if ($route !== null || $request->httpMethod() !== HttpMethod::Head) {
+            return $route;
+        }
+
+        return $routes[HttpMethod::Get->value] ?? null;
     }
 
     /**
@@ -44,7 +50,17 @@ final class Router
      */
     public function allowedMethods(string $path): array
     {
-        return array_keys($this->routes[self::normalizePath($path)] ?? []);
+        $methods = array_keys($this->routes[self::normalizePath($path)] ?? []);
+        if (!in_array(HttpMethod::Get->value, $methods, true)
+            || in_array(HttpMethod::Head->value, $methods, true)
+        ) {
+            return $methods;
+        }
+
+        $getPosition = array_search(HttpMethod::Get->value, $methods, true);
+        array_splice($methods, $getPosition + 1, 0, [HttpMethod::Head->value]);
+
+        return $methods;
     }
 
     /**
