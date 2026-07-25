@@ -49,9 +49,12 @@ final class ResponseableTest extends TestCase
     }
 }
 
-final readonly class ResponseableUser implements Responseable
+final class ResponseableUser implements Responseable
 {
-    public function __construct(private string $id, private string $name)
+    public function __construct(
+        private readonly string $id,
+        private readonly string $name
+    )
     {
     }
 
@@ -64,9 +67,9 @@ final readonly class ResponseableUser implements Responseable
     }
 }
 
-final readonly class ResponseableCode implements Responseable
+final class ResponseableCode implements Responseable
 {
-    public function __construct(private string $value)
+    public function __construct(private readonly string $value)
     {
     }
 
