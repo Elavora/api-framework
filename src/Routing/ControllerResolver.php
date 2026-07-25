@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elavora\Api\Framework\Routing;
 
 use Elavora\Api\Framework\Container;
+use Elavora\Api\Framework\Contracts\AfterExceptionAttribute;
 use Elavora\Api\Framework\Contracts\AfterResponseAttribute;
 use Elavora\Api\Framework\Contracts\BeforeRequestAttribute;
 use Elavora\Api\Framework\Contracts\HttpAttribute;
@@ -13,6 +14,7 @@ use Elavora\Api\Framework\Http\Request;
 use Elavora\Api\Framework\Http\Response;
 use ReflectionMethod;
 use RuntimeException;
+use Throwable;
 
 /**
  * Resolve e executa handlers de rota.
@@ -42,19 +44,35 @@ final class ControllerResolver
                 : new $handler[0]();
 
             $method = (string) $handler[1];
-            $validationResponse = $this->validateAttributes($controller, $method, $request);
+            $attributes = $this->attributeInstances($controller, $method);
+            $validationResponse = $this->validateAttributes($attributes, $request);
             if ($validationResponse instanceof Response) {
                 return $validationResponse;
             }
 
-            $beforeResponse = $this->runBeforeAttributes($controller, $method, $request);
-            if ($beforeResponse instanceof Response) {
-                return $beforeResponse;
+            $executedAttributes = [];
+
+            try {
+                foreach ($attributes as $attribute) {
+                    if (!$attribute instanceof BeforeRequestAttribute) {
+                        continue;
+                    }
+
+                    $response = $attribute->before($request, $this->container);
+                    $executedAttributes[] = $attribute;
+                    if ($response instanceof Response) {
+                        return $this->runAfterAttributes($executedAttributes, $request, $response);
+                    }
+                }
+
+                $result = $controller->{$method}($request);
+
+                return $this->runAfterAttributes($attributes, $request, $result);
+            } catch (Throwable $exception) {
+                $this->runAfterExceptionAttributes($executedAttributes, $request, $exception);
+
+                throw $exception;
             }
-
-            $result = $controller->{$method}($request);
-
-            return $this->runAfterAttributes($controller, $method, $request, $result);
         }
 
         if (is_callable($handler)) {
@@ -95,17 +113,17 @@ final class ControllerResolver
         return $options;
     }
 
-    private function validateAttributes(object $controller, string $method, Request $request): ?Response
+    /**
+     * @param list<object> $attributes
+     */
+    private function validateAttributes(array $attributes, Request $request): ?Response
     {
-        $reflection = new ReflectionMethod($controller, $method);
-
-        foreach ($reflection->getAttributes() as $attribute) {
-            $instance = $attribute->newInstance();
-            if (!$instance instanceof RequestValidatorAttribute) {
+        foreach ($attributes as $attribute) {
+            if (!$attribute instanceof RequestValidatorAttribute) {
                 continue;
             }
 
-            $response = $instance->validate($request);
+            $response = $attribute->validate($request);
             if ($response instanceof Response) {
                 return $response;
             }
@@ -114,45 +132,60 @@ final class ControllerResolver
         return null;
     }
 
-    private function runBeforeAttributes(object $controller, string $method, Request $request): ?Response
+    /**
+     * @return list<object>
+     */
+    private function attributeInstances(object $controller, string $method): array
     {
         $reflection = new ReflectionMethod($controller, $method);
 
-        foreach ($reflection->getAttributes() as $attribute) {
-            $instance = $attribute->newInstance();
-            if (!$instance instanceof BeforeRequestAttribute) {
-                continue;
-            }
-
-            $response = $instance->before($request, $this->container);
-            if ($response instanceof Response) {
-                return $response;
-            }
-        }
-
-        return null;
+        return array_map(
+            static fn ($attribute): object => $attribute->newInstance(),
+            $reflection->getAttributes()
+        );
     }
 
-    private function runAfterAttributes(object $controller, string $method, Request $request, mixed $result): mixed
+    /**
+     * @param list<object> $attributes
+     */
+    private function runAfterAttributes(array $attributes, Request $request, mixed $result): mixed
     {
-        $reflection = new ReflectionMethod($controller, $method);
-        $attributes = array_reverse($reflection->getAttributes());
         $response = null;
 
-        foreach ($attributes as $attribute) {
-            $instance = $attribute->newInstance();
-            if (!$instance instanceof AfterResponseAttribute) {
+        foreach (array_reverse($attributes) as $attribute) {
+            if (!$attribute instanceof AfterResponseAttribute) {
                 continue;
             }
 
             $response ??= $this->responseFromResult($result);
-            $replacement = $instance->after($request, $response, $this->container);
+            $replacement = $attribute->after($request, $response, $this->container);
             if ($replacement instanceof Response) {
                 $response = $replacement;
             }
         }
 
         return $response ?? $result;
+    }
+
+    /**
+     * @param list<object> $attributes
+     */
+    private function runAfterExceptionAttributes(
+        array $attributes,
+        Request $request,
+        Throwable $exception
+    ): void {
+        foreach (array_reverse($attributes) as $attribute) {
+            if (!$attribute instanceof AfterExceptionAttribute) {
+                continue;
+            }
+
+            try {
+                $attribute->afterException($request, $exception, $this->container);
+            } catch (Throwable) {
+                // A finalizacao nao pode ocultar a excecao que interrompeu a request.
+            }
+        }
     }
 
     private function responseFromResult(mixed $result): Response
