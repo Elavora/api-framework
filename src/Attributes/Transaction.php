@@ -6,12 +6,14 @@ namespace Elavora\Api\Framework\Attributes;
 
 use Attribute;
 use Elavora\Api\Framework\Container;
+use Elavora\Api\Framework\Contracts\AfterExceptionAttribute;
 use Elavora\Api\Framework\Contracts\AfterResponseAttribute;
 use Elavora\Api\Framework\Contracts\BeforeRequestAttribute;
 use Elavora\Api\Framework\Contracts\TransactionManager;
 use Elavora\Api\Framework\Http\Request;
 use Elavora\Api\Framework\Http\Response;
 use RuntimeException;
+use Throwable;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 /**
@@ -20,14 +22,19 @@ use RuntimeException;
  * Usa o TransactionManager registrado no container. Respostas 2xx confirmam a
  * transacao; outras respostas fazem rollback.
  */
-final class Transaction implements BeforeRequestAttribute, AfterResponseAttribute
+final class Transaction implements BeforeRequestAttribute, AfterResponseAttribute, AfterExceptionAttribute
 {
+    private ?TransactionManager $activeTransactionManager = null;
+
     /**
      * Inicia a transacao antes da action.
      */
     public function before(Request $request, Container $container): ?Response
     {
-        $this->transactionManager($container)->begin();
+        $transactionManager = $this->transactionManager($container);
+        if ($transactionManager->begin()) {
+            $this->activeTransactionManager = $transactionManager;
+        }
 
         return null;
     }
@@ -37,16 +44,28 @@ final class Transaction implements BeforeRequestAttribute, AfterResponseAttribut
      */
     public function after(Request $request, Response $response, Container $container): ?Response
     {
-        $transactionManager = $this->transactionManager($container);
-
-        if ($response->status() >= 200 && $response->status() < 300) {
-            $transactionManager->commit();
+        if ($this->activeTransactionManager === null) {
             return null;
         }
 
-        $transactionManager->rollback();
+        if ($response->status() >= 200 && $response->status() < 300) {
+            $this->activeTransactionManager->commit();
+            $this->activeTransactionManager = null;
+
+            return null;
+        }
+
+        $this->rollback();
 
         return null;
+    }
+
+    /**
+     * Desfaz a transacao quando a action ou outro hook falha.
+     */
+    public function afterException(Request $request, Throwable $exception, Container $container): void
+    {
+        $this->rollback();
     }
 
     /**
@@ -69,6 +88,22 @@ final class Transaction implements BeforeRequestAttribute, AfterResponseAttribut
         }
 
         return $transactionManager;
+    }
+
+    private function rollback(): void
+    {
+        if ($this->activeTransactionManager === null) {
+            return;
+        }
+
+        $transactionManager = $this->activeTransactionManager;
+        $this->activeTransactionManager = null;
+
+        try {
+            $transactionManager->rollback();
+        } catch (Throwable) {
+            // A falha de limpeza nao pode substituir a resposta ou excecao original.
+        }
     }
 }
 
