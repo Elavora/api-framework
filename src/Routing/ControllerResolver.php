@@ -94,11 +94,7 @@ final class ControllerResolver
             return [];
         }
 
-        $controller = $this->container->has($handler[0])
-            ? $this->container->get($handler[0])
-            : new $handler[0]();
-
-        $reflection = new ReflectionMethod($controller, (string) $handler[1]);
+        $reflection = new ReflectionMethod($handler[0], (string) $handler[1]);
         $options = [];
 
         foreach ($reflection->getAttributes() as $attribute) {

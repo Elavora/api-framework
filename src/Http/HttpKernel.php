@@ -93,6 +93,18 @@ final class HttpKernel
                 return Response::notFound();
             }
 
+            if ($request->method() === 'OPTIONS') {
+                $attributes = $this->controllerResolver->options($conventionHandler);
+                $headers = isset($attributes['methods']) && is_array($attributes['methods'])
+                    ? ['Allow' => implode(', ', $attributes['methods'])]
+                    : [];
+
+                return Response::json(
+                    payload: ['attributes' => $attributes],
+                    headers: $headers
+                );
+            }
+
             return Response::fromResult(
                 $this->controllerResolver->invoke($conventionHandler, $request)
             );

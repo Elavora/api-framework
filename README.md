@@ -79,6 +79,31 @@ final class UserController
 }
 ```
 
+### Rotas por convencao
+
+O fallback `/controller/action` exige `#[Action]` no metodo exposto. O atributo
+torna o opt-in HTTP explicito e impede que helpers publicos, metodos estaticos ou
+herdados sejam publicados acidentalmente.
+
+```php
+use Elavora\Api\Framework\Attributes\Action;
+use Elavora\Api\Framework\Attributes\Method;
+
+final class UserController
+{
+    #[Action]
+    #[Method('GET')]
+    public function index(Request $request): Response
+    {
+        return Response::json(['users' => []]);
+    }
+}
+```
+
+Ao atualizar de uma versao anterior, adicione `#[Action]` a cada metodo que deve
+continuar acessivel por convencao. Rotas registradas explicitamente nao exigem o
+atributo.
+
 ## Request
 
 `Request` normaliza metodo, path, query string, corpo, headers e request id.
@@ -150,6 +175,7 @@ final class UserController
 
 Atributos disponiveis:
 
+- `Action`: autoriza a exposicao da action pelo roteamento por convencao.
 - `Method`: restringe o metodo HTTP aceito.
 - `RequiredFields`: valida campos obrigatorios do corpo.
 - `OptionalFields`: descreve campos opcionais do corpo.

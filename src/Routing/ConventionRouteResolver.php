@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elavora\Api\Framework\Routing;
 
+use Elavora\Api\Framework\Attributes\Action;
 use Elavora\Api\Framework\Http\Request;
 use ReflectionMethod;
 
@@ -46,7 +47,14 @@ final class ConventionRouteResolver
         }
 
         $reflection = new ReflectionMethod($controllerClass, $action);
-        if (!$reflection->isPublic() || $reflection->isConstructor() || $reflection->isDestructor()) {
+        if (
+            !$reflection->isPublic()
+            || $reflection->isStatic()
+            || $reflection->isConstructor()
+            || $reflection->isDestructor()
+            || $reflection->getDeclaringClass()->getName() !== $controllerClass
+            || $reflection->getAttributes(Action::class) === []
+        ) {
             return null;
         }
 
