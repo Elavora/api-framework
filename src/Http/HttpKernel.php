@@ -51,25 +51,27 @@ final class HttpKernel
      */
     public function handle(Request $request): Response
     {
-        $dispatcher = fn (Request $incoming): Response => $this->dispatch($incoming);
+        return RequestContext::run($request->requestId(), function () use ($request): Response {
+            $dispatcher = fn (Request $incoming): Response => $this->dispatch($incoming);
 
-        foreach (array_reverse($this->middleware) as $middleware) {
-            $next = $dispatcher;
-            $dispatcher = fn (Request $incoming): Response => $middleware($incoming, $next);
-        }
-
-        try {
-            if ($request->bodyError() !== null) {
-                return $this->finalizeResponse(
-                    $request,
-                    Response::badRequest($request->bodyError())
-                );
+            foreach (array_reverse($this->middleware) as $middleware) {
+                $next = $dispatcher;
+                $dispatcher = fn (Request $incoming): Response => $middleware($incoming, $next);
             }
 
-            return $this->finalizeResponse($request, $dispatcher($request));
-        } catch (Throwable $exception) {
-            return $this->finalizeResponse($request, $this->exceptionResponse($exception));
-        }
+            try {
+                if ($request->bodyError() !== null) {
+                    return $this->finalizeResponse(
+                        $request,
+                        Response::badRequest($request->bodyError())
+                    );
+                }
+
+                return $this->finalizeResponse($request, $dispatcher($request));
+            } catch (Throwable $exception) {
+                return $this->finalizeResponse($request, $this->exceptionResponse($exception));
+            }
+        });
     }
 
     private function dispatch(Request $request): Response
