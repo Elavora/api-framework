@@ -59,6 +59,13 @@ final class HttpKernel
         }
 
         try {
+            if ($request->bodyError() !== null) {
+                return $this->finalizeResponse(
+                    $request,
+                    Response::badRequest($request->bodyError())
+                );
+            }
+
             return $this->finalizeResponse($request, $dispatcher($request));
         } catch (Throwable $exception) {
             return $this->finalizeResponse($request, $this->exceptionResponse($exception));

@@ -44,12 +44,12 @@ final class RequiredFields implements RequestValidatorAttribute
                 $rule = 'mixed';
             }
 
-            $value = $request->input((string) $field);
-            if ($value === null) {
+            if (!$request->hasInput((string) $field)) {
                 $errors[$field] = 'Field not found';
                 continue;
             }
 
+            $value = $request->input((string) $field);
             if ($rule !== 'mixed' && !ValidationRule::validate($value, $rule)) {
                 $errors[$field] = 'Invalid field type';
             }

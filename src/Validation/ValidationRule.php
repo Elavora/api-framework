@@ -73,11 +73,18 @@ final class ValidationRule
             'email' => is_string($value) && filter_var($value, FILTER_VALIDATE_EMAIL) !== false,
             'url' => is_string($value) && filter_var($value, FILTER_VALIDATE_URL) !== false,
             'base64' => is_string($value) && base64_decode($value, true) !== false,
-            'json' => is_string($value) && json_decode($value) !== null,
+            'json' => is_string($value) && self::isValidJson($value),
             'uuid' => is_string($value)
                 && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1,
             default => false,
         };
+    }
+
+    private static function isValidJson(string $value): bool
+    {
+        json_decode($value);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }
 
