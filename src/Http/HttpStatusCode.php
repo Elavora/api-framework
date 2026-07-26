@@ -58,7 +58,7 @@ enum HttpStatusCode: int
      */
     public function isSuccess(): bool
     {
-        return $this->value >= 200 && $this->value < 300;
+        return $this->value < 300;
     }
 
     /**

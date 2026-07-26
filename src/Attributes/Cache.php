@@ -79,7 +79,9 @@ final class Cache implements BeforeRequestAttribute, AfterResponseAttribute
 
         $cacheStore = $container->get(CacheStore::class);
         if (!$cacheStore instanceof CacheStore) {
-            throw new RuntimeException('CacheStore registrado deve implementar Elavora\\Api\\Contracts\\CacheStore.');
+            throw new RuntimeException(
+                'CacheStore registrado deve implementar Elavora\\Api\\Framework\\Contracts\\CacheStore.'
+            );
         }
 
         return $cacheStore;

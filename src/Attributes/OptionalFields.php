@@ -37,15 +37,11 @@ final class OptionalFields implements RequestValidatorAttribute
         $errors = [];
 
         foreach ($this->fields as $field => $rule) {
-            if (is_int($field)) {
+            if (!$request->hasInput($field)) {
                 continue;
             }
 
-            if (!$request->hasInput((string) $field)) {
-                continue;
-            }
-
-            $value = $request->input((string) $field);
+            $value = $request->input($field);
             if (!ValidationRule::validate($value, $rule)) {
                 $errors[$field] = 'Invalid field type';
             }

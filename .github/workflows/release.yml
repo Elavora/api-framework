@@ -1,0 +1,18 @@
+name: Release
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    uses: Elavora/.github/.github/workflows/release.yml@53066f062df3573aa619a86edfb119cdc43fe386
+    with:
+      package_name: elavora/api-framework
+      automation_ref: 53066f062df3573aa619a86edfb119cdc43fe386
+    secrets: inherit

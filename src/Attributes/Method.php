@@ -29,9 +29,11 @@ final class Method implements RequestValidatorAttribute
      */
     public function __construct(string|HttpMethod ...$methods)
     {
-        $this->methods = array_map(
-            static fn (string|HttpMethod $method): HttpMethod => HttpMethod::fromValue($method),
-            $methods
+        $this->methods = array_values(
+            array_map(
+                static fn (string|HttpMethod $method): HttpMethod => HttpMethod::fromValue($method),
+                $methods
+            )
         );
     }
 
