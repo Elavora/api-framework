@@ -17,26 +17,35 @@ composer require elavora/api-framework
 ## Exemplo rapido
 
 ```php
-use Elavora\Api\Application;
-use Elavora\Api\Http\Request;
-use Elavora\Api\Http\Response;
+<?php
 
-$app = new Application();
+declare(strict_types=1);
+
+use Elavora\Api\Framework\Application;
+use Elavora\Api\Framework\Http\Request;
+use Elavora\Api\Framework\Http\Response;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$app = Application::create();
 
 $app->get('/health', static fn (): Response => Response::json([
     'status' => 'ok',
 ]));
 
-$app->run(Request::fromGlobals());
+$response = $app->handle(Request::fromGlobals());
+$app->emit($response);
 ```
 
 ## Principais pontos de entrada
 
-- `Elavora\Api\Application`
-- `Elavora\Api\Container`
-- `Elavora\Api\Attributes\Cache`
-- `Elavora\Api\Attributes\Details`
-- `Elavora\Api\Attributes\Method`
+- `Elavora\Api\Framework\Application`
+- `Elavora\Api\Framework\Container`
+- `Elavora\Api\Framework\Attributes\Cache`
+- `Elavora\Api\Framework\Attributes\Details`
+- `Elavora\Api\Framework\Attributes\Method`
+- `Elavora\Api\Framework\Http\Request`
+- `Elavora\Api\Framework\Http\Response`
 
 ## Dependencias de runtime
 
@@ -47,8 +56,7 @@ $app->run(Request::fromGlobals());
 Depois de instalar o pacote, rode os testes da aplicacao consumidora. Para uma verificacao isolada do pacote, use container:
 
 ```bash
-docker run --rm -v "${PWD}:/workspace" -w "/workspace/api-framework" composer:2 composer validate --strict --no-check-publish
-docker run --rm -v "${PWD}:/workspace" -w "/workspace/api-framework" composer:2 sh -lc "find . \\( -path ./.git -o -path ./vendor \\) -prune -o -name '*.php' -print0 | xargs -0 -r -n1 php -l"
+docker run --rm -v "${PWD}:/workspace:ro" composer:2 sh -lc "cp -R /workspace /tmp/package && cd /tmp/package && composer install --no-interaction --no-progress && composer check"
 ```
 
 ## Observacoes

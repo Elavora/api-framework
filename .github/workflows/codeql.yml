@@ -2,8 +2,9 @@ name: CodeQL
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
   schedule:
     - cron: "0 9 * * 1"
   workflow_dispatch:
@@ -12,23 +13,7 @@ permissions:
   contents: read
   security-events: write
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  analyze:
-    name: Analyze GitHub Actions
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: actions
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+  codeql:
+    name: CodeQL
+    uses: Elavora/.github/.github/workflows/codeql.yml@53066f062df3573aa619a86edfb119cdc43fe386

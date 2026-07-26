@@ -2,8 +2,9 @@ name: Quality
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
   workflow_dispatch:
 
 permissions:
@@ -15,30 +16,8 @@ concurrency:
 
 jobs:
   quality:
-    name: Composer Quality
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.3"
-          tools: composer:2
-          coverage: none
-          extensions: apcu, json, mongodb, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite, redis
-
-      - name: Validate Composer
-        run: composer validate --strict --no-check-publish
-
-      - name: Install dependencies
-        run: composer update --no-interaction --no-progress --prefer-dist
-
-      - name: Run checks
-        run: |
-          if composer run-script --list | grep -q '^  check'; then
-            composer check
-          else
-            composer test
-          fi
+    name: Quality
+    uses: Elavora/.github/.github/workflows/quality.yml@53066f062df3573aa619a86edfb119cdc43fe386
+    with:
+      extensions: json
+      coverage_min: 80

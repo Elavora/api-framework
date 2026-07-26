@@ -1,0 +1,13 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: Dependency Review
+    uses: Elavora/.github/.github/workflows/dependency-review.yml@53066f062df3573aa619a86edfb119cdc43fe386

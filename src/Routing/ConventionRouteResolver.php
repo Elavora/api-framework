@@ -66,7 +66,10 @@ final class ConventionRouteResolver
      */
     private function segments(string $path): ?array
     {
-        $segments = array_values(array_filter(explode('/', trim($path, '/')), 'strlen'));
+        $segments = array_values(array_filter(
+            explode('/', trim($path, '/')),
+            static fn (string $segment): bool => $segment !== ''
+        ));
         if ($segments === [] || count($segments) > 2) {
             return null;
         }

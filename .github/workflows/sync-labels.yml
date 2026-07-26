@@ -1,0 +1,19 @@
+name: Sync Labels
+
+on:
+  schedule:
+    - cron: "30 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    name: Sync Labels
+    uses: Elavora/.github/.github/workflows/sync-labels.yml@53066f062df3573aa619a86edfb119cdc43fe386
+    with:
+      automation_ref: 53066f062df3573aa619a86edfb119cdc43fe386
+      prune: false
+    secrets: inherit

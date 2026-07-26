@@ -17,7 +17,7 @@ composer require elavora/api-framework
 
 Requisitos:
 
-- PHP 8.1 ou superior
+- PHP 8.3 ou superior
 - extensao `json`
 
 ## Aplicacao minima
