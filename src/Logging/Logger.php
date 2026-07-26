@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elavora\Api\Framework\Logging;
 
 use Elavora\Api\Framework\Contracts\LogWriter;
+use Elavora\Api\Framework\Http\RequestContext;
 use Closure;
 use Throwable;
 
@@ -102,20 +103,7 @@ final class Logger
      */
     private static function defaultRequestIdResolver(): Closure
     {
-        $requestId = null;
-
-        return static function () use (&$requestId): string {
-            if ($requestId !== null) {
-                return $requestId;
-            }
-
-            $header = $_SERVER['HTTP_X_REQUEST_ID'] ?? null;
-            if (is_string($header) && trim($header) !== '') {
-                return $requestId = trim($header);
-            }
-
-            return $requestId = bin2hex(random_bytes(16));
-        };
+        return static fn (): string => RequestContext::requestId();
     }
 }
 

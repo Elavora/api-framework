@@ -15,6 +15,9 @@ use JsonException;
  */
 final class Response
 {
+    /** @var array<string, string> */
+    private readonly array $headers;
+
     /**
      * @param string $body Corpo bruto da resposta.
      * @param int $status Codigo HTTP da resposta.
@@ -23,8 +26,9 @@ final class Response
     public function __construct(
         private readonly string $body = '',
         private readonly int $status = 200,
-        private readonly array $headers = []
+        array $headers = []
     ) {
+        $this->headers = self::normalizeHeaders($headers);
     }
 
     /**
@@ -37,7 +41,7 @@ final class Response
      */
     public static function json(mixed $payload, int $status = 200, array $headers = []): self
     {
-        $headers['Content-Type'] = 'application/json; charset=utf-8';
+        $headers = self::replaceHeader($headers, 'Content-Type', 'application/json; charset=utf-8');
 
         return new self(
             body: json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
@@ -131,7 +135,9 @@ final class Response
      */
     public static function text(string $body, int $status = 200, array $headers = []): self
     {
-        $headers['Content-Type'] ??= 'text/plain; charset=utf-8';
+        if (!self::hasHeader($headers, 'Content-Type')) {
+            $headers['Content-Type'] = 'text/plain; charset=utf-8';
+        }
 
         return new self(body: $body, status: $status, headers: $headers);
     }
@@ -144,7 +150,7 @@ final class Response
         return new self(
             body: $this->body,
             status: $this->status,
-            headers: array_merge($this->headers, [$name => $value])
+            headers: self::replaceHeader($this->headers, $name, $value)
         );
     }
 
@@ -178,6 +184,51 @@ final class Response
     public function headers(): array
     {
         return $this->headers;
+    }
+
+    /**
+     * @param array<string, string> $headers
+     * @return array<string, string>
+     */
+    private static function normalizeHeaders(array $headers): array
+    {
+        $normalized = [];
+        foreach ($headers as $name => $value) {
+            $normalized = self::replaceHeader($normalized, $name, $value);
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param array<string, string> $headers
+     * @return array<string, string>
+     */
+    private static function replaceHeader(array $headers, string $name, string $value): array
+    {
+        foreach (array_keys($headers) as $existingName) {
+            if (strcasecmp($existingName, $name) === 0) {
+                unset($headers[$existingName]);
+            }
+        }
+
+        $headers[$name] = $value;
+
+        return $headers;
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    private static function hasHeader(array $headers, string $name): bool
+    {
+        foreach (array_keys($headers) as $existingName) {
+            if (strcasecmp($existingName, $name) === 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

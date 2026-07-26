@@ -15,6 +15,7 @@ final class Request
     private readonly HttpMethod $method;
     private readonly array $headers;
     private readonly string $requestId;
+    private ?string $bodyError = null;
 
     /**
      * @param string|HttpMethod $method Metodo HTTP recebido.
@@ -40,22 +41,27 @@ final class Request
     /**
      * Cria uma request a partir das variaveis globais do PHP.
      */
-    public static function fromGlobals(): self
+    public static function fromGlobals(?string $rawBody = null): self
     {
         $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
         $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
         $path = (string) (parse_url($uri, PHP_URL_PATH) ?: '/');
-        $rawBody = file_get_contents('php://input');
-        $decoded = is_string($rawBody) && $rawBody !== '' ? json_decode($rawBody, true) : null;
-        $body = is_array($decoded) ? $decoded : (is_array($_POST) ? $_POST : []);
+        $rawBody ??= file_get_contents('php://input');
+        [$body, $bodyError] = self::parseBody(
+            is_string($rawBody) ? $rawBody : '',
+            is_array($_POST) ? $_POST : []
+        );
 
-        return new self(
+        $request = new self(
             method: $method,
             path: $path,
             query: is_array($_GET) ? $_GET : [],
             body: $body,
             headers: self::headersFromServer($_SERVER)
         );
+        $request->bodyError = $bodyError;
+
+        return $request;
     }
 
     /**
@@ -93,7 +99,17 @@ final class Request
      */
     public function query(?string $key = null, mixed $default = null): mixed
     {
-        return $key === null ? $this->query : ($this->query[$key] ?? $default);
+        return $key === null
+            ? $this->query
+            : (array_key_exists($key, $this->query) ? $this->query[$key] : $default);
+    }
+
+    /**
+     * Verifica se um parametro existe na query string, mesmo quando seu valor e null.
+     */
+    public function hasQuery(string $key): bool
+    {
+        return array_key_exists($key, $this->query);
     }
 
     /**
@@ -105,7 +121,25 @@ final class Request
      */
     public function input(?string $key = null, mixed $default = null): mixed
     {
-        return $key === null ? $this->body : ($this->body[$key] ?? $default);
+        return $key === null
+            ? $this->body
+            : (array_key_exists($key, $this->body) ? $this->body[$key] : $default);
+    }
+
+    /**
+     * Verifica se um campo existe no corpo, mesmo quando seu valor e null.
+     */
+    public function hasInput(string $key): bool
+    {
+        return array_key_exists($key, $this->body);
+    }
+
+    /**
+     * Retorna o erro detectado ao decodificar o corpo recebido, quando houver.
+     */
+    public function bodyError(): ?string
+    {
+        return $this->bodyError;
     }
 
     /**
@@ -164,6 +198,32 @@ final class Request
         }
 
         return bin2hex(random_bytes(16));
+    }
+
+    /**
+     * @param array<string, mixed> $formBody
+     * @return array{0: array<string|int, mixed>, 1: string|null}
+     */
+    private static function parseBody(string $rawBody, array $formBody): array
+    {
+        if ($rawBody === '') {
+            return [$formBody, null];
+        }
+
+        $decoded = json_decode($rawBody, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (is_array($decoded)) {
+                return [$decoded, null];
+            }
+
+            return [[], 'JSON body must be an object or array'];
+        }
+
+        if ($formBody !== []) {
+            return [$formBody, null];
+        }
+
+        return [[], 'Malformed JSON body'];
     }
 }
 

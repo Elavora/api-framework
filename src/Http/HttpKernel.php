@@ -51,18 +51,27 @@ final class HttpKernel
      */
     public function handle(Request $request): Response
     {
-        $dispatcher = fn (Request $incoming): Response => $this->dispatch($incoming);
+        return RequestContext::run($request->requestId(), function () use ($request): Response {
+            $dispatcher = fn (Request $incoming): Response => $this->dispatch($incoming);
 
-        foreach (array_reverse($this->middleware) as $middleware) {
-            $next = $dispatcher;
-            $dispatcher = fn (Request $incoming): Response => $middleware($incoming, $next);
-        }
+            foreach (array_reverse($this->middleware) as $middleware) {
+                $next = $dispatcher;
+                $dispatcher = fn (Request $incoming): Response => $middleware($incoming, $next);
+            }
 
-        try {
-            return $this->finalizeResponse($request, $dispatcher($request));
-        } catch (Throwable $exception) {
-            return $this->finalizeResponse($request, $this->exceptionResponse($exception));
-        }
+            try {
+                if ($request->bodyError() !== null) {
+                    return $this->finalizeResponse(
+                        $request,
+                        Response::badRequest($request->bodyError())
+                    );
+                }
+
+                return $this->finalizeResponse($request, $dispatcher($request));
+            } catch (Throwable $exception) {
+                return $this->finalizeResponse($request, $this->exceptionResponse($exception));
+            }
+        });
     }
 
     private function dispatch(Request $request): Response
@@ -91,6 +100,18 @@ final class HttpKernel
             $conventionHandler = $this->conventionRouteResolver->resolve($request);
             if ($conventionHandler === null) {
                 return Response::notFound();
+            }
+
+            if ($request->method() === 'OPTIONS') {
+                $attributes = $this->controllerResolver->options($conventionHandler);
+                $headers = isset($attributes['methods']) && is_array($attributes['methods'])
+                    ? ['Allow' => implode(', ', $attributes['methods'])]
+                    : [];
+
+                return Response::json(
+                    payload: ['attributes' => $attributes],
+                    headers: $headers
+                );
             }
 
             return Response::fromResult(
@@ -131,8 +152,12 @@ final class HttpKernel
      */
     private function finalizeResponse(Request $request, Response $response): Response
     {
-        return $this->withRequestIdPayload($request, $response)
+        $response = $this->withRequestIdPayload($request, $response)
             ->withHeader('X-Request-Id', $request->requestId());
+
+        return $request->httpMethod() === HttpMethod::Head
+            ? $response->withBody('')
+            : $response;
     }
 
     /**

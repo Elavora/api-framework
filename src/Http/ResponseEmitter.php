@@ -19,7 +19,16 @@ final class ResponseEmitter
             header($name . ': ' . $value);
         }
 
-        echo $response->body();
+        if ($this->allowsBody($response->status())) {
+            echo $response->body();
+        }
+    }
+
+    private function allowsBody(int $status): bool
+    {
+        return ($status < 100 || $status >= 200)
+            && $status !== 204
+            && $status !== 304;
     }
 }
 

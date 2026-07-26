@@ -41,11 +41,11 @@ final class OptionalFields implements RequestValidatorAttribute
                 continue;
             }
 
-            $value = $request->input((string) $field);
-            if ($value === null) {
+            if (!$request->hasInput((string) $field)) {
                 continue;
             }
 
+            $value = $request->input((string) $field);
             if (!ValidationRule::validate($value, $rule)) {
                 $errors[$field] = 'Invalid field type';
             }
