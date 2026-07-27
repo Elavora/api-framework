@@ -13,6 +13,7 @@ namespace Elavora\Api\Framework\Http;
 final class Request
 {
     private readonly HttpMethod $method;
+    /** @var array<string, string> */
     private readonly array $headers;
     private readonly string $requestId;
     private ?string $bodyError = null;
@@ -20,9 +21,9 @@ final class Request
     /**
      * @param string|HttpMethod $method Metodo HTTP recebido.
      * @param string $path Path da request, com ou sem barra inicial.
-     * @param array<string, mixed> $query Parametros de query string.
-     * @param array<string, mixed> $body Corpo decodificado da request.
-     * @param array<string, string> $headers Headers HTTP.
+     * @param array<array-key, mixed> $query Parametros de query string.
+     * @param array<array-key, mixed> $body Corpo decodificado da request.
+     * @param array<array-key, mixed> $headers Headers HTTP.
      * @param string|null $requestId Identificador da request. Se omitido, usa X-Request-Id ou gera um novo.
      */
     public function __construct(
@@ -49,13 +50,13 @@ final class Request
         $rawBody ??= file_get_contents('php://input');
         [$body, $bodyError] = self::parseBody(
             is_string($rawBody) ? $rawBody : '',
-            is_array($_POST) ? $_POST : []
+            $_POST
         );
 
         $request = new self(
             method: $method,
             path: $path,
-            query: is_array($_GET) ? $_GET : [],
+            query: $_GET,
             body: $body,
             headers: self::headersFromServer($_SERVER)
         );
@@ -161,6 +162,10 @@ final class Request
         return $this->requestId;
     }
 
+    /**
+     * @param array<array-key, mixed> $server
+     * @return array<string, string>
+     */
     private static function headersFromServer(array $server): array
     {
         $headers = [];
@@ -176,6 +181,10 @@ final class Request
         return $headers;
     }
 
+    /**
+     * @param array<array-key, mixed> $headers
+     * @return array<string, string>
+     */
     private static function normalizeHeaders(array $headers): array
     {
         $normalized = [];
@@ -190,6 +199,9 @@ final class Request
         return $normalized;
     }
 
+    /**
+     * @param array<string, string> $headers
+     */
     private static function resolveRequestId(array $headers, ?string $requestId): string
     {
         $requestId = trim((string) ($requestId ?? $headers['x-request-id'] ?? ''));
@@ -201,8 +213,8 @@ final class Request
     }
 
     /**
-     * @param array<string, mixed> $formBody
-     * @return array{0: array<string|int, mixed>, 1: string|null}
+     * @param array<array-key, mixed> $formBody
+     * @return array{0: array<array-key, mixed>, 1: string|null}
      */
     private static function parseBody(string $rawBody, array $formBody): array
     {

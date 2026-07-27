@@ -70,6 +70,9 @@ final class RequiredFields implements RequestValidatorAttribute
         return ['fields' => $this->describeFields()];
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function describeFields(): array
     {
         $fields = [];

@@ -84,7 +84,10 @@ final class Transaction implements BeforeRequestAttribute, AfterResponseAttribut
 
         $transactionManager = $container->get(TransactionManager::class);
         if (!$transactionManager instanceof TransactionManager) {
-            throw new RuntimeException('TransactionManager registrado deve implementar Elavora\\Api\\Contracts\\TransactionManager.');
+            throw new RuntimeException(
+                'TransactionManager registrado deve implementar '
+                . 'Elavora\\Api\\Framework\\Contracts\\TransactionManager.'
+            );
         }
 
         return $transactionManager;
