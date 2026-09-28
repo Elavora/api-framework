@@ -242,3 +242,7 @@ composer lint
 ## Licenca
 
 MIT
+
+## Bootstrap para projetos Skeleton
+
+Veja [bootstrap compartilhado](docs/BOOTSTRAP.md) para inicializar extensoes oficiais, rotas e customizacoes do projeto com configuracao atualizavel via Composer.
