@@ -68,6 +68,75 @@ final class EnvironmentExtensionsTest extends TestCase
         self::assertSame(['custom' => true], (array) $app->container()->get('official.config'));
     }
 
+    public static function cacheTtls(): iterable
+    {
+        foreach (['apcu', 'redis'] as $driver) {
+            yield "$driver absent" => [$driver, null, null];
+            yield "$driver empty" => [$driver, '', null];
+            yield "$driver positive" => [$driver, '60', 60];
+            yield "$driver zero" => [$driver, '0', 0];
+            yield "$driver negative" => [$driver, '-1', -1];
+        }
+    }
+
+    #[DataProvider('cacheTtls')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testForwardsConfiguredTtlToBothCacheDrivers(string $driver, ?string $value, ?int $expected): void
+    {
+        $class = $driver === 'redis' ? 'CacheRedis\\RedisCacheExtension' : 'CacheApcu\\ApcuCacheExtension';
+        class_alias(ConfiguredExtensionSpy::class, 'Elavora\\Api\\Extension\\' . $class);
+        $environment = ['CACHE_DRIVER' => $driver];
+        if ($value !== null) {
+            $environment['CACHE_TTL'] = $value;
+        }
+
+        $extensions = EnvironmentExtensions::load('/project', $environment);
+        self::assertCount(1, $extensions);
+        if ($expected === null) {
+            self::assertArrayNotHasKey('ttl', $extensions[0]->config);
+        } else {
+            self::assertSame($expected, $extensions[0]->config['ttl'] ?? null);
+        }
+    }
+    public static function databasePasswords(): iterable
+    {
+        foreach (['mysql', 'postgresql'] as $driver) {
+            yield "$driver absent" => [$driver, null, ''];
+            yield "$driver empty" => [$driver, '', ''];
+            yield "$driver zero" => [$driver, '0', '0'];
+            yield "$driver password" => [$driver, 'secret', 'secret'];
+        }
+    }
+
+    #[DataProvider('databasePasswords')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testPreservesDatabasePasswordFromMapAndProcess(string $driver, ?string $value, string $expected): void
+    {
+        $class = $driver === 'mysql' ? 'DatabaseMySql\\MySqlExtension' : 'DatabasePostgreSql\\PostgreSqlExtension';
+        class_alias(ConfiguredExtensionSpy::class, 'Elavora\\Api\\Extension\\' . $class);
+        $environment = ['DB_DRIVER' => $driver];
+        if ($value !== null) {
+            $environment['DB_PASSWORD'] = $value;
+        }
+        $extensions = EnvironmentExtensions::load('/project', $environment);
+        self::assertSame($expected, $extensions[0]->config['password']);
+
+        $previous = [];
+        foreach (['DB_DRIVER', 'DB_PASSWORD', 'CACHE_DRIVER', 'LOG_DRIVER'] as $key) {
+            $previous[$key] = getenv($key);
+            putenv(array_key_exists($key, $environment) ? $key . '=' . $environment[$key] : $key);
+        }
+        try {
+            $extensions = EnvironmentExtensions::load('/project');
+            self::assertSame($expected, $extensions[0]->config['password']);
+        } finally {
+            foreach ($previous as $key => $original) {
+                putenv($original === false ? $key : $key . '=' . $original);
+            }
+        }
+    }
     public function testUnsupportedDriversFailExplicitly(): void
     {
         foreach (['CACHE_DRIVER', 'DB_DRIVER', 'LOG_DRIVER'] as $key) {

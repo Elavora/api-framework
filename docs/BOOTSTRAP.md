@@ -50,3 +50,5 @@ os registros oficiais que agora serao carregados pelo ambiente, evitando duplica
 Esta API nao modifica arquivos do consumidor e nao depende do namespace App.
 O worker permanece implementado no pacote opcional api-queue-worker; o projeto
 continua fornecendo o registro de tarefas.
+
+CACHE_TTL e encaminhado como ttl tanto ao APCu quanto ao Redis quando definido e nao vazio. Valores zero e negativos sao preservados para o driver aplicar sua semantica. Sem a variavel, o default do pacote permanece em vigor.

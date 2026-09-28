@@ -40,7 +40,7 @@ final class ApplicationBootstrapTest extends TestCase
         putenv('APP_DEBUG=true');
         try {
             foreach ([null, [], ['APP_DEBUG' => 'true'], ['APP_DEBUG' => 'false']] as $environment) {
-                $app = ApplicationBootstrap::create('/project', environment: $environment);
+                $app = ApplicationBootstrap::create('/project', environment: $environment, loadEnvironmentExtensions: false);
                 $app->get('/error', static function (): never {
                     throw new \RuntimeException('private detail');
                 });

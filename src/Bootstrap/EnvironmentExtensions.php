@@ -51,6 +51,14 @@ final class EnvironmentExtensions
             throw new RuntimeException('CACHE_DRIVER deve ser apcu ou redis.');
         }
 
+        $cacheConfig = [
+            'prefix' => $read('CACHE_PREFIX') ?: 'api:cache:',
+        ];
+        $cacheTtl = $read('CACHE_TTL');
+        if ($cacheTtl !== false && $cacheTtl !== '') {
+            $cacheConfig['ttl'] = (int) $cacheTtl;
+        }
+
         $redisPassword = $read('REDIS_PASSWORD');
         $redisPassword = $redisPassword === false || $redisPassword === '' ? null : $redisPassword;
         $redisDatabase = $read('REDIS_DATABASE');
@@ -65,19 +73,11 @@ final class EnvironmentExtensions
                     'port' => (int) ($read('REDIS_PORT') ?: 6379),
                     'password' => $redisPassword,
                     'database' => $redisDatabase,
-                    'prefix' => $read('CACHE_PREFIX') ?: 'api:cache:',
-                ]
+                ] + $cacheConfig
             );
         }
 
         if ($cacheDriver === 'apcu') {
-            $cacheConfig = [
-                'prefix' => $read('CACHE_PREFIX') ?: 'api:cache:',
-            ];
-            $cacheTtl = $read('CACHE_TTL');
-            if ($cacheTtl !== false && $cacheTtl !== '') {
-                $cacheConfig['ttl'] = (int) $cacheTtl;
-            }
 
             $extensions[] = $createExtension(
                 'Elavora\Api\Extension\CacheApcu\ApcuCacheExtension',
@@ -106,12 +106,13 @@ final class EnvironmentExtensions
             throw new RuntimeException('DB_DRIVER deve ser mysql ou postgresql.');
         }
 
+        $databasePassword = $read('DB_PASSWORD');
         $databaseConfig = [
             'host' => $read('DB_HOST') ?: $databaseDriver,
             'port' => (int) ($read('DB_PORT') ?: ($databaseDriver === 'mysql' ? 3306 : 5432)),
             'database' => $read('DB_DATABASE') ?: 'app',
             'username' => $read('DB_USERNAME') ?: 'app',
-            'password' => $read('DB_PASSWORD') ?: '',
+            'password' => $databasePassword === false ? '' : $databasePassword,
         ];
 
         if ($databaseDriver === 'mysql') {
