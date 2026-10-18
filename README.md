@@ -2,7 +2,7 @@
 
 [![Packagist Version](https://img.shields.io/packagist/v/elavora/api-framework.svg?style=flat-square)](https://packagist.org/packages/elavora/api-framework)
 [![PHP Version](https://img.shields.io/packagist/php-v/elavora/api-framework.svg?style=flat-square)](https://packagist.org/packages/elavora/api-framework)
-[![Composer Quality](https://github.com/Elavora/api-framework/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/Elavora/api-framework/actions/workflows/quality.yml)
+[![Qualidade](https://github.com/Elavora/api-framework/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/Elavora/api-framework/actions/workflows/quality.yml)
 [![CodeQL](https://github.com/Elavora/api-framework/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/Elavora/api-framework/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/packagist/l/elavora/api-framework.svg?style=flat-square)](LICENSE)
 Nucleo HTTP modular do framework Elavora para criar APIs pequenas, testaveis e extensiveis.
@@ -229,20 +229,62 @@ Erros inesperados retornam `500 Internal Server Error` sem expor detalhes sensiv
 $app = Application::create(debug: true);
 ```
 
-## Testes
+## Bootstrap para projetos Skeleton
 
-O pacote possui scripts Composer para validar sintaxe e executar a suite:
+Veja [bootstrap compartilhado](docs/BOOTSTRAP.md) para inicializar extensoes oficiais, rotas e customizacoes do projeto com configuracao atualizavel via Composer.
+
+## Desenvolvimento e testes
+
+O ambiente de desenvolvimento é a imagem `ghcr.io/elavora/php-dev:8.3-0.3.0`, a mesma do CI. Você só precisa de
+Docker: abra o repositório no VS Code com **Dev Containers: Reopen in Container**, ou rode no PowerShell:
+
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.3-0.3.0 sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
+```
+
+Scripts Composer disponíveis:
 
 ```bash
-composer check
-composer test
-composer lint
+composer check   # lint, testes e PHPStan
+composer test    # testes PHPUnit
+composer lint    # sintaxe
 ```
+
+O código segue o padrão PER-CS, com as regras do pacote `elavora/code-standards`. No devcontainer, o arquivo é
+formatado ao salvar; no PR, o CI formata o que faltou e commita a correção (`style: organiza o código`).
+
+O passo a passo está em [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md).
+
+## Como contribuir
+
+1. Crie uma branch a partir da `main` (`feat/...` ou `fix/...`).
+2. Faça commits em português do Brasil, no padrão Conventional Commits (`feat: ...`, `fix: ...`, `docs: ...`).
+3. Rode `composer check` antes de abrir o PR.
+4. Abra o PR para a `main`, preencha o template e aplique as labels que definem a versão
+   ([Qual label usar](docs/RELEASE.md#qual-label-usar)).
+5. Confira o comentário do pipeline de qualidade no PR. Ele não bloqueia o merge, mas quem revisa olha o resultado.
+
+Um guia de contribuição mais completo (`CONTRIBUTING.md`) será escrito no futuro.
+
+## Versões
+
+Cada PR integrado na `main` gera uma versão automaticamente, conforme as labels do PR: sem a label `release` sai uma
+beta (`2.1.0-beta.1`), com ela sai a estável (`2.1.0`). As tags novas não têm o prefixo `v`, e as notas de cada
+GitHub Release são geradas em português a partir dos PRs. Veja
+[Versões e publicação](docs/RELEASE.md).
+
+## Documentação
+
+Leia nesta ordem:
+
+1. [Guia de uso](docs/USO.md): instalação, quando usar e os principais pontos de entrada.
+2. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
+3. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
+   no CI.
+4. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
+5. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
+   arquivo.
 
 ## Licenca
 
 MIT
-
-## Bootstrap para projetos Skeleton
-
-Veja [bootstrap compartilhado](docs/BOOTSTRAP.md) para inicializar extensoes oficiais, rotas e customizacoes do projeto com configuracao atualizavel via Composer.

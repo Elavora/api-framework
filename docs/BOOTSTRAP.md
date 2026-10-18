@@ -52,3 +52,7 @@ O worker permanece implementado no pacote opcional api-queue-worker; o projeto
 continua fornecendo o registro de tarefas.
 
 CACHE_TTL e encaminhado como ttl tanto ao APCu quanto ao Redis quando definido e nao vazio. Valores zero e negativos sao preservados para o driver aplicar sua semantica. Sem a variavel, o default do pacote permanece em vigor.
+
+---
+
+[README](../README.md) · Anterior: [Guia de uso](USO.md) · Próximo: [Ambiente de desenvolvimento e testes](DESENVOLVIMENTO.md)
