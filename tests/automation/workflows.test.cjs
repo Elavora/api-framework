@@ -66,8 +66,6 @@ const QUALITY = h.lines([
     '      pull-requests: write',
     '      id-token: write',
     '    uses: Elavora/.github/.github/workflows/php-quality.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0',
-    '    with:',
-    '      image: ghcr.io/elavora/php-dev:8.3-0.3.0',
 ]);
 
 const CODEQL = h.lines([
@@ -190,12 +188,14 @@ test.describe('sync-labels.yml', () => {
 });
 
 test.describe('quality.yml', () => {
-    test('job quality chama php-quality.yml só com a imagem', () => {
+    test('job quality chama php-quality.yml sem with nem image', () => {
         const text = h.read('.github/workflows/quality.yml');
         const jobs = h.splitJobs(text);
         assert.deepEqual(Object.keys(jobs), ['quality']);
         assert.match(jobs.quality, /uses: Elavora\/\.github\/\.github\/workflows\/php-quality\.yml@/);
-        assert.match(jobs.quality, /^\s+image: ghcr\.io\/elavora\/php-dev:8\.3-0\.3\.0$/m);
+        assert.doesNotMatch(jobs.quality, /^\s*with:/m);
+        assert.doesNotMatch(jobs.quality, /^\s*image:/m);
+        assert.ok(text.endsWith(' # 1.2.0\n'), 'quality.yml deveria terminar na linha do uses:');
         assert.match(jobs.quality, /contents: write/);
         assert.match(jobs.quality, /pull-requests: write/);
     });
@@ -242,6 +242,20 @@ test.describe('regras gerais dos workflows', () => {
             assert.doesNotMatch(text, /automation_ref/, file);
             assert.doesNotMatch(text, /secrets:\s*inherit/, file);
         }
+    });
+
+    test('nenhum chamador de Elavora/.github passa image nem automation_ref', () => {
+        let found = 0;
+        for (const file of h.workflowFiles()) {
+            const jobs = h.splitJobs(h.read(file));
+            for (const [id, body] of Object.entries(jobs)) {
+                if (!/uses:\s*Elavora\/\.github\//.test(body)) continue;
+                found++;
+                assert.doesNotMatch(body, /^\s*image:/m, `${file}: job ${id} passa a entrada image`);
+                assert.doesNotMatch(body, /automation_ref/, `${file}: job ${id} passa automation_ref`);
+            }
+        }
+        assert.ok(found >= 3, 'esperados pelo menos três chamadores centrais (release, sync-labels, quality)');
     });
 
     test('todo job que chama Elavora/.github concede id-token: write', () => {

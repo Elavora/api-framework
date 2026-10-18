@@ -8,7 +8,7 @@ const FILE = '.devcontainer/devcontainer.json';
 
 const EXPECTED = {
     name: 'Elavora PHP 8.3',
-    image: 'ghcr.io/elavora/php-dev:8.3-0.3.0',
+    image: 'ghcr.io/elavora/php-dev:8.3-latest',
     remoteUser: 'vscode',
     postCreateCommand:
         'git config --global --add safe.directory "$(pwd)" && composer install --no-interaction --prefer-dist',
@@ -45,17 +45,20 @@ test.describe('.devcontainer/devcontainer.json', () => {
         assert.deepEqual(load(), EXPECTED);
     });
 
-    test('image é a versão fixa 8.3-0.3.0, nunca tag móvel nem nome local', () => {
+    test('image é a tag 8.3-latest, nunca versão fixa, outra tag móvel nem nome local', () => {
         const { image } = load();
         assert.equal(image, h.IMAGE);
+        assert.equal(image, 'ghcr.io/elavora/php-dev:8.3-latest');
         for (const bad of [
+            'ghcr.io/elavora/php-dev:8.3-0.3.0',
+            'ghcr.io/elavora/php-dev:8.3-0.2.0',
             'ghcr.io/elavora/php-dev:8.3',
             'ghcr.io/elavora/php-dev:latest',
-            'ghcr.io/elavora/php-dev:8.3-latest',
             'elavora/php-dev:8.3',
         ]) {
             assert.notEqual(image, bad);
         }
+        assert.doesNotMatch(image, /^ghcr\.io\/elavora\/php-dev:8\.3-\d+\.\d+\.\d+$/);
     });
 
     test('remoteUser vscode e postCreateCommand com composer install', () => {
@@ -71,10 +74,9 @@ test.describe('.devcontainer/devcontainer.json', () => {
         assert.equal(vs.settings['[php]']['editor.formatOnSave'], true);
     });
 
-    test('a imagem do devcontainer é a mesma passada ao quality.yml', () => {
+    test('o quality.yml não passa a imagem: o CI usa o padrão do pipeline central', () => {
         const quality = h.read('.github/workflows/quality.yml');
-        const m = quality.match(/^\s+image:\s*(\S+)\s*$/m);
-        assert.ok(m, 'quality.yml sem entrada image');
-        assert.equal(m[1], load().image);
+        assert.doesNotMatch(quality, /^\s+image:/m, 'quality.yml não deveria passar a entrada image');
+        assert.doesNotMatch(quality, /php-dev/, 'quality.yml não deveria citar a imagem');
     });
 });

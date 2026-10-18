@@ -6,7 +6,7 @@ const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const SHA_120 = '3e8259291c0d3f7c031695fe63d714169792c454';
 const OLD_SHA = '1e0f42a92a4aafc35522709c30bc4e83acab82f1';
-const IMAGE = 'ghcr.io/elavora/php-dev:8.3-0.3.0';
+const IMAGE = 'ghcr.io/elavora/php-dev:8.3-latest';
 const CENTRAL_SUFFIX = `@${SHA_120} # 1.2.0`;
 
 function abs(rel) {
