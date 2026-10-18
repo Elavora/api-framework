@@ -23,9 +23,7 @@ final class OptionalParams implements RequestValidatorAttribute
     /**
      * @param array<string, mixed> $params Mapa de parametro opcional para regra de validacao.
      */
-    public function __construct(private readonly array $params)
-    {
-    }
+    public function __construct(private readonly array $params) {}
 
     /**
      * Valida apenas os parametros opcionais presentes na query string.
@@ -67,5 +65,3 @@ final class OptionalParams implements RequestValidatorAttribute
         return ['optionalParams' => $params];
     }
 }
-
-

@@ -26,7 +26,7 @@ final class RequestContextTest extends TestCase
         $response = $application->handle(new Request(
             method: 'GET',
             path: '/log',
-            headers: ['X-Request-Id' => 'req-upstream']
+            headers: ['X-Request-Id' => 'req-upstream'],
         ));
 
         self::assertSame('req-upstream', $response->headers()['X-Request-Id']);
@@ -51,7 +51,7 @@ final class RequestContextTest extends TestCase
 
         self::assertNotSame(
             $firstResponse->headers()['X-Request-Id'],
-            $secondResponse->headers()['X-Request-Id']
+            $secondResponse->headers()['X-Request-Id'],
         );
         self::assertSame($firstResponse->headers()['X-Request-Id'], $writer->entries[0]['request_id']);
         self::assertSame($secondResponse->headers()['X-Request-Id'], $writer->entries[1]['request_id']);

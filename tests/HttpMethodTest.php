@@ -25,7 +25,7 @@ final class HttpMethodTest extends TestCase
     public function testApplicationRoutesAcceptHttpMethodEnum(): void
     {
         $application = Application::create();
-        $application->route(HttpMethod::Patch, '/users/1', fn (): Response => Response::json(['updated' => true]));
+        $application->route(HttpMethod::Patch, '/users/1', fn(): Response => Response::json(['updated' => true]));
 
         $response = $application->handle(new Request(method: 'PATCH', path: '/users/1'));
 
@@ -50,4 +50,3 @@ final class HttpMethodTest extends TestCase
         new Request(method: 'TRACE', path: '/users');
     }
 }
-

@@ -31,7 +31,7 @@ final class StorageContractTest extends TestCase
             public function temporaryUrl(
                 string $key,
                 ?DateTimeImmutable $expiresAt = null,
-                array $options = []
+                array $options = [],
             ): string {
                 return 'https://storage.example/' . $key;
             }
@@ -42,8 +42,7 @@ final class StorageContractTest extends TestCase
         self::assertTrue($storage->delete('reports/file.txt')['Deleted']);
         self::assertSame(
             'https://storage.example/reports/file.txt',
-            $storage->temporaryUrl('reports/file.txt', new DateTimeImmutable('+5 minutes'))
+            $storage->temporaryUrl('reports/file.txt', new DateTimeImmutable('+5 minutes')),
         );
     }
 }
-

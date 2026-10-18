@@ -27,4 +27,3 @@ final class HealthController
         return Response::json(['action' => 'internal']);
     }
 }
-

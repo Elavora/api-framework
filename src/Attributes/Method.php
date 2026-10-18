@@ -31,9 +31,9 @@ final class Method implements RequestValidatorAttribute
     {
         $this->methods = array_values(
             array_map(
-                static fn (string|HttpMethod $method): HttpMethod => HttpMethod::fromValue($method),
-                $methods
-            )
+                static fn(string|HttpMethod $method): HttpMethod => HttpMethod::fromValue($method),
+                $methods,
+            ),
         );
     }
 
@@ -48,12 +48,12 @@ final class Method implements RequestValidatorAttribute
             return null;
         }
 
-        $allowedMethods = array_map(static fn (HttpMethod $method): string => $method->value, $this->methods);
+        $allowedMethods = array_map(static fn(HttpMethod $method): string => $method->value, $this->methods);
 
         return Response::json(
             payload: ['message' => sprintf('Method %s is not allowed for this endpoint.', $request->method())],
             status: 405,
-            headers: ['Allow' => implode(', ', $allowedMethods)]
+            headers: ['Allow' => implode(', ', $allowedMethods)],
         );
     }
 
@@ -62,8 +62,6 @@ final class Method implements RequestValidatorAttribute
      */
     public function options(): array
     {
-        return ['methods' => array_map(static fn (HttpMethod $method): string => $method->value, $this->methods)];
+        return ['methods' => array_map(static fn(HttpMethod $method): string => $method->value, $this->methods)];
     }
 }
-
-

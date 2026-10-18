@@ -142,4 +142,3 @@ final class RecordingTransactionManager implements TransactionManager
         return true;
     }
 }
-

@@ -21,9 +21,7 @@ final class Response implements HttpAttribute
     /**
      * @param array<string, mixed> $schema Schema ou metadados da resposta.
      */
-    public function __construct(private readonly array $schema)
-    {
-    }
+    public function __construct(private readonly array $schema) {}
 
     /**
      * @return array{response: array<string, mixed>} Metadados da resposta.
@@ -33,5 +31,3 @@ final class Response implements HttpAttribute
         return ['response' => $this->schema];
     }
 }
-
-

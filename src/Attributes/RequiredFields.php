@@ -25,9 +25,7 @@ final class RequiredFields implements RequestValidatorAttribute
      * @param array<int|string, mixed> $fields Campos obrigatorios. Use ['campo'] para aceitar qualquer valor
      *                                        ou ['campo' => 'string'] para validar tipo/regra.
      */
-    public function __construct(private readonly array $fields)
-    {
-    }
+    public function __construct(private readonly array $fields) {}
 
     /**
      * Valida os campos obrigatorios no corpo JSON/form da request.
@@ -88,5 +86,3 @@ final class RequiredFields implements RequestValidatorAttribute
         return $fields;
     }
 }
-
-

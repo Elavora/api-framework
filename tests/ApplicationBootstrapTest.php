@@ -27,7 +27,7 @@ final class ApplicationBootstrapTest extends TestCase
             configure: static function (Application $app): void {
                 self::assertSame('extension', $app->container()->get('message')->text);
                 $app->container()->instance('message', (object) ['text' => 'project']);
-                $app->get('/custom', static fn (): Response => Response::text($app->container()->get('message')->text));
+                $app->get('/custom', static fn(): Response => Response::text($app->container()->get('message')->text));
             },
             environment: [],
         );
@@ -69,7 +69,7 @@ final class ApplicationBootstrapTest extends TestCase
     public function testLegacyFactoryRemainsAvailable(): void
     {
         $app = Application::create();
-        $app->get('/legacy', static fn (): Response => Response::text('ok'));
+        $app->get('/legacy', static fn(): Response => Response::text('ok'));
         self::assertSame('ok', $app->handle(new Request('GET', '/legacy'))->body());
     }
 }

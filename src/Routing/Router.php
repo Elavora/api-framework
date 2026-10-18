@@ -80,5 +80,3 @@ final class Router
         return $path !== '/' ? rtrim($path, '/') : $path;
     }
 }
-
-

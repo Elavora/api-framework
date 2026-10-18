@@ -16,5 +16,3 @@ interface Extension
      */
     public function register(Application $application): void;
 }
-
-

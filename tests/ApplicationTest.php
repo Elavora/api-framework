@@ -19,7 +19,7 @@ final class ApplicationTest extends TestCase
     public function testDispatchesRegisteredRoute(): void
     {
         $application = Application::create();
-        $application->get('/health', fn (): Response => Response::json(['status' => 'healthy']));
+        $application->get('/health', fn(): Response => Response::json(['status' => 'healthy']));
 
         $response = $application->handle(new Request(method: 'GET', path: '/health'));
 
@@ -30,7 +30,7 @@ final class ApplicationTest extends TestCase
     public function testReportsMethodNotAllowed(): void
     {
         $application = Application::create();
-        $application->get('/health', fn (): Response => Response::json(['status' => 'healthy']));
+        $application->get('/health', fn(): Response => Response::json(['status' => 'healthy']));
 
         $response = $application->handle(new Request(method: 'POST', path: '/health'));
 
@@ -41,12 +41,12 @@ final class ApplicationTest extends TestCase
     public function testPreservesIncomingRequestIdInResponseHeader(): void
     {
         $application = Application::create();
-        $application->get('/health', fn (): Response => Response::json(['status' => 'healthy']));
+        $application->get('/health', fn(): Response => Response::json(['status' => 'healthy']));
 
         $response = $application->handle(new Request(
             method: 'GET',
             path: '/health',
-            headers: ['X-Request-Id' => 'req-123']
+            headers: ['X-Request-Id' => 'req-123'],
         ));
 
         self::assertSame('req-123', $response->headers()['X-Request-Id']);
@@ -55,7 +55,7 @@ final class ApplicationTest extends TestCase
     public function testGeneratesRequestIdWhenHeaderIsMissing(): void
     {
         $application = Application::create();
-        $application->get('/health', fn (): Response => Response::json(['status' => 'healthy']));
+        $application->get('/health', fn(): Response => Response::json(['status' => 'healthy']));
 
         $response = $application->handle(new Request(method: 'GET', path: '/health'));
 
@@ -66,9 +66,9 @@ final class ApplicationTest extends TestCase
     {
         $application = Application::create();
         $application->middleware(
-            fn (Request $request, callable $next): Response => $next($request)->withHeader('X-Framework', 'Elavora')
+            fn(Request $request, callable $next): Response => $next($request)->withHeader('X-Framework', 'Elavora'),
         );
-        $application->get('/', fn (): string => 'ok');
+        $application->get('/', fn(): string => 'ok');
 
         $response = $application->handle(new Request(method: 'GET', path: '/'));
 
@@ -103,9 +103,9 @@ final class ApplicationTest extends TestCase
         self::assertJsonStringEqualsJsonString(
             sprintf(
                 '{"message":"Internal Server Error","request_id":"%s"}',
-                $response->headers()['X-Request-Id']
+                $response->headers()['X-Request-Id'],
             ),
-            $response->body()
+            $response->body(),
         );
     }
 
@@ -116,13 +116,13 @@ final class ApplicationTest extends TestCase
         $response = $application->handle(new Request(
             method: 'GET',
             path: '/missing',
-            headers: ['X-Request-Id' => 'req-not-found']
+            headers: ['X-Request-Id' => 'req-not-found'],
         ));
 
         self::assertSame(404, $response->status());
         self::assertJsonStringEqualsJsonString(
             '{"message":"Not Found","request_id":"req-not-found"}',
-            $response->body()
+            $response->body(),
         );
     }
 
@@ -136,14 +136,14 @@ final class ApplicationTest extends TestCase
         $response = $application->handle(new Request(
             method: 'POST',
             path: '/users',
-            headers: ['X-Request-Id' => 'req-http-error']
+            headers: ['X-Request-Id' => 'req-http-error'],
         ));
 
         self::assertSame(400, $response->status());
         self::assertSame('req-http-error', $response->headers()['X-Request-Id']);
         self::assertJsonStringEqualsJsonString(
             '{"message":"Invalid payload","errors":{"fields":{"email":"Invalid field type"}},"request_id":"req-http-error"}',
-            $response->body()
+            $response->body(),
         );
     }
 
@@ -156,7 +156,7 @@ final class ApplicationTest extends TestCase
             method: 'POST',
             path: '/users',
             query: ['page' => '1'],
-            body: ['name' => 'Elavora']
+            body: ['name' => 'Elavora'],
         ));
 
         self::assertSame(400, $response->status());
@@ -172,7 +172,7 @@ final class ApplicationTest extends TestCase
             method: 'POST',
             path: '/users',
             query: ['page' => '1'],
-            body: ['name' => 'Elavora', 'email' => 'team@Elavora.dev']
+            body: ['name' => 'Elavora', 'email' => 'team@Elavora.dev'],
         ));
 
         self::assertSame(201, $response->status());
@@ -202,4 +202,3 @@ final class AttributeControllerStub
         return Response::json(['created' => true], status: 201);
     }
 }
-

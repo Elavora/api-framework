@@ -13,7 +13,10 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
-final class InvalidExtensionFixture { public function __construct(array $config) {} }
+final class InvalidExtensionFixture
+{
+    public function __construct(array $config) {}
+}
 
 final class ConfiguredExtensionSpy implements Extension
 {

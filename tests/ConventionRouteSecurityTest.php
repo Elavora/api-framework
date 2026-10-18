@@ -79,7 +79,7 @@ final class ConventionRouteSecurityTest extends TestCase
         self::assertSame('POST', $response->headers()['Allow']);
         self::assertJsonStringEqualsJsonString(
             '{"attributes":{"methods":["POST"],"summary":"Executa operacao segura"}}',
-            $response->body()
+            $response->body(),
         );
         self::assertSame(0, SecuredController::$executions);
         self::assertSame(0, SecuredController::$instances);
@@ -100,7 +100,7 @@ final class ConventionRouteSecurityTest extends TestCase
         $application->route(
             'OPTIONS',
             '/explicit-options',
-            fn (): Response => Response::json(['explicit' => true])
+            fn(): Response => Response::json(['explicit' => true]),
         );
 
         $response = $application->handle(new Request(method: 'OPTIONS', path: '/explicit-options'));

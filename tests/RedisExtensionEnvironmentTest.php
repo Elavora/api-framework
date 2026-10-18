@@ -24,9 +24,7 @@ final class RedisExtensionConfigurationSpy implements Extension
         self::$configs[(string) $config['prefix']] = $config;
     }
 
-    public function register(Application $application): void
-    {
-    }
+    public function register(Application $application): void {}
 }
 
 final class RedisExtensionEnvironmentTest extends TestCase
@@ -61,11 +59,11 @@ final class RedisExtensionEnvironmentTest extends TestCase
     {
         self::assertTrue(class_alias(
             RedisExtensionConfigurationSpy::class,
-            'Elavora\Api\Extension\CacheRedis\RedisCacheExtension'
+            'Elavora\Api\Extension\CacheRedis\RedisCacheExtension',
         ));
         self::assertTrue(class_alias(
             RedisExtensionConfigurationSpy::class,
-            'Elavora\Api\Extension\QueueRedis\RedisQueueExtension'
+            'Elavora\Api\Extension\QueueRedis\RedisQueueExtension',
         ));
 
         putenv('CACHE_DRIVER=redis');

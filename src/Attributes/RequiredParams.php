@@ -24,9 +24,7 @@ final class RequiredParams implements RequestValidatorAttribute
      * @param array<int|string, mixed> $params Parametros obrigatorios. Use ['param'] para aceitar qualquer valor
      *                                        ou ['param' => 'string'] para validar tipo/regra.
      */
-    public function __construct(private readonly array $params)
-    {
-    }
+    public function __construct(private readonly array $params) {}
 
     /**
      * Valida os parametros obrigatorios da query string.
@@ -79,5 +77,3 @@ final class RequiredParams implements RequestValidatorAttribute
         return ['params' => $params];
     }
 }
-
-

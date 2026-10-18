@@ -18,7 +18,7 @@ final class ResponseableTest extends TestCase
     public function testReturnsResponseableObjectAsJson(): void
     {
         $application = Application::create();
-        $application->get('/user', fn (): Responseable => new ResponseableUser('user-123', 'Ada'));
+        $application->get('/user', fn(): Responseable => new ResponseableUser('user-123', 'Ada'));
 
         $response = $application->handle(new Request(method: 'GET', path: '/user'));
 
@@ -30,7 +30,7 @@ final class ResponseableTest extends TestCase
     public function testReturnsResponseableScalarAsJson(): void
     {
         $application = Application::create();
-        $application->get('/code', fn (): Responseable => new ResponseableCode('APP-1234'));
+        $application->get('/code', fn(): Responseable => new ResponseableCode('APP-1234'));
 
         $response = $application->handle(new Request(method: 'GET', path: '/code'));
 
@@ -53,10 +53,8 @@ final class ResponseableUser implements Responseable
 {
     public function __construct(
         private readonly string $id,
-        private readonly string $name
-    )
-    {
-    }
+        private readonly string $name,
+    ) {}
 
     /**
      * @return array{id: string, name: string}
@@ -69,9 +67,7 @@ final class ResponseableUser implements Responseable
 
 final class ResponseableCode implements Responseable
 {
-    public function __construct(private readonly string $value)
-    {
-    }
+    public function __construct(private readonly string $value) {}
 
     public function jsonSerialize(): string
     {
@@ -101,4 +97,3 @@ final class MarkResponseable implements AfterResponseAttribute
         return [];
     }
 }
-

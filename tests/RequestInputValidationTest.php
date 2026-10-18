@@ -59,7 +59,7 @@ final class RequestInputValidationTest extends TestCase
         self::assertSame('req-malformed-json', $response->headers()['X-Request-Id']);
         self::assertJsonStringEqualsJsonString(
             '{"message":"Malformed JSON body","request_id":"req-malformed-json"}',
-            $response->body()
+            $response->body(),
         );
     }
 
@@ -91,7 +91,7 @@ final class RequestInputValidationTest extends TestCase
 
         self::assertSame(
             'JSON body must be an object or array',
-            Request::fromGlobals('"value"')->bodyError()
+            Request::fromGlobals('"value"')->bodyError(),
         );
     }
 
@@ -101,7 +101,7 @@ final class RequestInputValidationTest extends TestCase
             method: 'POST',
             path: '/',
             query: ['filter' => null],
-            body: ['nickname' => null]
+            body: ['nickname' => null],
         );
 
         self::assertTrue($request->hasQuery('filter'));
@@ -118,7 +118,7 @@ final class RequestInputValidationTest extends TestCase
             method: 'POST',
             path: '/',
             query: ['required' => null, 'optional' => null],
-            body: ['required' => null, 'optional' => null]
+            body: ['required' => null, 'optional' => null],
         );
 
         self::assertNull((new RequiredFields(['required' => 'null']))->validate($request));

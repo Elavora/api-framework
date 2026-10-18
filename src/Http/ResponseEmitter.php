@@ -31,5 +31,3 @@ final class ResponseEmitter
             && $status !== 304;
     }
 }
-
-

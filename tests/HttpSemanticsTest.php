@@ -18,8 +18,8 @@ final class HttpSemanticsTest extends TestCase
         $application = Application::create();
         $application->get(
             '/health',
-            fn (): Response => Response::json(['status' => 'healthy'])
-                ->withHeader('X-Resource', 'health')
+            fn(): Response => Response::json(['status' => 'healthy'])
+                ->withHeader('X-Resource', 'health'),
         );
 
         $response = $application->handle(new Request(method: 'HEAD', path: '/health'));
@@ -33,11 +33,11 @@ final class HttpSemanticsTest extends TestCase
     public function testExplicitHeadRouteHasPriorityOverGetFallback(): void
     {
         $application = Application::create();
-        $application->get('/resource', fn (): Response => Response::text('get'));
+        $application->get('/resource', fn(): Response => Response::text('get'));
         $application->route(
             'HEAD',
             '/resource',
-            fn (): Response => Response::text('head', status: 202)->withHeader('X-Route', 'head')
+            fn(): Response => Response::text('head', status: 202)->withHeader('X-Route', 'head'),
         );
 
         $response = $application->handle(new Request(method: 'HEAD', path: '/resource'));
@@ -50,7 +50,7 @@ final class HttpSemanticsTest extends TestCase
     public function testAllowIncludesHeadWhenGetRouteExists(): void
     {
         $application = Application::create();
-        $application->get('/health', fn (): Response => Response::text('ok'));
+        $application->get('/health', fn(): Response => Response::text('ok'));
 
         $response = $application->handle(new Request(method: 'POST', path: '/health'));
 

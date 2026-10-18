@@ -27,5 +27,3 @@ interface DataType
      */
     public function value(): mixed;
 }
-
-

@@ -22,7 +22,7 @@ final class HttpException extends RuntimeException
         string $message,
         private readonly int $status = 500,
         private readonly array $errors = [],
-        private readonly array $headers = []
+        private readonly array $headers = [],
     ) {
         parent::__construct($message);
     }
@@ -82,5 +82,3 @@ final class HttpException extends RuntimeException
         return $this->headers;
     }
 }
-
-

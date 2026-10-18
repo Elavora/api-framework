@@ -26,5 +26,3 @@ interface CacheStore
      */
     public function delete(string $key): void;
 }
-
-

@@ -18,7 +18,7 @@ final class EnvironmentExtensions
      */
     public static function load(string $basePath, ?array $environment = null): array
     {
-        $read = static fn (string $name): string|false => $environment === null
+        $read = static fn(string $name): string|false => $environment === null
             ? getenv($name)
             : ($environment[$name] ?? false);
 
@@ -73,7 +73,7 @@ final class EnvironmentExtensions
                     'port' => (int) ($read('REDIS_PORT') ?: 6379),
                     'password' => $redisPassword,
                     'database' => $redisDatabase,
-                ] + $cacheConfig
+                ] + $cacheConfig,
             );
         }
 
@@ -82,7 +82,7 @@ final class EnvironmentExtensions
             $extensions[] = $createExtension(
                 'Elavora\Api\Extension\CacheApcu\ApcuCacheExtension',
                 'Instale elavora/api-cache-apcu para usar CACHE_DRIVER=apcu.',
-                $cacheConfig
+                $cacheConfig,
             );
         }
 
@@ -97,7 +97,7 @@ final class EnvironmentExtensions
                     'password' => $redisPassword,
                     'database' => $redisDatabase,
                     'prefix' => $read('QUEUE_PREFIX') ?: 'api:queue:',
-                ]
+                ],
             );
         }
 
@@ -119,7 +119,7 @@ final class EnvironmentExtensions
             $extensions[] = $createExtension(
                 'Elavora\Api\Extension\DatabaseMySql\MySqlExtension',
                 'Instale elavora/api-database-mysql para usar DB_DRIVER=mysql.',
-                $databaseConfig
+                $databaseConfig,
             );
         }
 
@@ -127,7 +127,7 @@ final class EnvironmentExtensions
             $extensions[] = $createExtension(
                 'Elavora\Api\Extension\DatabasePostgreSql\PostgreSqlExtension',
                 'Instale elavora/api-database-postgresql para usar DB_DRIVER=postgresql.',
-                $databaseConfig
+                $databaseConfig,
             );
         }
 
@@ -142,7 +142,7 @@ final class EnvironmentExtensions
                 'Instale elavora/api-log-stdout para usar LOG_DRIVER=stdout.',
                 [
                     'stream' => $read('LOG_STREAM') ?: 'stdout',
-                ]
+                ],
             );
         }
 
@@ -152,7 +152,7 @@ final class EnvironmentExtensions
                 'Instale elavora/api-log-file para usar LOG_DRIVER=file.',
                 [
                     'path' => $read('LOG_FILE') ?: rtrim($basePath, '/\\') . '/storage/logs/app.log',
-                ]
+                ],
             );
         }
 
@@ -168,7 +168,7 @@ final class EnvironmentExtensions
                     'collection' => $read('MONGO_LOG_COLLECTION') ?: 'logs',
                     'username' => $read('MONGO_LOG_USERNAME') ?: null,
                     'password' => $read('MONGO_LOG_PASSWORD') ?: null,
-                ]
+                ],
             );
         }
 

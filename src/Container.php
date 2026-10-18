@@ -72,5 +72,3 @@ final class Container
         return $this->instances[$id] = $instance;
     }
 }
-
-

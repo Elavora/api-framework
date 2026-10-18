@@ -18,5 +18,3 @@ interface DatabaseConnectionFactory
      */
     public function connection(?string $name = null): PDO;
 }
-
-
