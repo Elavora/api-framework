@@ -16,8 +16,8 @@ final class LoggerTest extends TestCase
         $writer = new RecordingLogWriter();
         $logger = new Logger(
             writer: $writer,
-            timestampResolver: static fn (): string => '2026-05-28T12:00:00+00:00',
-            requestIdResolver: static fn (): string => 'req-123'
+            timestampResolver: static fn(): string => '2026-05-28T12:00:00+00:00',
+            requestIdResolver: static fn(): string => 'req-123',
         );
 
         $logger->info('Requisicao recebida', ['route' => '/health']);
@@ -36,8 +36,8 @@ final class LoggerTest extends TestCase
         $writer = new RecordingLogWriter();
         $logger = new Logger(
             writer: $writer,
-            timestampResolver: static fn (): string => '2026-05-28T12:00:00+00:00',
-            requestIdResolver: static fn (): string => 'req-123'
+            timestampResolver: static fn(): string => '2026-05-28T12:00:00+00:00',
+            requestIdResolver: static fn(): string => 'req-123',
         );
 
         $logger->exception(new RuntimeException('senha=secret', 500), ['operation' => 'store']);
@@ -60,4 +60,3 @@ final class RecordingLogWriter implements LogWriter
         $this->entries[] = $entry;
     }
 }
-

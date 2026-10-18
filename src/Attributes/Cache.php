@@ -32,9 +32,8 @@ final class Cache implements BeforeRequestAttribute, AfterResponseAttribute
     public function __construct(
         private readonly int $seconds,
         private readonly array $varyByHeaders = [],
-        private readonly array $extra = []
-    ) {
-    }
+        private readonly array $extra = [],
+    ) {}
 
     /**
      * Retorna resposta em cache quando a chave existir.
@@ -80,7 +79,7 @@ final class Cache implements BeforeRequestAttribute, AfterResponseAttribute
         $cacheStore = $container->get(CacheStore::class);
         if (!$cacheStore instanceof CacheStore) {
             throw new RuntimeException(
-                'CacheStore registrado deve implementar Elavora\\Api\\Framework\\Contracts\\CacheStore.'
+                'CacheStore registrado deve implementar Elavora\\Api\\Framework\\Contracts\\CacheStore.',
             );
         }
 
@@ -104,5 +103,3 @@ final class Cache implements BeforeRequestAttribute, AfterResponseAttribute
         ]));
     }
 }
-
-

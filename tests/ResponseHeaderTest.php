@@ -23,12 +23,12 @@ final class ResponseHeaderTest extends TestCase
     {
         $response = Response::json(
             payload: ['ok' => true],
-            headers: ['content-type' => 'application/problem+json']
+            headers: ['content-type' => 'application/problem+json'],
         );
 
         self::assertSame(
             ['Content-Type' => 'application/json; charset=utf-8'],
-            $response->headers()
+            $response->headers(),
         );
     }
 

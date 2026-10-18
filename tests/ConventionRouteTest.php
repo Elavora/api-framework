@@ -36,7 +36,7 @@ final class ConventionRouteTest extends TestCase
     public function testRegisteredRouteHasPriorityOverConvention(): void
     {
         $application = Application::create();
-        $application->get('/health/show', fn (): Response => Response::json(['action' => 'registered']));
+        $application->get('/health/show', fn(): Response => Response::json(['action' => 'registered']));
 
         $response = $application->handle(new Request(method: 'GET', path: '/health/show'));
 
@@ -62,4 +62,3 @@ final class ConventionRouteTest extends TestCase
         self::assertSame(404, $response->status());
     }
 }
-

@@ -26,9 +26,7 @@ final class ControllerResolver
     /**
      * @param Container $container Container usado para resolver controllers registrados.
      */
-    public function __construct(private readonly Container $container)
-    {
-    }
+    public function __construct(private readonly Container $container) {}
 
     /**
      * Executa um handler de rota.
@@ -136,8 +134,8 @@ final class ControllerResolver
         $reflection = new ReflectionMethod($controller, $method);
 
         return array_map(
-            static fn ($attribute): object => $attribute->newInstance(),
-            $reflection->getAttributes()
+            static fn($attribute): object => $attribute->newInstance(),
+            $reflection->getAttributes(),
         );
     }
 
@@ -169,7 +167,7 @@ final class ControllerResolver
     private function runAfterExceptionAttributes(
         array $attributes,
         Request $request,
-        Throwable $exception
+        Throwable $exception,
     ): void {
         foreach (array_reverse($attributes) as $attribute) {
             if (!$attribute instanceof AfterExceptionAttribute) {
@@ -189,5 +187,3 @@ final class ControllerResolver
         return Response::fromResult($result);
     }
 }
-
-

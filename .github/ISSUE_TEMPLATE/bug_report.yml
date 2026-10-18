@@ -16,9 +16,9 @@ body:
       label: Como reproduzir
       description: Liste os passos para reproduzir o problema.
       placeholder: |
-        1. 
-        2. 
-        3. 
+        1.
+        2.
+        3.
     validations:
       required: true
   - type: textarea

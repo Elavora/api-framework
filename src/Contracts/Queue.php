@@ -23,5 +23,3 @@ interface Queue
      */
     public function pop(string $queue): ?array;
 }
-
-

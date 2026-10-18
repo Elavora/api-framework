@@ -35,5 +35,3 @@ enum HttpMethod: string
             ?? throw new InvalidArgumentException(sprintf('Metodo HTTP invalido: %s.', $method));
     }
 }
-
-

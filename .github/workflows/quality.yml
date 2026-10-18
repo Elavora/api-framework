@@ -1,23 +1,18 @@
-name: Quality
+name: Qualidade
 
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review]
-  merge_group:
-  workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   quality:
-    name: Quality
-    uses: Elavora/.github/.github/workflows/quality.yml@1e0f42a92a4aafc35522709c30bc4e83acab82f1
-    with:
-      extensions: json
-      coverage_min: 80
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    uses: Elavora/.github/.github/workflows/php-quality.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0

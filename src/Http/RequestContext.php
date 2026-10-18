@@ -13,9 +13,7 @@ final class RequestContext
 {
     private static ?string $requestId = null;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Executa uma operacao usando o request-id informado e restaura o contexto anterior ao final.

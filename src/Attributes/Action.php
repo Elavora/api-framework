@@ -12,6 +12,4 @@ use Attribute;
  *
  * Rotas registradas explicitamente nao exigem este atributo.
  */
-final class Action
-{
-}
+final class Action {}

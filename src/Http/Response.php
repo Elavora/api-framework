@@ -26,7 +26,7 @@ final class Response
     public function __construct(
         private readonly string $body = '',
         private readonly int $status = 200,
-        array $headers = []
+        array $headers = [],
     ) {
         $this->headers = self::normalizeHeaders($headers);
     }
@@ -46,7 +46,7 @@ final class Response
         return new self(
             body: json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             status: $status,
-            headers: $headers
+            headers: $headers,
         );
     }
 
@@ -150,7 +150,7 @@ final class Response
         return new self(
             body: $this->body,
             status: $this->status,
-            headers: self::replaceHeader($this->headers, $name, $value)
+            headers: self::replaceHeader($this->headers, $name, $value),
         );
     }
 
@@ -231,5 +231,3 @@ final class Response
         return false;
     }
 }
-
-

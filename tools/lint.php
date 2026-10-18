@@ -7,7 +7,7 @@ $failed = false;
 
 foreach ($roots as $root) {
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+        new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
     );
 
     foreach ($files as $file) {

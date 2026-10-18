@@ -19,5 +19,3 @@ interface RequestValidatorAttribute extends HttpAttribute
      */
     public function validate(Request $request): ?Response;
 }
-
-

@@ -21,9 +21,7 @@ final class Details implements HttpAttribute
     /**
      * @param array<string, mixed> $details Metadados livres do endpoint.
      */
-    public function __construct(private readonly array $details)
-    {
-    }
+    public function __construct(private readonly array $details) {}
 
     /**
      * @return array<string, mixed> Metadados informados no attribute.
@@ -33,5 +31,3 @@ final class Details implements HttpAttribute
         return $this->details;
     }
 }
-
-

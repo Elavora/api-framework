@@ -22,5 +22,3 @@ interface Responseable extends JsonSerializable
      */
     public function jsonSerialize(): mixed;
 }
-
-

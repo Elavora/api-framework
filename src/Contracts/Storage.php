@@ -44,8 +44,6 @@ interface Storage
     public function temporaryUrl(
         string $key,
         ?DateTimeImmutable $expiresAt = null,
-        array $options = []
+        array $options = [],
     ): string;
 }
-
-

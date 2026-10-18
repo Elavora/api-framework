@@ -31,9 +31,9 @@ final class Logger
     public function __construct(
         private readonly LogWriter $writer,
         ?callable $timestampResolver = null,
-        ?callable $requestIdResolver = null
+        ?callable $requestIdResolver = null,
     ) {
-        $this->timestampResolver = Closure::fromCallable($timestampResolver ?? static fn (): string => gmdate('c'));
+        $this->timestampResolver = Closure::fromCallable($timestampResolver ?? static fn(): string => gmdate('c'));
         $this->requestIdResolver = Closure::fromCallable($requestIdResolver ?? self::defaultRequestIdResolver());
     }
 
@@ -103,7 +103,6 @@ final class Logger
      */
     private static function defaultRequestIdResolver(): Closure
     {
-        return static fn (): string => RequestContext::requestId();
+        return static fn(): string => RequestContext::requestId();
     }
 }
-

@@ -16,5 +16,3 @@ interface LogWriter
      */
     public function write(array $entry): void;
 }
-
-

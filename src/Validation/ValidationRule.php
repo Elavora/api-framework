@@ -87,4 +87,3 @@ final class ValidationRule
         return json_last_error() === JSON_ERROR_NONE;
     }
 }
-

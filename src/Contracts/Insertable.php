@@ -14,5 +14,3 @@ interface Insertable
      */
     public function value(): string|int|bool|float|null;
 }
-
-

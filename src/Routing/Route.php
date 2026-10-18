@@ -15,9 +15,8 @@ final class Route
     public function __construct(
         private readonly string $method,
         private readonly string $path,
-        private readonly mixed $handler
-    ) {
-    }
+        private readonly mixed $handler,
+    ) {}
 
     /**
      * Retorna o metodo HTTP da rota.
@@ -45,5 +44,3 @@ final class Route
         return $this->handler;
     }
 }
-
-

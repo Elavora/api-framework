@@ -34,7 +34,7 @@ final class Application
             router: $this->router,
             controllerResolver: new ControllerResolver($this->container),
             conventionRouteResolver: new ConventionRouteResolver(),
-            debug: $debug
+            debug: $debug,
         );
         $this->emitter = new ResponseEmitter();
     }
@@ -159,5 +159,3 @@ final class Application
         $this->emitter->emit($response);
     }
 }
-
-

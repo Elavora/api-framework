@@ -24,5 +24,3 @@ interface TransactionManager
      */
     public function rollback(): bool;
 }
-
-

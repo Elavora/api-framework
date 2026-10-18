@@ -23,9 +23,7 @@ final class OptionalFields implements RequestValidatorAttribute
     /**
      * @param array<string, mixed> $fields Mapa de campo opcional para regra de validacao.
      */
-    public function __construct(private readonly array $fields)
-    {
-    }
+    public function __construct(private readonly array $fields) {}
 
     /**
      * Valida apenas os campos opcionais presentes na request.
@@ -67,5 +65,3 @@ final class OptionalFields implements RequestValidatorAttribute
         return ['optionalFields' => $fields];
     }
 }
-
-

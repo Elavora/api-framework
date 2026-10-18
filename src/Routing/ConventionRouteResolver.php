@@ -24,9 +24,8 @@ final class ConventionRouteResolver
     public function __construct(
         private readonly string $controllerNamespace = 'App\\Http\\Controller',
         private readonly string $controllerSuffix = 'Controller',
-        private readonly string $defaultAction = 'index'
-    ) {
-    }
+        private readonly string $defaultAction = 'index',
+    ) {}
 
     /**
      * Busca um handler seguindo a convencao /controller/action.
@@ -68,7 +67,7 @@ final class ConventionRouteResolver
     {
         $segments = array_values(array_filter(
             explode('/', trim($path, '/')),
-            static fn (string $segment): bool => $segment !== ''
+            static fn(string $segment): bool => $segment !== '',
         ));
         if ($segments === [] || count($segments) > 2) {
             return null;
@@ -96,5 +95,3 @@ final class ConventionRouteResolver
         return preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $segment) === 1;
     }
 }
-
-

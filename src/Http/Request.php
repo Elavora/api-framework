@@ -32,7 +32,7 @@ final class Request
         private readonly array $query = [],
         private readonly array $body = [],
         array $headers = [],
-        ?string $requestId = null
+        ?string $requestId = null,
     ) {
         $this->method = HttpMethod::fromValue($method);
         $this->headers = self::normalizeHeaders($headers);
@@ -50,7 +50,7 @@ final class Request
         $rawBody ??= file_get_contents('php://input');
         [$body, $bodyError] = self::parseBody(
             is_string($rawBody) ? $rawBody : '',
-            $_POST
+            $_POST,
         );
 
         $request = new self(
@@ -58,7 +58,7 @@ final class Request
             path: $path,
             query: $_GET,
             body: $body,
-            headers: self::headersFromServer($_SERVER)
+            headers: self::headersFromServer($_SERVER),
         );
         $request->bodyError = $bodyError;
 
@@ -238,5 +238,3 @@ final class Request
         return [[], 'Malformed JSON body'];
     }
 }
-
-

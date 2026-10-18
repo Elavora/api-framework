@@ -20,5 +20,3 @@ interface BeforeRequestAttribute extends HttpAttribute
      */
     public function before(Request $request, Container $container): ?Response;
 }
-
-

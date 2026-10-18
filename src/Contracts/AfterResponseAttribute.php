@@ -20,5 +20,3 @@ interface AfterResponseAttribute extends HttpAttribute
      */
     public function after(Request $request, Response $response, Container $container): ?Response;
 }
-
-

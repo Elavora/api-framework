@@ -81,7 +81,7 @@ final class TransactionFailureTest extends TestCase
      */
     private function application(
         bool $beginResult = true,
-        bool $rollbackThrows = false
+        bool $rollbackThrows = false,
     ): array {
         $application = Application::create(debug: true);
         $transactionManager = new FailureRecordingTransactionManager($beginResult, $rollbackThrows);
@@ -134,9 +134,8 @@ final class FailureRecordingTransactionManager implements TransactionManager
 
     public function __construct(
         private readonly bool $beginResult,
-        private readonly bool $rollbackThrows
-    ) {
-    }
+        private readonly bool $rollbackThrows,
+    ) {}
 
     public function begin(): bool
     {

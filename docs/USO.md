@@ -53,14 +53,20 @@ $app->emit($response);
 
 ## Validacao no projeto consumidor
 
-Depois de instalar o pacote, rode os testes da aplicacao consumidora. Para uma verificacao isolada do pacote, use container:
+Depois de instalar o pacote, rode os testes da aplicacao consumidora. Para uma verificacao isolada do pacote, use a imagem de desenvolvimento da Elavora (PowerShell, na pasta do pacote):
 
-```bash
-docker run --rm -v "${PWD}:/workspace:ro" composer:2 sh -lc "cp -R /workspace /tmp/package && cd /tmp/package && composer install --no-interaction --no-progress && composer check"
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" ghcr.io/elavora/php-dev:8.3-latest sh -lc 'cp -R /workspace /tmp/package && cd /tmp/package && git config --global --add safe.directory /tmp/package && composer install --no-interaction --no-progress && composer check'
 ```
+
+Mais detalhes em [Ambiente de desenvolvimento e testes](DESENVOLVIMENTO.md).
 
 ## Observacoes
 
 - Mantenha regras de produto fora deste pacote.
 - Prefira configurar extensoes no bootstrap da aplicacao.
 - Instale apenas os modulos que a aplicacao realmente usa.
+
+---
+
+[README](../README.md) · Próximo: [Bootstrap compartilhado](BOOTSTRAP.md)

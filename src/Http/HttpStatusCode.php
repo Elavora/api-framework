@@ -85,5 +85,3 @@ enum HttpStatusCode: int
         return $this->value >= 500;
     }
 }
-
-

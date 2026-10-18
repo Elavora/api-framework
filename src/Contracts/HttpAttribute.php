@@ -14,5 +14,3 @@ interface HttpAttribute
      */
     public function options(): array;
 }
-
-

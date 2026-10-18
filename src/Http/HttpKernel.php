@@ -32,9 +32,8 @@ final class HttpKernel
         private readonly Router $router,
         private readonly ControllerResolver $controllerResolver,
         private readonly ConventionRouteResolver $conventionRouteResolver,
-        private readonly bool $debug = false
-    ) {
-    }
+        private readonly bool $debug = false,
+    ) {}
 
     /**
      * Registra um middleware no pipeline HTTP.
@@ -52,18 +51,18 @@ final class HttpKernel
     public function handle(Request $request): Response
     {
         return RequestContext::run($request->requestId(), function () use ($request): Response {
-            $dispatcher = fn (Request $incoming): Response => $this->dispatch($incoming);
+            $dispatcher = fn(Request $incoming): Response => $this->dispatch($incoming);
 
             foreach (array_reverse($this->middleware) as $middleware) {
                 $next = $dispatcher;
-                $dispatcher = fn (Request $incoming): Response => $middleware($incoming, $next);
+                $dispatcher = fn(Request $incoming): Response => $middleware($incoming, $next);
             }
 
             try {
                 if ($request->bodyError() !== null) {
                     return $this->finalizeResponse(
                         $request,
-                        Response::badRequest($request->bodyError())
+                        Response::badRequest($request->bodyError()),
                     );
                 }
 
@@ -93,7 +92,7 @@ final class HttpKernel
                 return Response::json(
                     payload: ['message' => 'Method Not Allowed'],
                     status: 405,
-                    headers: ['Allow' => implode(', ', $allowedMethods)]
+                    headers: ['Allow' => implode(', ', $allowedMethods)],
                 );
             }
 
@@ -110,17 +109,17 @@ final class HttpKernel
 
                 return Response::json(
                     payload: ['attributes' => $attributes],
-                    headers: $headers
+                    headers: $headers,
                 );
             }
 
             return Response::fromResult(
-                $this->controllerResolver->invoke($conventionHandler, $request)
+                $this->controllerResolver->invoke($conventionHandler, $request),
             );
         }
 
         return Response::fromResult(
-            $this->controllerResolver->invoke($route->handler(), $request)
+            $this->controllerResolver->invoke($route->handler(), $request),
         );
     }
 
@@ -138,12 +137,12 @@ final class HttpKernel
             return Response::json(
                 payload: $payload,
                 status: $exception->status(),
-                headers: $exception->headers()
+                headers: $exception->headers(),
             );
         }
 
         return Response::internalServerError(
-            message: $this->debug ? $exception->getMessage() : 'Internal Server Error'
+            message: $this->debug ? $exception->getMessage() : 'Internal Server Error',
         );
     }
 
@@ -192,5 +191,3 @@ final class HttpKernel
         return false;
     }
 }
-
-
