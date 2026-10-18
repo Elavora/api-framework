@@ -20,6 +20,7 @@
     }
   },
   "require-dev": {
+    "elavora/code-standards": "^1.0",
     "phpstan/phpstan": "^2.2",
     "phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"
   },
@@ -31,14 +32,16 @@
       "@lint",
       "@test",
       "@analyse"
-    ]
+    ],
+    "post-install-cmd": ["Elavora\\CodeStandards\\Composer::sync"],
+    "post-update-cmd": ["Elavora\\CodeStandards\\Composer::sync"]
   },
   "config": {
     "sort-packages": true
   },
   "extra": {
     "branch-alias": {
-      "dev-main": "1.0-dev"
+      "dev-main": "2.0-dev"
     }
   }
 }
