@@ -16,5 +16,3 @@ jobs:
       pull-requests: write
       id-token: write
     uses: Elavora/.github/.github/workflows/php-quality.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0
-    with:
-      image: ghcr.io/elavora/php-dev:8.3-0.3.0
