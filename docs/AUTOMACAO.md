@@ -96,14 +96,15 @@ feita pelo orquestrador no momento do PR de adoção, antes do merge.
 Esta seção é o contrato de cada arquivo, conferido pelos testes da automação. Nela:
 
 - **SHA da 1.2.0** é `3e8259291c0d3f7c031695fe63d714169792c454`, o commit da tag `1.2.0` do `Elavora/.github`;
-- **imagem** é `ghcr.io/elavora/php-dev:8.3-0.3.0`.
+- **imagem** é `ghcr.io/elavora/php-dev:8.3-latest`, a tag que aponta sempre para a versão estável mais recente da
+  imagem PHP 8.3 (só muda quando sai uma release estável do `Elavora/devcontainers`).
 
 ### Regras gerais
 
 - Nenhum arquivo em `.github/` cita o SHA antigo `1e0f42a92a4aafc35522709c30bc4e83acab82f1` (nem o prefixo `1e0f42a`).
 - Todo `uses:` para `Elavora/.github/.github/workflows/...` termina exatamente em
   `@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0`. Nenhum usa nome de branch, `main`, tag sem SHA ou outro SHA.
-- Nenhum chamador passa a entrada `automation_ref`.
+- Nenhum chamador passa a entrada `automation_ref` nem a entrada `image`.
 - Todo job que chama um workflow de `Elavora/.github` concede `id-token: write`.
 - Toda action de terceiros (`actions/*`, `github/*`) é fixada por SHA completo (40 caracteres hexadecimais), com a
   versão em comentário.
@@ -113,12 +114,12 @@ Esta seção é o contrato de cada arquivo, conferido pelos testes da automaçã
 ### `.devcontainer/devcontainer.json`
 
 Igual ao `examples/devcontainer.json` da versão `0.3.0` do `Elavora/devcontainers`, trocando a imagem pela
-`8.3-0.3.0`. Conteúdo exato:
+`8.3-latest`. Conteúdo exato:
 
 ```json
 {
   "name": "Elavora PHP 8.3",
-  "image": "ghcr.io/elavora/php-dev:8.3-0.3.0",
+  "image": "ghcr.io/elavora/php-dev:8.3-latest",
   "remoteUser": "vscode",
   "postCreateCommand": "git config --global --add safe.directory \"$(pwd)\" && composer install --no-interaction --prefer-dist",
   "customizations": {
@@ -146,9 +147,11 @@ Igual ao `examples/devcontainer.json` da versão `0.3.0` do `Elavora/devcontaine
 ```
 
 - É JSON válido (sem comentários).
-- `image` é exatamente `ghcr.io/elavora/php-dev:8.3-0.3.0`. Não pode ser uma tag móvel (`8.3`, `latest`,
-  `8.3-latest`) nem o nome local `elavora/php-dev:8.3`. A `8.3-latest` existe e aponta para a estável mais recente,
-  mas mudaria o ambiente sem PR.
+- `image` é exatamente `ghcr.io/elavora/php-dev:8.3-latest`. Não pode ser uma versão fixa (`8.3-0.3.0`,
+  `8.3-0.2.0` ou qualquer `8.3-X.Y.Z`), outra tag móvel (`8.3`, `latest`) nem o nome local `elavora/php-dev:8.3`.
+  Por que a `8.3-latest`: o ambiente acompanha cada release estável da imagem sem PR de troca. Pré-releases não movem
+  a tag, e o contêiner só passa a usar a versão nova quando é reconstruído (ver
+  [Atualizações da imagem](DESENVOLVIMENTO.md#atualizações-da-imagem)).
 - `remoteUser` é `vscode`, e `postCreateCommand` contém `composer install`.
 - As extensões incluem `junstyle.php-cs-fixer` e `EditorConfig.EditorConfig`, e `editor.formatOnSave` é `true` para
   PHP: o arquivo é formatado ao salvar.
@@ -234,15 +237,22 @@ jobs:
       pull-requests: write
       id-token: write
     uses: Elavora/.github/.github/workflows/php-quality.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0
-    with:
-      image: ghcr.io/elavora/php-dev:8.3-0.3.0
 ```
+
+O arquivo termina na linha do `uses:`, com uma quebra de linha no final: não existe bloco `with:`.
 
 - O arquivo continua se chamando `quality.yml`, então o badge do README continua funcionando.
 - O id do job é `quality`, e o check aparece no PR como **`quality / Qualidade PHP`**.
 - `contents: write` permite o commit de formatação na branch do PR, e `pull-requests: write`, o comentário fixo.
-- `image` é a mesma imagem do devcontainer. Sem ela, o central usaria o padrão dele (`8.3-0.2.0`), e o CI teria
-  ferramentas diferentes das do editor.
+- Não passa a entrada `image`: o CI usa a imagem padrão do pipeline central. Assim a imagem do CI é atualizada junto
+  com o `Elavora/.github`, sem PR neste repositório só para trocar a imagem.
+  - No SHA fixado (1.2.0), esse padrão é `ghcr.io/elavora/php-dev:8.3-0.2.0`. Ela foi gerada do mesmo Dockerfile da
+    `8.3-0.3.0`, então traz as mesmas ferramentas do devcontainer.
+  - Uma próxima versão do `Elavora/.github` muda o padrão para `8.3-latest`. Quando ela sair, o Dependabot abre o PR
+    que sobe o SHA e o comentário de versão (ver [`.github/dependabot.yml`](#githubdependabotyml)), e a partir daí o
+    CI usa a mesma tag do devcontainer.
+  - Enquanto o SHA for o da 1.2.0, a diferença de tag entre o CI (`8.3-0.2.0`) e o devcontainer (`8.3-latest`) é
+    esperada.
 - Nenhuma entrada mexe em cobertura, `composer audit` ou dependências mínimas: as três ficam no padrão do central
   (cobertura mínima de 80%, auditoria ligada e `lowest`), que reproduz as garantias do `quality.yml` antigo.
 - Não existe nenhum job local de PHP neste arquivo (matriz, cobertura ou `setup-php`): tudo vem do central.
@@ -456,10 +466,12 @@ O que cada atualização cobre:
 | `composer` | `phpstan/phpstan`, `phpunit/phpunit` e `elavora/code-standards` (as regras de estilo) |
 | `github-actions` | as actions de terceiros e os workflows reutilizáveis do `Elavora/.github` (o SHA e o comentário `# 1.2.0`) |
 
-**A imagem do devcontainer não é coberta.** O ecossistema `devcontainers` do Dependabot só atualiza *features* do
-`devcontainer.json`, e este arquivo não usa nenhuma. O ecossistema `docker` só lê `Dockerfile` e arquivos Compose, e
-o repositório não tem nenhum. Por isso não existe uma terceira entrada, e a troca da imagem é manual (ver
-[Atualizar a versão da imagem](DESENVOLVIMENTO.md#atualizar-a-versão-da-imagem)).
+**A imagem não precisa de entrada.** O devcontainer usa a tag móvel `8.3-latest`, que já acompanha as releases
+estáveis, e o CI usa o padrão do pipeline central, que muda junto com o SHA do `Elavora/.github` (coberto pela
+entrada `github-actions`). Além disso, o ecossistema `devcontainers` do Dependabot só atualiza *features* do
+`devcontainer.json`, e este arquivo não usa nenhuma; o ecossistema `docker` só lê `Dockerfile` e arquivos Compose, e
+o repositório não tem nenhum. Por isso não existe uma terceira entrada (ver
+[Atualizações da imagem](DESENVOLVIMENTO.md#atualizações-da-imagem)).
 
 Regras conferidas pelos testes:
 

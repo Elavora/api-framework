@@ -13,9 +13,10 @@ lugares.
 Você não precisa instalar PHP nem Composer: só Docker. PHPUnit e PHPStan não vêm na imagem: eles estão no
 `require-dev` deste pacote e são instalados pelo `composer install`.
 
-Este repositório usa a versão **`ghcr.io/elavora/php-dev:8.3-0.3.0`**. Existe também a tag `8.3-latest`, que acompanha
-a versão estável mais recente da imagem, mas ela não é usada aqui: uma tag que muda sozinha mudaria o ambiente sem
-nenhum PR.
+Este repositório usa a tag **`ghcr.io/elavora/php-dev:8.3-latest`**, que aponta sempre para a versão estável mais
+recente da imagem PHP 8.3. Ela só muda quando sai uma release estável do `Elavora/devcontainers` (pré-releases não a
+movem), então o ambiente acompanha as releases sem nenhum PR de troca de imagem. O CI usa a imagem padrão do
+pipeline central (ver [O que roda no CI](#o-que-roda-no-ci)).
 
 ## Estilo de código
 
@@ -67,7 +68,7 @@ cobertura, use `XDEBUG_MODE=coverage`.
 Na pasta do repositório, no PowerShell:
 
 ```powershell
-docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.3-0.3.0 sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.3-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
 ```
 
 O comando cria `vendor/` e `composer.lock` na pasta (os dois estão no `.gitignore`) e pode atualizar o
@@ -89,7 +90,9 @@ docker run --rm -v "$($PWD.Path):/w:ro" -w /w rhysd/actionlint:1.7.12 -no-color
 ## O que roda no CI
 
 Em cada PR e em cada push na `main`, o workflow **Qualidade** (`quality.yml`) chama o pipeline de qualidade central
-do `Elavora/.github` 1.2.0, igual para todos os pacotes `api-*`, dentro da imagem `php-dev:8.3-0.3.0`:
+do `Elavora/.github` 1.2.0, igual para todos os pacotes `api-*`, dentro da imagem padrão do pipeline central. Na
+1.2.0 esse padrão é `php-dev:8.3-0.2.0`, gerada do mesmo Dockerfile da `8.3-0.3.0`. Uma próxima versão do
+`Elavora/.github` passa o padrão para `8.3-latest`, e o Dependabot sobe o SHA quando ela sair:
 
 1. **Formatação:** roda o PHP-CS-Fixer com a configuração do repositório. Se algo mudou, commita a correção na
    branch do PR, com a mensagem `style: organiza o código`. Em PR de fork, PR do Dependabot e push na `main` não é
@@ -114,17 +117,19 @@ Outros workflows que também rodam em cada PR:
 
 Os detalhes de cada arquivo estão em [Automação do repositório](AUTOMACAO.md).
 
-## Atualizar a versão da imagem
+## Atualizações da imagem
 
-Uma versão publicada da imagem não muda. Para usar uma nova (por exemplo `8.3-0.4.0`), abra um PR que troque a
-referência em todos os lugares de uma vez:
+Não existe PR de troca de imagem neste repositório:
 
-- `.devcontainer/devcontainer.json` (campo `image`);
-- `.github/workflows/quality.yml` (entrada `image`);
-- os comandos deste documento e do [Guia de uso](USO.md).
+- **Devcontainer e comandos `docker run`:** usam `8.3-latest`. Quando sai uma release estável da imagem, a tag passa a
+  apontar para ela. O Docker não baixa a versão nova sozinho: rode `docker pull ghcr.io/elavora/php-dev:8.3-latest`
+  ou, no VS Code, **Dev Containers: Rebuild Container**.
+- **CI:** o `quality.yml` não passa a entrada `image` e usa o padrão do pipeline central. Esse padrão muda junto com
+  o SHA do `Elavora/.github`, que o Dependabot atualiza (ver
+  [`.github/dependabot.yml`](AUTOMACAO.md#githubdependabotyml)).
 
-O Dependabot não faz essa troca: ele não lê a imagem do `devcontainer.json` (ver
-[`.github/dependabot.yml`](AUTOMACAO.md#githubdependabotyml)).
+Se uma release nova da imagem quebrar algo, a correção é feita no `Elavora/devcontainers` (com uma nova release
+estável), e não fixando uma versão aqui.
 
 ---
 
