@@ -258,6 +258,36 @@ O arquivo termina na linha do `uses:`, com uma quebra de linha no final: não ex
 - Não existe nenhum job local de PHP neste arquivo (matriz, cobertura ou `setup-php`): tudo vem do central.
 - Sem bloco `concurrency`: o workflow central já cancela a execução anterior do mesmo PR.
 
+### `phpunit.xml`
+
+O pipeline central roda os testes com cobertura:
+`XDEBUG_MODE=coverage composer test -- --coverage-clover=<arquivo>`.
+
+O `phpunit.xml` tem o bloco abaixo, filho direto de `<phpunit>`:
+
+```xml
+<source>
+    <include>
+        <directory>src</directory>
+    </include>
+</source>
+```
+
+Esse bloco diz ao PHPUnit que a cobertura mede a pasta `src/`.
+
+Sem o bloco, o PHPUnit 10.5 avisa `No filter is configured, code coverage will not be processed`. Como o
+`phpunit.xml` tem `failOnWarning="true"`, o aviso faz o `composer test` sair com código 1, mesmo com todos os testes
+passando. Além disso, nenhuma cobertura é gerada.
+
+Com o bloco, `XDEBUG_MODE=coverage composer test -- --coverage-clover=<arquivo>` cumpre três condições:
+
+- sai com código 0 quando todos os testes passam;
+- não mostra o aviso `No filter is configured`;
+- gera o `<arquivo>` de cobertura, com os arquivos de `src/`.
+
+O restante do `phpunit.xml` não muda: `bootstrap`, `cacheDirectory`, `colors`, `failOnWarning="true"` e a suíte
+`tests`.
+
 ### Estilo de código (`elavora/code-standards`)
 
 As regras de estilo (PHP-CS-Fixer com PER-CS e o `.editorconfig` base) vêm do pacote Composer

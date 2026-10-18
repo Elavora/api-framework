@@ -76,6 +76,18 @@ O comando cria `vendor/` e `composer.lock` na pasta (os dois estão no `.gitigno
 
 No Git Bash, a conversão automática de caminhos quebra o `docker run`. Use o PowerShell.
 
+### Validar como o CI
+
+O CI roda os testes com cobertura. O `composer check` roda sem cobertura e não pega um erro de configuração da
+cobertura. Para reproduzir o CI, rode também, no PowerShell:
+
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace -e XDEBUG_MODE=coverage ghcr.io/elavora/php-dev:8.3-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer test -- --coverage-clover=/tmp/clover.xml'
+```
+
+O comando precisa sair com código 0 e não pode mostrar o aviso `No filter is configured`. A configuração que garante
+isso está em [Automação do repositório](AUTOMACAO.md#phpunitxml).
+
 ### Testes da automação
 
 Além dos testes PHP, o repositório tem testes que conferem os arquivos de automação (workflows, Dependabot,
