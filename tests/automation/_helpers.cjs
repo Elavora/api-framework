@@ -4,10 +4,63 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const SHA_120 = '3e8259291c0d3f7c031695fe63d714169792c454';
 const OLD_SHA = '1e0f42a92a4aafc35522709c30bc4e83acab82f1';
 const IMAGE = 'ghcr.io/elavora/php-dev:8.3-latest';
-const CENTRAL_SUFFIX = `@${SHA_120} # 1.2.0`;
+
+/**
+ * Formato das referências (docs/AUTOMACAO.md, "Formato das referências").
+ * Os testes conferem o formato, nunca o valor: o Dependabot troca SHA e versão.
+ */
+const CENTRAL_REF = /^@[0-9a-f]{40} # \d+\.\d+\.\d+$/;
+const ACTION_REF = /^@[0-9a-f]{40} # v\d+(?:\.\d+){0,2}$/;
+const CENTRAL_PREFIX = 'Elavora/.github/';
+const REF_PLACEHOLDER = '@<ref>';
+
+function isCentralRef(ref) {
+    return CENTRAL_REF.test(ref);
+}
+
+function isActionRef(ref) {
+    return ACTION_REF.test(ref);
+}
+
+/** Divide o valor de um `uses:` em { target, ref } (ref começa no primeiro `@`). */
+function splitUses(uses) {
+    const at = uses.indexOf('@');
+    if (at < 0) return { target: uses, ref: '' };
+    return { target: uses.slice(0, at), ref: uses.slice(at) };
+}
+
+/** A referência de um `uses:` tem o formato certo para o tipo (central ou action)? */
+function usesRefIsValid(uses) {
+    const { target, ref } = splitUses(uses);
+    return target.startsWith(CENTRAL_PREFIX) ? isCentralRef(ref) : isActionRef(ref);
+}
+
+/**
+ * Troca a referência das linhas `uses:` com formato válido por um marcador fixo.
+ * Referências com formato inválido ficam como estão, e a comparação falha nelas.
+ */
+function normalizeWorkflow(text) {
+    return text
+        .split('\n')
+        .map((line) => {
+            const m = line.match(/^(\s*(?:-\s+)?uses:\s*)(\S+@.*?)\s*$/);
+            if (!m) return line;
+            if (!usesRefIsValid(m[2])) return line;
+            return m[1] + splitUses(m[2]).target + REF_PLACEHOLDER;
+        })
+        .join('\n');
+}
+
+/** Compara um workflow com o bloco esperado: igual linha a linha, menos o valor das referências. */
+function assertWorkflowMatches(assert, actual, expected, label) {
+    assert.equal(
+        normalizeWorkflow(actual.replace(/\r\n/g, '\n')),
+        normalizeWorkflow(expected),
+        `${label} difere do conteúdo esperado documentado`,
+    );
+}
 
 function abs(rel) {
     return path.join(ROOT, rel);
@@ -105,10 +158,17 @@ function usesLines(text) {
 
 module.exports = {
     ROOT,
-    SHA_120,
     OLD_SHA,
     IMAGE,
-    CENTRAL_SUFFIX,
+    CENTRAL_REF,
+    ACTION_REF,
+    CENTRAL_PREFIX,
+    isCentralRef,
+    isActionRef,
+    splitUses,
+    usesRefIsValid,
+    normalizeWorkflow,
+    assertWorkflowMatches,
     abs,
     exists,
     read,
