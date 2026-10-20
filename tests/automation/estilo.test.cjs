@@ -15,19 +15,27 @@ function composer() {
     return h.readJson('composer.json');
 }
 
-/** Restrição aceita para elavora/code-standards: só o major 1 é conferido. */
-const CODE_STANDARDS = /^\^1\.\d+(?:\.\d+)?$/;
+/**
+ * Restrição aceita para elavora/code-standards: major 1 e minor 1 ou maior (a 1.0.0 não tem o
+ * subcomando lint), com patch opcional. O valor exato não é conferido.
+ */
+const CODE_STANDARDS = /^\^1\.[1-9]\d*(?:\.\d+)?$/;
 
 test.describe('restrição de elavora/code-standards (exemplos da doc)', () => {
     for (const [c, ok] of [
-        ['^1.0', true],
         ['^1.1', true],
+        ['^1.2', true],
         ['^1.1.2', true],
+        ['^1.1.3', true],
+        ['^1.10', true],
+        ['^1.0', false],
+        ['^1.0.5', false],
         ['^2.0', false],
+        ['^1.1 || ^2.0', false],
         ['^1.0 || ^2.0', false],
+        ['~1.1', false],
         ['^1', false],
-        ['~1.0', false],
-        ['1.0.0', false],
+        ['1.1.0', false],
         ['^1.1.2.3', false],
     ]) {
         test(`${c} ${ok ? 'passa' : 'falha'}`, () => {
@@ -37,7 +45,7 @@ test.describe('restrição de elavora/code-standards (exemplos da doc)', () => {
 });
 
 test.describe('composer.json', () => {
-    test('elavora/code-standards ^1.x em require-dev, fora do require', () => {
+    test('elavora/code-standards ^1.N (N >= 1) em require-dev, fora do require', () => {
         const c = composer();
         const constraint = (c['require-dev'] || {})['elavora/code-standards'];
         assert.equal(typeof constraint, 'string', 'elavora/code-standards ausente em require-dev');
@@ -64,9 +72,13 @@ test.describe('composer.json', () => {
         assert.deepEqual(s['post-update-cmd'], ['Elavora\\CodeStandards\\Composer::sync']);
     });
 
-    test('scripts lint, test, analyse e check mantêm o conteúdo', () => {
+    test('lint é exatamente elavora-standards lint, sem argumentos', () => {
         const s = composer().scripts || {};
-        assert.equal(s.lint, 'php tools/lint.php');
+        assert.equal(s.lint, 'elavora-standards lint');
+    });
+
+    test('scripts test, analyse e check mantêm o conteúdo (check chama @lint)', () => {
+        const s = composer().scripts || {};
         assert.equal(s.test, 'phpunit -c phpunit.xml');
         assert.equal(s.analyse, 'phpstan analyse --no-progress --memory-limit=512M');
         assert.deepEqual(s.check, ['@lint', '@test', '@analyse']);

@@ -29,6 +29,11 @@ test.describe('arquivos removidos', () => {
         }
     });
 
+    test('não existe tools/lint.php nem a pasta tools/', () => {
+        assert.ok(!h.exists('tools/lint.php'), 'tools/lint.php deveria ter sido apagado');
+        assert.ok(!h.exists('tools'), 'a pasta tools/ deveria ter sido apagada');
+    });
+
     test('não existe packagist-sync.yml em .github/workflows/', () => {
         const found = namesIn('.github/workflows').filter((n) => /^packagist-sync\.ya?ml$/i.test(n));
         assert.deepEqual(found, []);
