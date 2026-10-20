@@ -16,6 +16,7 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "App\\": "examples/app/",
       "Elavora\\Api\\Framework\\Tests\\": "tests/"
     }
   },
