@@ -280,11 +280,13 @@ GitHub Release são geradas em português a partir dos PRs. Veja
 Leia nesta ordem:
 
 1. [Guia de uso](docs/USO.md): instalação, quando usar e os principais pontos de entrada.
-2. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
-3. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
+2. [Exemplos de código](docs/EXEMPLOS.md): uma API de tarefas pequena, com controller, rota explícita, validação,
+   DataType, atributo próprio, middleware, cache e transação. O código está em `examples/` e é testado.
+3. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
+4. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
    no CI.
-4. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
-5. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
+5. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
+6. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
    arquivo.
 
 ## Licenca
