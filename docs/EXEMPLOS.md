@@ -1,6 +1,6 @@
 # Exemplos de código
 
-[README](../README.md) · Anterior: [Guia de uso](USO.md) · Próximo: [Bootstrap compartilhado](BOOTSTRAP.md)
+[README](../README.md) · Anterior: [Segurança do roteamento](ROTEAMENTO.md) · Próximo: [Bootstrap compartilhado](BOOTSTRAP.md)
 
 Este documento mostra o framework em uso, com código que roda de verdade.
 
@@ -73,8 +73,15 @@ método sem nenhum registro de rota.
 - `/task` chama `TaskController::index` (a action padrão é `index`);
 - `/task/store` chama `TaskController::store`.
 
-Só os métodos com `#[Action]` são expostos. O `archive` não tem `#[Action]`, então `/task/archive` responde `404`.
-As regras estão em [Rotas por convenção](../README.md#rotas-por-convencao).
+A URL só chega a código que o projeto marcou como público:
+
+- cada segmento começa com letra minúscula e só tem letras e números (`/Task` e `/task/Store` respondem `404`);
+- a URL tem um ou dois segmentos (`/task/index/1` responde `404`);
+- a classe e o método precisam ter o nome exato, com as mesmas maiúsculas;
+- a action é pública, não estática, declarada no próprio controller e tem `#[Action]`.
+
+O `archive` não tem `#[Action]`, então `/task/archive` responde `404`. Toda recusa responde `404`, sem dizer o
+motivo. As regras completas estão em [Segurança do roteamento](ROTEAMENTO.md).
 
 <!-- exemplo: examples/app/Http/Controller/TaskController.php -->
 ```php
@@ -147,6 +154,11 @@ Quando a URL não segue a convenção, registre a rota no `bootstrap.php`:
 
 A rota explícita não exige `#[Action]`. Quem registra já escolheu o método no código. Por isso o `archive` responde
 em `/tasks/archive`, mas não em `/task/archive`.
+
+O handler precisa ser uma `Closure`, um objeto com `__invoke` ou um par `[Classe::class, 'metodo']` (ou
+`[$objeto, 'metodo']`). Um handler em texto, como `'App\Http\Controller\TaskController::archive'`, é recusado já no
+registro, com `InvalidArgumentException`. Os handlers aceitos estão em
+[Segurança do roteamento](ROTEAMENTO.md#handlers-aceitos).
 
 ## Validação dos dados
 
@@ -456,6 +468,15 @@ status `400` ou maior também tem o campo `request_id` no corpo. As colunas de c
 | 12 | `POST /tasks/archive` | 200 | `{"archived": true}` | |
 | 13 | `POST /task/archive` | 404 | `{"message": "Not Found"}` | sem `#[Action]` |
 | 14 | `GET /tasks` | 404 | `{"message": "Not Found"}` | não existe `TasksController` |
+| 15 | `GET /Task` | 404 | `{"message": "Not Found"}` | o segmento começa com maiúscula |
+| 16 | `GET /task/Index` | 404 | `{"message": "Not Found"}` | o segmento começa com maiúscula |
+| 17 | `GET /task/index/1` | 404 | `{"message": "Not Found"}` | três segmentos |
+
+Registro de rota:
+
+| # | Chamada | Resultado |
+| --- | --- | --- |
+| 18 | `$app->get('/x', 'App\Http\Controller\TaskController::index')` na aplicação do `bootstrap.php` | lança `InvalidArgumentException` |
 
 O "log da transação" é o valor de `log()` do `TransactionManager` do container da aplicação, depois da request. O
 número de itens do cache é o valor de `count()` do `CacheStore` do container.
@@ -577,4 +598,4 @@ Os passos seguem o fluxo da organização: primeiro a doc, depois o teste, depoi
 
 ---
 
-[README](../README.md) · Anterior: [Guia de uso](USO.md) · Próximo: [Bootstrap compartilhado](BOOTSTRAP.md)
+[README](../README.md) · Anterior: [Segurança do roteamento](ROTEAMENTO.md) · Próximo: [Bootstrap compartilhado](BOOTSTRAP.md)

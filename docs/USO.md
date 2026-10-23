@@ -69,4 +69,4 @@ Mais detalhes em [Ambiente de desenvolvimento e testes](DESENVOLVIMENTO.md).
 
 ---
 
-[README](../README.md) · Próximo: [Exemplos de código](EXEMPLOS.md)
+[README](../README.md) · Próximo: [Segurança do roteamento](ROTEAMENTO.md)
