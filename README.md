@@ -253,7 +253,7 @@ Scripts Composer disponíveis:
 ```bash
 composer check   # lint, testes e PHPStan
 composer test    # testes PHPUnit
-composer lint    # sintaxe
+composer lint    # sintaxe (elavora-standards lint, do elavora/code-standards)
 ```
 
 O código segue o padrão PER-CS, com as regras do pacote `elavora/code-standards`. No devcontainer, o arquivo é
