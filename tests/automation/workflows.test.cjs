@@ -158,12 +158,118 @@ const EXPECTED = {
     '.github/workflows/automation.yml': AUTOMATION,
 };
 
-test.describe('conteúdo exato dos workflows', () => {
+test.describe('conteúdo esperado dos workflows (referências conferidas pelo formato)', () => {
     for (const [file, content] of Object.entries(EXPECTED)) {
         test(`${file} tem o conteúdo documentado`, () => {
-            h.assertExactContent(assert, file, content);
+            assert.ok(h.exists(file), `${file} deveria existir`);
+            h.assertWorkflowMatches(assert, h.read(file), content, file);
         });
     }
+});
+
+test.describe('formato das referências (tabela da doc)', () => {
+    const central = [
+        ['@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0', true],
+        ['@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0', true],
+        ['@3e8259291c0d3f7c031695fe63d714169792c454 # v1.2.0', false],
+        ['@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2', false],
+        ['@1.2.0', false],
+        ['@3e8259291c0d3f7c031695fe63d714169792c454', false],
+        ['@3e82592 # 1.2.0', false],
+        ['@3E8259291C0D3F7C031695FE63D714169792C454 # 1.2.0', false],
+        ['@3e8259291c0d3f7c031695fe63d714169792c45g # 1.2.0', false],
+        ['@main # 1.2.0', false],
+        ['@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0 extra', false],
+        ['@3e8259291c0d3f7c031695fe63d714169792c454 # -1.2.0', false],
+    ];
+    for (const [ref, ok] of central) {
+        test(`central ${ref} ${ok ? 'passa' : 'falha'}`, () => {
+            assert.equal(h.isCentralRef(ref), ok);
+        });
+    }
+
+    const action = [
+        ['@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4', true],
+        ['@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39', true],
+        ['@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0', true],
+        ['@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1', true],
+        ['@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1', false],
+        ['@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1.2', false],
+        ['@3d3c42e5aac5ba805825da76410c181273ba90b1 # latest', false],
+        ['@v7.0.1', false],
+        ['@3d3c42e5aac5ba805825da76410c181273ba90b1', false],
+        ['@3d3c42e # v7.0.1', false],
+        ['@3D3C42E5AAC5BA805825DA76410C181273BA90B1 # v7.0.1', false],
+        ['@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 extra', false],
+    ];
+    for (const [ref, ok] of action) {
+        test(`action ${ref} ${ok ? 'passa' : 'falha'}`, () => {
+            assert.equal(h.isActionRef(ref), ok);
+        });
+    }
+});
+
+test.describe('comparação linha a linha (exemplos da doc)', () => {
+    const DR = '      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4';
+    const matches = (text, expected = DEPENDENCY_REVIEW) =>
+        h.normalizeWorkflow(text) === h.normalizeWorkflow(expected);
+    const swap = (from, to) => {
+        assert.ok(DEPENDENCY_REVIEW.includes(from), `linha base ausente: ${from}`);
+        return DEPENDENCY_REVIEW.replace(from, to);
+    };
+
+    test('o próprio bloco passa', () => {
+        assert.ok(matches(DEPENDENCY_REVIEW));
+    });
+
+    const casos = [
+        ['outro SHA (PR #52) passa', DR,
+            '      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v4', true],
+        ['outro SHA e outra versão passa', DR,
+            '      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0', true],
+        ['checkout com outro SHA e # v7.1.0 passa',
+            '      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1',
+            '      - uses: actions/checkout@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v7.1.0', true],
+        ['tag em vez de SHA falha', DR, '      - uses: actions/dependency-review-action@v4', false],
+        ['outra action falha', DR,
+            '      - uses: actions/some-other-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v4', false],
+        ['SHA curto no checkout falha',
+            '      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1',
+            '      - uses: actions/checkout@3d3c42e # v7.0.1', false],
+        ['outra entrada with falha', '          fail-on-severity: high', '          fail-on-severity: critical', false],
+        ['permissão acrescentada falha', '  contents: read\n', '  contents: read\n  pull-requests: write\n', false],
+    ];
+    for (const [nome, from, to, ok] of casos) {
+        test(`dependency-review.yml: ${nome}`, () => {
+            assert.equal(matches(swap(from, to)), ok);
+        });
+    }
+
+    const REL = '    uses: Elavora/.github/.github/workflows/release.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0';
+    const centrais = [
+        ['outro SHA e # 1.3.0 passa',
+            '    uses: Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0', true],
+        ['tag em vez de SHA falha', '    uses: Elavora/.github/.github/workflows/release.yml@1.3.0', false],
+        ['sem comentário de versão falha',
+            '    uses: Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487', false],
+        ['versão com v falha',
+            '    uses: Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # v1.3.0', false],
+        ['outro workflow central falha',
+            '    uses: Elavora/.github/.github/workflows/php-quality.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0', false],
+    ];
+    for (const [nome, to, ok] of centrais) {
+        test(`release.yml: ${nome}`, () => {
+            assert.ok(RELEASE.includes(REL));
+            assert.equal(matches(RELEASE.replace(REL, to), RELEASE), ok);
+        });
+    }
+
+    test('codeql.yml: só o analyze subir (PR #53) passa; init e analyze podem ter SHAs diferentes', () => {
+        const from = '      - uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4';
+        const to = '      - uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4';
+        assert.ok(CODEQL.includes(from));
+        assert.ok(matches(CODEQL.replace(from, to), CODEQL));
+    });
 });
 
 test.describe('release.yml', () => {
@@ -195,7 +301,10 @@ test.describe('quality.yml', () => {
         assert.match(jobs.quality, /uses: Elavora\/\.github\/\.github\/workflows\/php-quality\.yml@/);
         assert.doesNotMatch(jobs.quality, /^\s*with:/m);
         assert.doesNotMatch(jobs.quality, /^\s*image:/m);
-        assert.ok(text.endsWith(' # 1.2.0\n'), 'quality.yml deveria terminar na linha do uses:');
+        const last = text.replace(/\n$/, '').split('\n').pop();
+        assert.ok(text.endsWith('\n') && !text.endsWith('\n\n'), 'quality.yml deveria terminar com uma quebra de linha');
+        assert.match(last, /^\s+uses:\s*Elavora\/\.github\/\.github\/workflows\/php-quality\.yml@/,
+            'quality.yml deveria terminar na linha do uses:');
         assert.match(jobs.quality, /contents: write/);
         assert.match(jobs.quality, /pull-requests: write/);
     });
@@ -222,15 +331,15 @@ test.describe('regras gerais dos workflows', () => {
         }
     });
 
-    test('todo uses central termina em @<SHA 1.2.0> # 1.2.0', () => {
+    test('todo uses central tem uma referência central (@SHA # X.Y.Z)', () => {
         let found = 0;
         for (const file of h.workflowFiles()) {
             for (const uses of h.usesLines(h.read(file))) {
                 if (!uses.startsWith('Elavora/.github/')) continue;
                 found++;
                 assert.match(uses, /^Elavora\/\.github\/\.github\/workflows\/[A-Za-z0-9_.-]+\.ya?ml@/, `${file}: ${uses}`);
-                assert.ok(uses.endsWith(h.CENTRAL_SUFFIX), `${file}: ${uses} não termina em ${h.CENTRAL_SUFFIX}`);
                 assert.equal(uses.split('@').length, 2, `${file}: ${uses}`);
+                assert.ok(h.isCentralRef(h.splitUses(uses).ref), `${file}: ${uses} sem referência central válida`);
             }
         }
         assert.ok(found >= 3, 'esperados pelo menos três chamadores centrais (release, sync-labels, quality)');
@@ -268,11 +377,13 @@ test.describe('regras gerais dos workflows', () => {
         }
     });
 
-    test('actions de terceiros são fixadas por SHA de 40 caracteres com versão em comentário', () => {
+    test('actions de terceiros têm uma referência de action (@SHA # vN[.N[.N]])', () => {
         for (const file of h.workflowFiles()) {
             for (const uses of h.usesLines(h.read(file))) {
                 if (uses.startsWith('Elavora/.github/') || uses.startsWith('./')) continue;
-                assert.match(uses, /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_./-]+@[0-9a-f]{40} # \S+$/, `${file}: ${uses}`);
+                assert.match(uses, /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_./-]+@/, `${file}: ${uses}`);
+                assert.equal(uses.split('@').length, 2, `${file}: ${uses}`);
+                assert.ok(h.isActionRef(h.splitUses(uses).ref), `${file}: ${uses} sem referência de action válida`);
             }
         }
     });

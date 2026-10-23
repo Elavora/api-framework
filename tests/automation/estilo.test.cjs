@@ -15,10 +15,33 @@ function composer() {
     return h.readJson('composer.json');
 }
 
+/** Restrição aceita para elavora/code-standards: só o major 1 é conferido. */
+const CODE_STANDARDS = /^\^1\.\d+(?:\.\d+)?$/;
+
+test.describe('restrição de elavora/code-standards (exemplos da doc)', () => {
+    for (const [c, ok] of [
+        ['^1.0', true],
+        ['^1.1', true],
+        ['^1.1.2', true],
+        ['^2.0', false],
+        ['^1.0 || ^2.0', false],
+        ['^1', false],
+        ['~1.0', false],
+        ['1.0.0', false],
+        ['^1.1.2.3', false],
+    ]) {
+        test(`${c} ${ok ? 'passa' : 'falha'}`, () => {
+            assert.equal(CODE_STANDARDS.test(c), ok);
+        });
+    }
+});
+
 test.describe('composer.json', () => {
-    test('elavora/code-standards ^1.0 em require-dev, fora do require', () => {
+    test('elavora/code-standards ^1.x em require-dev, fora do require', () => {
         const c = composer();
-        assert.equal((c['require-dev'] || {})['elavora/code-standards'], '^1.0');
+        const constraint = (c['require-dev'] || {})['elavora/code-standards'];
+        assert.equal(typeof constraint, 'string', 'elavora/code-standards ausente em require-dev');
+        assert.match(constraint, CODE_STANDARDS);
         assert.ok(!('elavora/code-standards' in (c.require || {})));
     });
 

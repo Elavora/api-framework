@@ -95,21 +95,83 @@ feita pelo orquestrador no momento do PR de adoção, antes do merge.
 
 Esta seção é o contrato de cada arquivo, conferido pelos testes da automação. Nela:
 
-- **SHA da 1.2.0** é `3e8259291c0d3f7c031695fe63d714169792c454`, o commit da tag `1.2.0` do `Elavora/.github`;
 - **imagem** é `ghcr.io/elavora/php-dev:8.3-latest`, a tag que aponta sempre para a versão estável mais recente da
   imagem PHP 8.3 (só muda quando sai uma release estável do `Elavora/devcontainers`).
+
+Os SHAs e as versões que aparecem nos exemplos desta seção são os da adoção. O Dependabot troca esses valores, e os
+testes aceitam a troca. Veja
+[Atualizações do Dependabot não quebram os testes](#atualizações-do-dependabot-não-quebram-os-testes).
 
 ### Regras gerais
 
 - Nenhum arquivo em `.github/` cita o SHA antigo `1e0f42a92a4aafc35522709c30bc4e83acab82f1` (nem o prefixo `1e0f42a`).
-- Todo `uses:` para `Elavora/.github/.github/workflows/...` termina exatamente em
-  `@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0`. Nenhum usa nome de branch, `main`, tag sem SHA ou outro SHA.
+- Todo `uses:` para `Elavora/.github/.github/workflows/...` tem uma **referência central**. O formato está em
+  [Formato das referências](#formato-das-referências). Nenhum usa nome de branch, `main` ou tag sem SHA.
 - Nenhum chamador passa a entrada `automation_ref` nem a entrada `image`.
 - Todo job que chama um workflow de `Elavora/.github` concede `id-token: write`.
-- Toda action de terceiros (`actions/*`, `github/*`) é fixada por SHA completo (40 caracteres hexadecimais), com a
-  versão em comentário.
+- Toda action de terceiros (`actions/*`, `github/*`) tem uma **referência de action**, no formato de
+  [Formato das referências](#formato-das-referências).
 - Nenhum chamador usa `secrets: inherit`.
 - Os workflows passam no actionlint 1.7.12 sem avisos.
+
+### Como os testes comparam os workflows
+
+Cada workflow tem, abaixo, um bloco **Conteúdo esperado**. O teste compara o arquivo com esse bloco, linha a linha.
+
+A única parte que pode ser diferente é a referência no fim de cada linha `uses:`: o `@`, o SHA, o espaço e o
+comentário de versão. Nessa parte, o teste confere o formato, e não o valor.
+
+Todo o resto precisa ser igual ao bloco: os gatilhos, as permissões, os jobs, os passos, a ordem dos passos, as
+entradas `with`, os comandos `run` e o caminho de cada action ou workflow usado (o texto antes do `@`).
+
+Exemplo com o bloco do `dependency-review.yml`:
+
+| Linha no arquivo | Resultado | Por quê |
+| --- | --- | --- |
+| `- uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v4` | passa | outro SHA, formato válido |
+| `- uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0` | passa | outro SHA e outra versão, formato válido |
+| `- uses: actions/dependency-review-action@v4` | falha | tag em vez de SHA |
+| `- uses: actions/some-other-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v4` | falha | outra action |
+| `fail-on-severity: critical` no lugar de `fail-on-severity: high` | falha | outra entrada `with` |
+| `pull-requests: write` acrescentado às permissões | falha | outra permissão |
+
+Os outros arquivos com **Conteúdo exato** (`devcontainer.json`, `dependabot.yml` e `.php-cs-fixer.dist.php`) são
+comparados por inteiro, sem nenhuma parte livre. O Dependabot não muda esses arquivos.
+
+### Formato das referências
+
+Uma **referência central** é o fim de um `uses:` que chama o `Elavora/.github`. O formato é:
+`@` + SHA + espaço + `# ` + versão `X.Y.Z`.
+
+Uma **referência de action** é o fim de um `uses:` que chama uma action de terceiros. O formato é:
+`@` + SHA + espaço + `# v` + versão com uma, duas ou três partes (`v4`, `v4.39`, `v4.39.0`).
+
+Nos dois casos:
+
+- o SHA tem exatamente 40 caracteres, todos de `0` a `9` ou de `a` a `f` (minúsculos);
+- o comentário é o último texto da linha;
+- cada parte da versão é um número sem sinal (`0`, `7`, `39`).
+
+| Referência | Tipo | Resultado | Por quê |
+| --- | --- | --- | --- |
+| `@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0` | central | passa | |
+| `@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0` | central | passa | outro SHA e outra versão |
+| `@3e8259291c0d3f7c031695fe63d714169792c454 # v1.2.0` | central | falha | a versão central não tem `v` |
+| `@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2` | central | falha | a versão central tem três partes |
+| `@1.2.0` | central | falha | tag em vez de SHA |
+| `@3e8259291c0d3f7c031695fe63d714169792c454` | central | falha | sem comentário de versão |
+| `@3e82592 # 1.2.0` | central | falha | SHA curto |
+| `@3E8259291C0D3F7C031695FE63D714169792C454 # 1.2.0` | central | falha | SHA com letras maiúsculas |
+| `@3e8259291c0d3f7c031695fe63d714169792c45g # 1.2.0` | central | falha | `g` não é hexadecimal |
+| `@main # 1.2.0` | central | falha | nome de branch |
+| `@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4` | action | passa | |
+| `@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0` | action | passa | outro SHA e outra versão |
+| `@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1` | action | passa | |
+| `@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1` | action | falha | falta o `v` |
+| `@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1.2` | action | falha | quatro partes |
+| `@3d3c42e5aac5ba805825da76410c181273ba90b1 # latest` | action | falha | não é versão |
+| `@v7.0.1` | action | falha | tag em vez de SHA |
+| `@3d3c42e5aac5ba805825da76410c181273ba90b1` | action | falha | sem comentário de versão |
 
 ### `.devcontainer/devcontainer.json`
 
@@ -158,7 +220,7 @@ Igual ao `examples/devcontainer.json` da versão `0.3.0` do `Elavora/devcontaine
 
 ### `.github/workflows/release.yml`
 
-Conteúdo exato:
+Conteúdo esperado ([como o teste compara](#como-os-testes-comparam-os-workflows)):
 
 ```yaml
 name: Release
@@ -190,7 +252,7 @@ jobs:
 
 ### `.github/workflows/sync-labels.yml`
 
-Conteúdo exato:
+Conteúdo esperado ([como o teste compara](#como-os-testes-comparam-os-workflows)):
 
 ```yaml
 name: Sincronizar labels
@@ -216,7 +278,8 @@ jobs:
 
 ### `.github/workflows/quality.yml`
 
-Chamador do workflow reutilizável `php-quality.yml` do `Elavora/.github`. Conteúdo exato:
+Chamador do workflow reutilizável `php-quality.yml` do `Elavora/.github`. Conteúdo
+esperado ([como o teste compara](#como-os-testes-comparam-os-workflows)):
 
 ```yaml
 name: Qualidade
@@ -297,7 +360,10 @@ O contrato completo está no
 
 **`composer.json`:**
 
-- `elavora/code-standards` entra em `require-dev`, com a restrição `^1.0`. Não entra no `require`.
+- `elavora/code-standards` entra em `require-dev`, com a restrição `^1.0`. Não entra no `require`. O teste confere
+  só o major: a restrição é `^1.` seguido de um ou dois números separados por ponto, como `^1.0`, `^1.1` ou
+  `^1.1.2` (veja
+  [Atualizações do Dependabot não quebram os testes](#atualizações-do-dependabot-não-quebram-os-testes)).
 - `friendsofphp/php-cs-fixer` não entra em nenhuma seção: o binário vem da imagem.
 - `scripts` ganha as duas entradas abaixo, exatamente assim:
 
@@ -361,7 +427,8 @@ Se sobrar algo, o pipeline do PR completa a formatação com o commit automátic
 
 ### `.github/workflows/codeql.yml`
 
-Deixa de chamar o workflow central antigo e passa a ter o job local. Conteúdo exato:
+Deixa de chamar o workflow central antigo e passa a ter o job local. Conteúdo
+esperado ([como o teste compara](#como-os-testes-comparam-os-workflows)):
 
 ```yaml
 name: CodeQL
@@ -395,7 +462,7 @@ jobs:
 
 ### `.github/workflows/dependency-review.yml`
 
-Conteúdo exato:
+Conteúdo esperado ([como o teste compara](#como-os-testes-comparam-os-workflows)):
 
 ```yaml
 name: Dependency Review
@@ -422,7 +489,7 @@ jobs:
 
 ### `.github/workflows/automation.yml`
 
-Conteúdo exato:
+Conteúdo esperado ([como o teste compara](#como-os-testes-comparam-os-workflows)):
 
 ```yaml
 name: Automação
@@ -456,7 +523,13 @@ jobs:
 
 Duas atualizações, `composer` e `github-actions`, com a mesma agenda e o mesmo limite de hoje. Cada uma ganha
 `labels: ["dependencies"]` e `commit-message`, para que os commits e os títulos dos PRs do Dependabot sigam o
-Conventional Commits da organização. Conteúdo exato:
+Conventional Commits da organização.
+
+A entrada `github-actions` tem também o grupo `codeql-action`. Ele junta numa só PR as atualizações de
+`github/codeql-action/init` e `github/codeql-action/analyze` (veja
+[Grupo do CodeQL](#grupo-do-codeql)).
+
+Conteúdo exato:
 
 ```yaml
 version: 2
@@ -487,6 +560,10 @@ updates:
     commit-message:
       prefix: "ci"
       include: "scope"
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
 ```
 
 O que cada atualização cobre:
@@ -509,9 +586,34 @@ Regras conferidas pelos testes:
 - Toda entrada de `updates` tem `commit-message` com `include: "scope"`. O `prefix` é `chore` para `composer` (com
   `prefix-development` também `chore`) e `ci` para `github-actions`.
 - Não existe entrada para outros ecossistemas.
+- A entrada `github-actions` tem exatamente um grupo, `codeql-action`, com exatamente um padrão:
+  `github/codeql-action*`. O grupo não tem outras chaves (`applies-to`, `dependency-type`, `update-types`,
+  `exclude-patterns`).
+- A entrada `composer` não tem grupos.
 
 Resultado: os PRs saem como `chore(deps): bump phpstan/phpstan from 2.2.0 to 2.2.1`, `chore(deps-dev): ...` (para
-dependências de desenvolvimento) e `ci(deps): bump actions/checkout from 7.0.1 to 7.1.0`.
+dependências de desenvolvimento) e `ci(deps): bump actions/checkout from 7.0.1 to 7.1.0`. O PR do grupo sai como
+`ci(deps): bump the codeql-action group with 2 updates`.
+
+### Grupo do CodeQL
+
+O `codeql.yml` usa duas actions do mesmo repositório: `github/codeql-action/init` e `github/codeql-action/analyze`.
+Elas precisam estar na mesma versão. O `analyze` lê o que o `init` preparou.
+
+Sem grupo, o Dependabot trata as duas como dependências separadas. Ele abre um PR para cada uma, e cada PR deixa as
+duas em versões diferentes até o outro entrar. Foi o que aconteceu no PR #53: ele subiu só o `analyze`.
+
+Com o grupo, as duas sobem juntas num PR só.
+
+O padrão `github/codeql-action*` pega o `init`, o `analyze` e qualquer outra action desse repositório que o
+workflow passe a usar. Ele não pega nenhuma outra action do `codeql.yml`: o `actions/checkout` continua no seu
+próprio PR.
+
+O grupo vale só para as atualizações de versão. As atualizações de segurança seguem o padrão do Dependabot, um PR por
+dependência. É o comportamento padrão quando o grupo não define `applies-to`.
+
+Os testes não exigem que o `init` e o `analyze` tenham o mesmo SHA. Quem garante isso é o grupo. Assim, um PR antigo
+que suba só uma delas continua passando nos testes.
 
 **Limitação:** a regra da organização é que todo commit, inclusive os de bots, seja em português do Brasil e siga o
 Conventional Commits. O Dependabot só deixa configurar o prefixo. O resto da mensagem (`bump X from A to B`) é
@@ -555,6 +657,52 @@ workflows, Dependabot, devcontainer, os arquivos de estilo, as entradas do `comp
 arquivos removidos.
 
 Os arquivos `.test.cjs` não são PHP: o PHPUnit e o `composer lint` os ignoram.
+
+### Atualizações do Dependabot não quebram os testes
+
+O Dependabot abre PRs que mudam referências fixas. Esses PRs precisam passar no check **Automação** sem ninguém
+editar os testes.
+
+Antes, os testes conferiam o valor exato de cada SHA e de cada versão. Todo PR do Dependabot falhava, porque mudar
+esse valor é justamente o que ele faz. Os PRs #52 e #53 falharam por isso. Esse comportamento está errado.
+
+Por isso os testes conferem o **formato** das referências que o Dependabot atualiza, e nunca o **valor**:
+
+| O que o Dependabot muda | O que o teste confere | O que o teste não confere |
+| --- | --- | --- |
+| SHA e comentário do `Elavora/.github` nos chamadores | a [referência central](#formato-das-referências) | qual SHA e qual versão |
+| SHA e comentário das actions de terceiros | a [referência de action](#formato-das-referências) | qual SHA e qual versão |
+| Restrição de `elavora/code-standards` no `composer.json` | a restrição é `^1.` seguido de um ou dois números separados por ponto (`^1.0`, `^1.1`, `^1.1.2`) | qual minor e qual patch |
+| Restrições de `phpstan/phpstan` e `phpunit/phpunit` | o pacote está em `require-dev` | a restrição |
+| Bloco do `.editorconfig`, quando a versão nova do pacote muda o bloco | os marcadores de início e fim | o conteúdo do bloco |
+| `composer.lock` | nada | o conteúdo do lock |
+
+A estrutura continua conferida. Um PR que muda um job, um passo, uma permissão, uma entrada `with` ou a action usada
+falha no teste (veja [Como os testes comparam os workflows](#como-os-testes-comparam-os-workflows)).
+
+Exemplos que passam:
+
+- o PR #52: `actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4` trocado por
+  `actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v4`;
+- o PR #53: `github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4` trocado por
+  `github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4`;
+- `Elavora/.github/.github/workflows/release.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0` trocado por
+  `Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0`;
+- `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1` trocado por outro SHA com `# v7.1.0`;
+- `"elavora/code-standards": "^1.0"` trocado por `"^1.1"`;
+- `"phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"` trocado por `"^10.5 || ^11.0 || ^12.0 || ^13.0"`.
+
+Exemplos que falham:
+
+- `Elavora/.github/.github/workflows/release.yml@1.3.0` (tag em vez de SHA);
+- `Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487` (sem o comentário de
+  versão);
+- `actions/checkout@3d3c42e # v7.0.1` (SHA curto);
+- `"elavora/code-standards": "^2.0"` (outro major);
+- `"elavora/code-standards": "^1.0 || ^2.0"` (aceita outro major).
+
+Por que o major de `elavora/code-standards` é conferido: um major novo muda as regras de estilo e reformata o código.
+Essa troca precisa de um PR próprio, que atualize também esta documentação e o teste.
 
 Como rodar: veja [Testes da automação](DESENVOLVIMENTO.md#testes-da-automação). No CI, rodam no workflow
 **Automação**, em todo PR e em todo push na `main`.
