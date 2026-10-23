@@ -33,7 +33,7 @@ final class Application
         $this->kernel = new HttpKernel(
             router: $this->router,
             controllerResolver: new ControllerResolver($this->container),
-            conventionRouteResolver: new ConventionRouteResolver(),
+            conventionRouteResolver: new ConventionRouteResolver(container: $this->container),
             debug: $debug,
         );
         $this->emitter = new ResponseEmitter();

@@ -104,6 +104,10 @@ Ao atualizar de uma versao anterior, adicione `#[Action]` a cada metodo que deve
 continuar acessivel por convencao. Rotas registradas explicitamente nao exigem o
 atributo.
 
+As regras completas de segurança do roteamento estão em
+[Segurança do roteamento](docs/ROTEAMENTO.md). Elas cobrem o formato da URL, quais classes e métodos podem ser
+expostos, a resposta `404` quando uma regra falha, o log da recusa e os handlers aceitos por `Router::add`.
+
 ## Request
 
 `Request` normaliza metodo, path, query string, corpo, headers e request id.
@@ -280,11 +284,13 @@ GitHub Release são geradas em português a partir dos PRs. Veja
 Leia nesta ordem:
 
 1. [Guia de uso](docs/USO.md): instalação, quando usar e os principais pontos de entrada.
-2. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
-3. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
+2. [Segurança do roteamento](docs/ROTEAMENTO.md): roteamento por convenção, recusas com `404`, log e handlers
+   aceitos no registro de rotas.
+3. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
+4. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
    no CI.
-4. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
-5. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
+5. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
+6. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
    arquivo.
 
 ## Licenca
