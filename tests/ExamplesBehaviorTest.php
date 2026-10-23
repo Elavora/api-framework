@@ -216,6 +216,34 @@ final class ExamplesBehaviorTest extends TestCase
         self::assertSame(self::NOT_FOUND, $body);
     }
 
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function unsafeConventionPaths(): array
+    {
+        return [
+            'caso 15: controller com maiúscula' => ['/Task'],
+            'caso 16: action com maiúscula' => ['/task/Index'],
+            'caso 17: três segmentos' => ['/task/index/1'],
+        ];
+    }
+
+    #[DataProvider('unsafeConventionPaths')]
+    public function testUnsafeConventionPathIsNotFound(string $path): void
+    {
+        $body = self::assertCommon(self::app()->handle(self::request('GET', $path)), 404);
+
+        self::assertSame(self::NOT_FOUND, $body);
+    }
+
+    public function testCase18StringHandlerIsRefusedOnRegistration(): void
+    {
+        $app = self::app();
+
+        $this->expectException(InvalidArgumentException::class);
+        $app->get('/x', 'App\Http\Controller\TaskController::index');
+    }
+
     public function testEachRequireReturnsANewApplication(): void
     {
         self::assertNotSame(self::app(), self::app());
