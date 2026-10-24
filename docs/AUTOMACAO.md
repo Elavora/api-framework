@@ -353,17 +353,34 @@ O restante do `phpunit.xml` não muda: `bootstrap`, `cacheDirectory`, `colors`, 
 
 ### Estilo de código (`elavora/code-standards`)
 
-As regras de estilo (PHP-CS-Fixer com PER-CS e o `.editorconfig` base) vêm do pacote Composer
-[`elavora/code-standards`](https://packagist.org/packages/elavora/code-standards) **1.0.0**, publicado no Packagist.
-O contrato completo está no
-[guia de adoção do pacote](https://github.com/Elavora/code-standards/blob/1.0.0/docs/adocao.md).
+As regras de estilo (PHP-CS-Fixer com PER-CS e o `.editorconfig` base) e o lint de sintaxe vêm do pacote Composer
+[`elavora/code-standards`](https://packagist.org/packages/elavora/code-standards), a partir da **1.1.0**, publicado
+no Packagist. O contrato completo está no
+[guia de adoção do pacote](https://github.com/Elavora/code-standards/blob/1.1.0/docs/adocao.md). O lint está em
+[Lint de sintaxe PHP](https://github.com/Elavora/code-standards/blob/1.1.0/docs/lint.md).
 
 **`composer.json`:**
 
-- `elavora/code-standards` entra em `require-dev`, com a restrição `^1.0`. Não entra no `require`. O teste confere
-  só o major: a restrição é `^1.` seguido de um ou dois números separados por ponto, como `^1.0`, `^1.1` ou
-  `^1.1.2` (veja
+- `elavora/code-standards` entra em `require-dev`, com a restrição `^1.1`. Não entra no `require`.
+- A restrição precisa começar no minor 1 ou maior. Motivo: o CI roda o `composer lint` com as dependências nas
+  versões mínimas permitidas. Com `^1.0`, a mínima é a 1.0.0, que não tem o subcomando `lint`, e o CI falha.
+- O teste confere o major e o minor mínimo, e não o valor exato: a restrição é `^1.` seguido do minor, e
+  opcionalmente do patch, com minor maior ou igual a 1. Assim, o PR do Dependabot que sobe a restrição continua
+  passando (veja
   [Atualizações do Dependabot não quebram os testes](#atualizações-do-dependabot-não-quebram-os-testes)).
+
+  | Restrição | Resultado | Por quê |
+  | --- | --- | --- |
+  | `^1.1` | passa | |
+  | `^1.2` | passa | minor maior |
+  | `^1.1.3` | passa | com patch |
+  | `^1.10` | passa | minor 10 |
+  | `^1.0` | falha | a 1.0.0 não tem o lint |
+  | `^1.0.5` | falha | minor 0 |
+  | `^2.0` | falha | outro major |
+  | `^1.1 \|\| ^2.0` | falha | aceita outro major |
+  | `~1.1` | falha | outro operador |
+
 - `friendsofphp/php-cs-fixer` não entra em nenhuma seção: o binário vem da imagem.
 - `scripts` ganha as duas entradas abaixo, exatamente assim:
 
@@ -376,8 +393,11 @@ O contrato completo está no
   pacote não existe, e um comando em `vendor/bin` faria a instalação falhar. Com o método, o Composer só avisa
   `Class Elavora\CodeStandards\Composer is not autoloadable, can not call post-install-cmd script` e segue com
   sucesso. Esse aviso é esperado.
-- Os scripts `lint`, `test`, `analyse` e `check` continuam existindo, com o mesmo conteúdo. O `test` continua
-  chamando o PHPUnit direto (`phpunit -c phpunit.xml`), porque o pipeline acrescenta argumentos de cobertura a ele.
+- O script `lint` é exatamente `"lint": "elavora-standards lint"`, sem argumentos. Antes era `php tools/lint.php`.
+  Veja [Lint de sintaxe](#lint-de-sintaxe).
+- Os scripts `test`, `analyse` e `check` continuam existindo, com o mesmo conteúdo. O `check` continua chamando
+  `@lint`. O `test` continua chamando o PHPUnit direto (`phpunit -c phpunit.xml`), porque o pipeline acrescenta
+  argumentos de cobertura a ele.
 - `extra.branch-alias.dev-main` passa de `1.0-dev` para `2.0-dev`, porque a `main` passa a ser a linha 2.
 
 **`.php-cs-fixer.dist.php`** (raiz, versionado): é o stub que a sincronização cria. Conteúdo exato, em bytes (fim de
@@ -409,9 +429,47 @@ depois de adicionar o pacote, e é esse resultado que se commita.
 
 - `/.elavora/` é a pasta onde o CI baixa os scripts centrais.
 - `/.php-cs-fixer.php` é o override pessoal opcional de quem desenvolve (ver
-  [Ajustar as regras](https://github.com/Elavora/code-standards/blob/1.0.0/docs/php-cs-fixer.md)).
+  [Ajustar as regras](https://github.com/Elavora/code-standards/blob/1.1.0/docs/php-cs-fixer.md)).
 
 As linhas que já existem no `.gitignore` continuam.
+
+### Lint de sintaxe
+
+O `composer lint` roda `elavora-standards lint`, o subcomando do `elavora/code-standards`. Ele roda `php -l` em cada
+arquivo PHP e falha se algum não compilar. Não é análise estática (isso é o PHPStan) nem formatação.
+
+O repositório não tem mais lint próprio. O `tools/lint.php` foi apagado, e a pasta `tools/` também, porque ficou
+vazia. Motivo: uma cópia local não recebe correções. Com o lint no pacote, as melhorias chegam pelo PR do
+Dependabot, junto com as regras de estilo.
+
+Quais arquivos entram: todo `.php` do projeto, menos a pasta `vendor`, os arquivos e pastas cujo nome começa com
+ponto e o que for passado em `--exclude`. O script não usa `--exclude`.
+
+| Arquivo | Conferido? | Por quê |
+| --- | --- | --- |
+| `src/Application.php` | sim | |
+| `tests/ApplicationTest.php` | sim | |
+| `tests/Fixtures/App/Http/Controller/HealthController.php` | sim | |
+| `.php-cs-fixer.dist.php` | não | nome começa com ponto |
+| `.phpstan.cache/resultCache.php` | não | pasta começa com ponto |
+| `vendor/autoload.php` | não | pasta `vendor` |
+| `tests/automation/workflows.test.cjs` | não | não é `.php` |
+
+Hoje, na prática, a lista é a mesma do script antigo: `src/` e `tests/`. Uma pasta nova com PHP, como `examples/`,
+passa a ser conferida sem mudar o script.
+
+O que muda na saída:
+
+| | `tools/lint.php` (antigo) | `elavora-standards lint` |
+| --- | --- | --- |
+| Sem erro | uma linha `No syntax errors detected in ...` por arquivo | uma linha só: `elavora/code-standards: lint ok: N arquivo(s) sem erro de sintaxe` |
+| Com erro | a mensagem do `php -l` | só os arquivos com erro, cada um com a mensagem, e um resumo no fim; código de saída 1 |
+
+Depois de `composer install --no-dev`, o comando não existe e o `composer lint` falha. Isso é esperado: o lint é só
+para desenvolvimento e CI.
+
+Para rodar só uma pasta, numa execução: `composer lint -- src`. Os detalhes estão no
+[guia do lint](https://github.com/Elavora/code-standards/blob/1.1.0/docs/lint.md).
 
 ### Primeira formatação
 
@@ -646,6 +704,8 @@ minor) e não tinha a seção "Notas de release". Manter uma cópia do template 
 - `.github/pull_request_template.md`, pelo motivo acima.
 - `CONTRIBUTING.md`, porque estava desatualizado (versão de PHP e checks antigos). Ele será revisto e reescrito no
   futuro. Enquanto isso, o fluxo de contribuição está no [README](../README.md#documentação) e nestes documentos.
+- `tools/lint.php` e a pasta `tools/`, porque o lint passou para o `elavora/code-standards` (veja
+  [Lint de sintaxe](#lint-de-sintaxe)).
 - Nenhum arquivo `packagist-sync.yml` existe em `.github/workflows/`.
 - Nenhum workflow local usa `shivammathur/setup-php`.
 
@@ -672,7 +732,7 @@ Por isso os testes conferem o **formato** das referências que o Dependabot atua
 | --- | --- | --- |
 | SHA e comentário do `Elavora/.github` nos chamadores | a [referência central](#formato-das-referências) | qual SHA e qual versão |
 | SHA e comentário das actions de terceiros | a [referência de action](#formato-das-referências) | qual SHA e qual versão |
-| Restrição de `elavora/code-standards` no `composer.json` | a restrição é `^1.` seguido de um ou dois números separados por ponto (`^1.0`, `^1.1`, `^1.1.2`) | qual minor e qual patch |
+| Restrição de `elavora/code-standards` no `composer.json` | a restrição é `^1.` seguido do minor (1 ou maior) e, opcionalmente, do patch (`^1.1`, `^1.2`, `^1.1.2`) | qual minor, a partir do 1, e qual patch |
 | Restrições de `phpstan/phpstan` e `phpunit/phpunit` | o pacote está em `require-dev` | a restrição |
 | Bloco do `.editorconfig`, quando a versão nova do pacote muda o bloco | os marcadores de início e fim | o conteúdo do bloco |
 | `composer.lock` | nada | o conteúdo do lock |
@@ -689,7 +749,7 @@ Exemplos que passam:
 - `Elavora/.github/.github/workflows/release.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0` trocado por
   `Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0`;
 - `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1` trocado por outro SHA com `# v7.1.0`;
-- `"elavora/code-standards": "^1.0"` trocado por `"^1.1"`;
+- `"elavora/code-standards": "^1.1"` trocado por `"^1.2"`;
 - `"phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"` trocado por `"^10.5 || ^11.0 || ^12.0 || ^13.0"`.
 
 Exemplos que falham:
@@ -699,10 +759,14 @@ Exemplos que falham:
   versão);
 - `actions/checkout@3d3c42e # v7.0.1` (SHA curto);
 - `"elavora/code-standards": "^2.0"` (outro major);
-- `"elavora/code-standards": "^1.0 || ^2.0"` (aceita outro major).
+- `"elavora/code-standards": "^1.1 || ^2.0"` (aceita outro major);
+- `"elavora/code-standards": "^1.0"` (minor 0: a 1.0.0 não tem o lint).
 
 Por que o major de `elavora/code-standards` é conferido: um major novo muda as regras de estilo e reformata o código.
 Essa troca precisa de um PR próprio, que atualize também esta documentação e o teste.
+
+Por que o minor mínimo é 1: o `composer lint` usa o subcomando `lint`, que só existe a partir da 1.1.0 (veja
+[Estilo de código](#estilo-de-código-elavoracode-standards)).
 
 Como rodar: veja [Testes da automação](DESENVOLVIMENTO.md#testes-da-automação). No CI, rodam no workflow
 **Automação**, em todo PR e em todo push na `main`.

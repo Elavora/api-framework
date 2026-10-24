@@ -44,7 +44,7 @@ git ls-files -z | xargs -0 editorconfig-checker   # confere os arquivos versiona
 ```
 
 Para desligar uma regra só na sua máquina, crie um `.php-cs-fixer.php` (ele está no `.gitignore`), conforme o
-[guia do pacote](https://github.com/Elavora/code-standards/blob/1.0.0/docs/php-cs-fixer.md).
+[guia do pacote](https://github.com/Elavora/code-standards/blob/1.1.0/docs/php-cs-fixer.md).
 
 ## Abrir no VS Code (Dev Containers)
 
@@ -57,8 +57,11 @@ Para desligar uma regra só na sua máquina, crie um `.php-cs-fixer.php` (ele es
    ```sh
    composer check   # lint, testes PHPUnit e PHPStan
    composer test    # só os testes PHPUnit
-   composer lint    # só a checagem de sintaxe
+   composer lint    # só a checagem de sintaxe (php -l em todo .php do projeto)
    ```
+
+   O `composer lint` chama o `elavora-standards lint`, do pacote `elavora/code-standards`. Os detalhes estão em
+   [Lint de sintaxe](AUTOMACAO.md#lint-de-sintaxe).
 
 O Xdebug fica desligado por padrão (`XDEBUG_MODE=off`). Para depurar, use `XDEBUG_MODE=debug`. Para gerar
 cobertura, use `XDEBUG_MODE=coverage`.
