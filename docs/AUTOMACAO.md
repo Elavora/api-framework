@@ -455,8 +455,8 @@ ponto e o que for passado em `--exclude`. O script não usa `--exclude`.
 | `vendor/autoload.php` | não | pasta `vendor` |
 | `tests/automation/workflows.test.cjs` | não | não é `.php` |
 
-Hoje, na prática, a lista é a mesma do script antigo: `src/` e `tests/`. Uma pasta nova com PHP, como `examples/`,
-passa a ser conferida sem mudar o script.
+Na prática, a lista é `src/`, `tests/` e `examples/`. O script antigo só conferia `src/` e `tests/`; a pasta
+`examples/` entrou sem mudar o script, e qualquer outra pasta nova com PHP também entra.
 
 O que muda na saída:
 
