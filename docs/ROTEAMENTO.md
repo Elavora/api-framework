@@ -1,5 +1,7 @@
 # Segurança do roteamento
 
+[README](../README.md) · Anterior: [Guia de uso](USO.md) · Próximo: [Exemplos de código](EXEMPLOS.md)
+
 Este documento é o contrato de segurança do roteamento. Ele cobre duas coisas:
 
 - o roteamento por convenção, que transforma a URL `/controller/action` em uma classe e um método;
@@ -360,3 +362,7 @@ Estas mudanças entram como correção de segurança. Quem usava algum destes ca
 | controller com construtor de parâmetros obrigatórios, fora do container, dava `500` | 404 | registre o controller no container |
 | handler inválido em `add` dava `500` na request | `InvalidArgumentException` no registro | corrija o handler |
 | handler em texto (`'Classe::metodo'`, nome de função) era aceito | `InvalidArgumentException` no registro | use `[Classe::class, 'metodo']` ou uma `Closure` |
+
+---
+
+[README](../README.md) · Anterior: [Guia de uso](USO.md) · Próximo: [Exemplos de código](EXEMPLOS.md)

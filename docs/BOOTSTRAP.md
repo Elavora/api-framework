@@ -55,4 +55,4 @@ CACHE_TTL e encaminhado como ttl tanto ao APCu quanto ao Redis quando definido e
 
 ---
 
-[README](../README.md) · Anterior: [Guia de uso](USO.md) · Próximo: [Ambiente de desenvolvimento e testes](DESENVOLVIMENTO.md)
+[README](../README.md) · Anterior: [Exemplos de código](EXEMPLOS.md) · Próximo: [Ambiente de desenvolvimento e testes](DESENVOLVIMENTO.md)

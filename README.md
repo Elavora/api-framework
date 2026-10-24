@@ -286,11 +286,13 @@ Leia nesta ordem:
 1. [Guia de uso](docs/USO.md): instalação, quando usar e os principais pontos de entrada.
 2. [Segurança do roteamento](docs/ROTEAMENTO.md): roteamento por convenção, recusas com `404`, log e handlers
    aceitos no registro de rotas.
-3. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
-4. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
+3. [Exemplos de código](docs/EXEMPLOS.md): uma API de tarefas pequena, com controller, rota explícita, validação,
+   DataType, atributo próprio, middleware, cache e transação. O código está em `examples/` e é testado.
+4. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
+5. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
    no CI.
-5. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
-6. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
+6. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
+7. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
    arquivo.
 
 ## Licenca
