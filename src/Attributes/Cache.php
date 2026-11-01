@@ -24,6 +24,8 @@ use RuntimeException;
  */
 final class Cache implements BeforeRequestAttribute, AfterResponseAttribute
 {
+    private bool $hit = false;
+
     /**
      * @param int $seconds Tempo de vida do cache em segundos.
      * @param list<string> $varyByHeaders Headers que devem compor a chave de cache.
@@ -42,14 +44,24 @@ final class Cache implements BeforeRequestAttribute, AfterResponseAttribute
     {
         $cached = $this->cacheStore($container)->get($this->key($request));
 
-        return $cached instanceof Response ? $cached : null;
+        if ($cached instanceof Response) {
+            $this->hit = true;
+
+            return $cached;
+        }
+
+        return null;
     }
 
     /**
-     * Salva respostas de sucesso no cache.
+     * Salva respostas de sucesso no cache. Em hit nao grava nada: o TTL e fixo, contado da gravacao.
      */
     public function after(Request $request, Response $response, Container $container): ?Response
     {
+        if ($this->hit) {
+            return null;
+        }
+
         if ($response->status() >= 200 && $response->status() < 300) {
             $this->cacheStore($container)->set($this->key($request), $response, $this->seconds);
         }
