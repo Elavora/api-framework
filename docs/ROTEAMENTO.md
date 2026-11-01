@@ -192,6 +192,31 @@ final class UserController extends BaseController
 As regras de atributos continuam depois da resolução. Por exemplo, uma action com `#[Method('GET')]` chamada com
 `POST` responde `405`, como hoje.
 
+#### `HEAD` e `#[Method]`
+
+`HEAD` vale onde `GET` vale, como numa rota explícita. Uma action de convenção com `#[Method('GET')]` também aceita
+`HEAD`. A regra é: se a lista de `#[Method]` tem `GET`, o `HEAD` é aceito, mesmo sem estar na lista.
+
+- `HEAD` na action roda a mesma action que o `GET` e responde com o mesmo status e os mesmos headers, mas com o corpo
+  vazio (o framework esvazia o corpo de toda resposta a `HEAD`).
+- Se a lista **não** tem `GET` (por exemplo `#[Method('POST')]`), `HEAD` continua recusado com `405`.
+- Listar `HEAD` de forma explícita (`#[Method('GET', 'HEAD')]`) funciona e dá o mesmo resultado.
+- O header `Allow` do `405` lista `HEAD` logo depois de `GET`, como nas rotas explícitas. O mesmo vale para o
+  `Allow` da resposta de `OPTIONS` de uma action de convenção.
+
+Com `#[Action] #[Method('GET')] public function index()`, no controller `TaskController`:
+
+| Request | Resultado |
+| --- | --- |
+| `GET /task` | `200` com corpo |
+| `HEAD /task` | `200`, corpo vazio, mesmos headers do `GET` (antes: `405`) |
+| `POST /task` | `405`, `Allow: GET, HEAD` (antes: `Allow: GET`) |
+| `OPTIONS /task` | `Allow: GET, HEAD` |
+
+Com `#[Method('POST')]` em `store`: `HEAD /task/store` responde `405` e `Allow: POST`.
+
+A regra de segurança não muda: `HEAD` num path que a convenção recusa continua `404`.
+
 ### Quando uma regra falha
 
 A resposta é a mesma de um path que não existe:
