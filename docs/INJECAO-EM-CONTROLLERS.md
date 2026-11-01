@@ -18,8 +18,9 @@ faz:
 2. Se há, usa `$container->get(Controller::class)`.
 3. Se não há, faz `new Controller()`, sem nenhum argumento.
 
-Consequência: um controller com construtor que exige parâmetros, sem registro no container, falha com `ArgumentCountError`
-e a resposta é `500`. Isso acontece só quando a rota é executada, não no registro da rota.
+Consequência: um controller com construtor que exige parâmetros, sem registro no container, não pode ser criado.
+Na rota por convenção, a resposta é `404` (veja [Segurança do roteamento](ROTEAMENTO.md)). Na rota explícita
+`[Controller::class, 'metodo']`, o registro da rota passa e o `new` falha na request, com `ArgumentCountError`: `500`.
 
 Dois detalhes importantes do container:
 
@@ -195,8 +196,8 @@ Saída esperada (o `X-Request-Id` fica nos headers, não no corpo):
 
 ## O que acontece sem a fábrica
 
-Se você remover o `bind` do exemplo acima, `GET /task` chama `new TaskController()` sem argumentos. Como o construtor
-exige um `TaskRepository`, a request responde `500 Internal Server Error` (com `debug: true`, a mensagem da exceção
+Se você remover o `bind` do exemplo acima, o controller não pode ser criado sem argumentos. `GET /task` (convenção)
+responde `404`, e `GET /tarefas` (rota explícita) responde `500 Internal Server Error` (com `debug: true`, a mensagem da exceção
 aparece no corpo).
 
 ## Resumo
@@ -205,6 +206,6 @@ aparece no corpo).
 | --- | --- |
 | Controller sem construtor, sem registro | `new Controller()` |
 | Controller com dependências, com `bind` | usa a fábrica, uma vez, e reaproveita o objeto |
-| Controller com dependências, sem `bind` | `new Controller()` falha: `500` |
+| Controller com dependências, sem `bind` | convenção: `404`; rota explícita: `500` |
 | `instance(Controller::class, $obj)` | usa o objeto pronto |
 | Classe fora das regras da convenção | `404`, o controller nem é criado |
