@@ -44,11 +44,13 @@ final class Method implements RequestValidatorAttribute
      */
     public function validate(Request $request): ?Response
     {
-        if (in_array($request->httpMethod(), $this->methods, true)) {
+        $effectiveMethods = $this->effectiveMethods();
+
+        if (in_array($request->httpMethod(), $effectiveMethods, true)) {
             return null;
         }
 
-        $allowedMethods = array_map(static fn(HttpMethod $method): string => $method->value, $this->methods);
+        $allowedMethods = array_map(static fn(HttpMethod $method): string => $method->value, $effectiveMethods);
 
         return Response::json(
             payload: ['message' => sprintf('Method %s is not allowed for this endpoint.', $request->method())],
@@ -62,6 +64,28 @@ final class Method implements RequestValidatorAttribute
      */
     public function options(): array
     {
-        return ['methods' => array_map(static fn(HttpMethod $method): string => $method->value, $this->methods)];
+        return ['methods' => array_map(static fn(HttpMethod $method): string => $method->value, $this->effectiveMethods())];
+    }
+
+    /**
+     * Lista efetiva: quando GET esta presente, HEAD tambem e aceito (logo apos GET).
+     *
+     * @return list<HttpMethod>
+     */
+    private function effectiveMethods(): array
+    {
+        if (!in_array(HttpMethod::Get, $this->methods, true) || in_array(HttpMethod::Head, $this->methods, true)) {
+            return $this->methods;
+        }
+
+        $effective = [];
+        foreach ($this->methods as $method) {
+            $effective[] = $method;
+            if ($method === HttpMethod::Get) {
+                $effective[] = HttpMethod::Head;
+            }
+        }
+
+        return $effective;
     }
 }
