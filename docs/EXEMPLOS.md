@@ -122,7 +122,7 @@ final class TaskController
     #[Transaction]
     public function store(Request $request): Response
     {
-        $code = ProjectCode::from($request->input('code'));
+        $code = new ProjectCode($request->input('code'));
 
         return Response::created([
             'code' => $code,
@@ -504,9 +504,9 @@ transação nem começa (casos 6 e 7). E uma request com o corpo errado recebe `
 | `ProjectCode::isValid('1234')` | `false` |
 | `ProjectCode::isValid(1234)` | `false` |
 | `ProjectCode::isValid(null)` | `false` |
-| `ProjectCode::from('app-1234')->value()` | `'APP-1234'` |
-| `json_encode(ProjectCode::from('abc-0001'))` | `'"ABC-0001"'` |
-| `ProjectCode::from('APP-12')` | lança `InvalidArgumentException` com a mensagem `ProjectCode deve usar o formato APP-1234.` |
+| `(new ProjectCode('app-1234'))->value()` | `'APP-1234'` |
+| `json_encode(new ProjectCode('abc-0001'))` | `'"ABC-0001"'` |
+| `new ProjectCode('APP-12')` | lança `InvalidArgumentException` com a mensagem `ProjectCode deve usar o formato APP-1234.` |
 
 ### `InMemoryCacheStore`
 
