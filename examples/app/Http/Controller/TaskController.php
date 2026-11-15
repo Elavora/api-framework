@@ -35,7 +35,7 @@ final class TaskController
     #[Transaction]
     public function store(Request $request): Response
     {
-        $code = ProjectCode::from($request->input('code'));
+        $code = new ProjectCode($request->input('code'));
 
         return Response::created([
             'code' => $code,

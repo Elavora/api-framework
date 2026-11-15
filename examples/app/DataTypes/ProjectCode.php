@@ -10,15 +10,15 @@ use InvalidArgumentException;
 
 final readonly class ProjectCode implements DataType, Responseable
 {
-    private function __construct(private string $value) {}
+    private string $value;
 
-    public static function from(mixed $value): static
+    public function __construct(mixed $value)
     {
         if (!self::isValid($value)) {
             throw new InvalidArgumentException('ProjectCode deve usar o formato APP-1234.');
         }
 
-        return new self(strtoupper((string) $value));
+        $this->value = strtoupper((string) $value);
     }
 
     public static function isValid(mixed $value): bool

@@ -273,22 +273,22 @@ final class ExamplesBehaviorTest extends TestCase
         yield 'null' => [null, false];
     }
 
-    public function testProjectCodeFromNormalizesToUppercase(): void
+    public function testProjectCodeNormalizesToUppercase(): void
     {
-        self::assertSame('APP-1234', ProjectCode::from('app-1234')->value());
+        self::assertSame('APP-1234', (new ProjectCode('app-1234'))->value());
     }
 
     public function testProjectCodeSerializesAsString(): void
     {
-        self::assertSame('"ABC-0001"', json_encode(ProjectCode::from('abc-0001')));
+        self::assertSame('"ABC-0001"', json_encode(new ProjectCode('abc-0001')));
     }
 
-    public function testProjectCodeFromInvalidThrows(): void
+    public function testProjectCodeInvalidThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('ProjectCode deve usar o formato APP-1234.');
 
-        ProjectCode::from('APP-12');
+        new ProjectCode('APP-12');
     }
 
     // ---------------------------------------------------------------
