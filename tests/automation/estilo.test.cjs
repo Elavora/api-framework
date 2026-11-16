@@ -22,20 +22,18 @@ const CODE_STANDARDS = /^\^2\.\d+(?:\.\d+)?$/;
 
 test.describe('restrição de elavora/code-standards (exemplos da doc)', () => {
     for (const [c, ok] of [
-        ['^1.1', true],
-        ['^1.2', true],
-        ['^1.1.2', true],
-        ['^1.1.3', true],
-        ['^1.10', true],
-        ['^1.0', false],
-        ['^1.0.5', false],
-        ['^2.0', false],
-        ['^1.1 || ^2.0', false],
-        ['^1.0 || ^2.0', false],
-        ['~1.1', false],
-        ['^1', false],
-        ['1.1.0', false],
-        ['^1.1.2.3', false],
+        ['^2.0', true],
+        ['^2.1', true],
+        ['^2.0.3', true],
+        ['^2.10', true],
+        ['^1.1', false],
+        ['^1.2', false],
+        ['^3.0', false],
+        ['^2.0 || ^3.0', false],
+        ['~2.0', false],
+        ['^2', false],
+        ['2.0.0', false],
+        ['^2.0.2.3', false],
     ]) {
         test(`${c} ${ok ? 'passa' : 'falha'}`, () => {
             assert.equal(CODE_STANDARDS.test(c), ok);
