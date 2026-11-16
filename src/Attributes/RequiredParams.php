@@ -60,14 +60,14 @@ final class RequiredParams implements RequestValidatorAttribute
     }
 
     /**
-     * @return array{params: array<string, string>} Metadados dos parametros obrigatorios.
+     * @return array{params: array<string, array<string, mixed>>} Metadados dos parametros obrigatorios.
      */
     public function options(): array
     {
         $params = [];
         foreach ($this->params as $param => $rule) {
             if (is_int($param)) {
-                $params[(string) $rule] = 'mixed';
+                $params[(string) $rule] = ['type' => 'mixed'];
                 continue;
             }
 

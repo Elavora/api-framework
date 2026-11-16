@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Elavora\Api\Framework\Validation;
 
 use Elavora\Api\Framework\Contracts\DataType;
+use Elavora\Api\Framework\Contracts\DescribesType;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionNamedType;
 
 /**
  * Valida valores usados pelos attributes de request.
@@ -44,18 +48,94 @@ final class ValidationRule
 
     /**
      * Descreve uma regra em formato legivel para metadados de endpoint.
+     *
+     * O resultado e pensado para quem consome a API, entao nunca e o nome completo de uma classe PHP:
+     *
+     * - regra nomeada (`int`, `email`, ...): `['type' => 'int']`;
+     * - DataType: o tipo que declara (`DescribesType`) ou o primitivo do retorno de `value()`, ou `mixed`;
+     * - outra classe: o nome curto, sem namespace.
+     *
+     * O resultado e sempre um array com `type` e, se o tipo declarar, `format`, `mask`, `pattern`, `enum`, `example` e
+     * `description` (chaves fixas de `DescribesType`).
+     *
+     * @return array<string, mixed>
      */
-    public static function describe(mixed $rule): string
+    public static function describe(mixed $rule): array
     {
         if (is_string($rule)) {
-            return $rule;
+            return class_exists($rule) || enum_exists($rule) ? self::describeClass($rule) : ['type' => $rule];
         }
 
         if (is_object($rule)) {
-            return $rule::class;
+            return self::describeClass($rule::class);
         }
 
-        return get_debug_type($rule);
+        return ['type' => get_debug_type($rule)];
+    }
+
+    /**
+     * @param class-string $class
+     * @return array<string, mixed>
+     */
+    private static function describeClass(string $class): array
+    {
+        if (is_a($class, DescribesType::class, true)) {
+            return self::normalizeDocumentedType($class::documentedType());
+        }
+
+        if (is_a($class, DataType::class, true)) {
+            return ['type' => self::valueType($class)];
+        }
+
+        return ['type' => (new ReflectionClass($class))->getShortName()];
+    }
+
+    /**
+     * Mantem so as chaves fixas do contrato (`type`, `format`, `mask`, `pattern`, `enum`, `example`,
+     * `description`) e descarta as vazias, para um tipo nao vazar mais do que deve.
+     *
+     * @param array<array-key, mixed> $documented
+     * @return array<string, mixed>
+     */
+    private static function normalizeDocumentedType(array $documented): array
+    {
+        $type = isset($documented['type']) && is_string($documented['type']) && $documented['type'] !== ''
+            ? $documented['type']
+            : 'mixed';
+        $normalized = ['type' => $type];
+
+        foreach (['format', 'mask', 'pattern', 'description'] as $key) {
+            if (isset($documented[$key]) && is_string($documented[$key]) && $documented[$key] !== '') {
+                $normalized[$key] = $documented[$key];
+            }
+        }
+
+        if (isset($documented['enum']) && is_array($documented['enum'])) {
+            $options = array_values(array_filter($documented['enum'], is_scalar(...)));
+            if ($options !== []) {
+                $normalized['enum'] = $options;
+            }
+        }
+
+        if (isset($documented['example']) && (is_scalar($documented['example']) || is_array($documented['example']))) {
+            $normalized['example'] = $documented['example'];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Primitivo declarado no retorno de `value()`. Uniao de tipos, `mixed` ou ausencia de tipo viram `mixed`.
+     */
+    private static function valueType(string $class): string
+    {
+        $type = (new ReflectionMethod($class, 'value'))->getReturnType();
+
+        if ($type instanceof ReflectionNamedType && $type->isBuiltin() && $type->getName() !== 'void') {
+            return $type->getName();
+        }
+
+        return 'mixed';
     }
 
     private static function validateNamedRule(mixed $value, string $rule): bool
