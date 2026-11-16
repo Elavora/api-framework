@@ -229,6 +229,8 @@ throw HttpException::badRequest('Invalid payload', [
 ]);
 ```
 
+Fabricas disponiveis: `badRequest` (400), `unauthorized` (401), `forbidden` (403), `notFound` (404), `conflict` (409), `unprocessable` (422) e `internalServerError` (500). Todas aceitam a mensagem; `badRequest`, `conflict` e `unprocessable` aceitam tambem `errors`, e todas aceitam `headers`. Para outro status, use o construtor: `new HttpException(message: ..., status: 429)`.
+
 Erros inesperados retornam `500 Internal Server Error` sem expor detalhes sensiveis por padrao. Para desenvolvimento, crie a aplicacao com debug:
 
 ```php

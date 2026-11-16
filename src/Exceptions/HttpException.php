@@ -39,6 +39,26 @@ final class HttpException extends RuntimeException
     }
 
     /**
+     * Cria uma excecao 401 Unauthorized.
+     *
+     * @param array<string, string> $headers Headers adicionais (por exemplo, WWW-Authenticate).
+     */
+    public static function unauthorized(string $message = 'Unauthorized', array $headers = []): self
+    {
+        return new self(message: $message, status: 401, headers: $headers);
+    }
+
+    /**
+     * Cria uma excecao 403 Forbidden.
+     *
+     * @param array<string, string> $headers Headers adicionais.
+     */
+    public static function forbidden(string $message = 'Forbidden', array $headers = []): self
+    {
+        return new self(message: $message, status: 403, headers: $headers);
+    }
+
+    /**
      * Cria uma excecao 404 Not Found.
      *
      * @param array<string, string> $headers Headers adicionais.
@@ -46,6 +66,28 @@ final class HttpException extends RuntimeException
     public static function notFound(string $message = 'Not Found', array $headers = []): self
     {
         return new self(message: $message, status: 404, headers: $headers);
+    }
+
+    /**
+     * Cria uma excecao 409 Conflict, quando o pedido conflita com o estado atual (por exemplo, e-mail ja cadastrado).
+     *
+     * @param array<string, mixed> $errors Erros seguros para retornar ao cliente.
+     * @param array<string, string> $headers Headers adicionais.
+     */
+    public static function conflict(string $message = 'Conflict', array $errors = [], array $headers = []): self
+    {
+        return new self(message: $message, status: 409, errors: $errors, headers: $headers);
+    }
+
+    /**
+     * Cria uma excecao 422 Unprocessable Entity, quando o pedido esta bem formado mas viola uma regra de negocio.
+     *
+     * @param array<string, mixed> $errors Erros seguros para retornar ao cliente.
+     * @param array<string, string> $headers Headers adicionais.
+     */
+    public static function unprocessable(string $message = 'Unprocessable Entity', array $errors = [], array $headers = []): self
+    {
+        return new self(message: $message, status: 422, errors: $errors, headers: $headers);
     }
 
     /**
