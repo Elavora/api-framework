@@ -61,7 +61,7 @@ final class RequiredFields implements RequestValidatorAttribute
     }
 
     /**
-     * @return array{fields: array<string, string>} Metadados dos campos obrigatorios.
+     * @return array{fields: array<string, string|array<string, string>>} Metadados dos campos obrigatorios.
      */
     public function options(): array
     {
@@ -69,7 +69,7 @@ final class RequiredFields implements RequestValidatorAttribute
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, string|array<string, mixed>>
      */
     private function describeFields(): array
     {

@@ -60,7 +60,7 @@ final class RequiredParams implements RequestValidatorAttribute
     }
 
     /**
-     * @return array{params: array<string, string>} Metadados dos parametros obrigatorios.
+     * @return array{params: array<string, string|array<string, string>>} Metadados dos parametros obrigatorios.
      */
     public function options(): array
     {

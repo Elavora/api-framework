@@ -7,6 +7,7 @@ namespace Elavora\Api\Framework\Attributes;
 use Attribute;
 use Elavora\Api\Framework\Contracts\DescribesResponse;
 use Elavora\Api\Framework\Contracts\HttpAttribute;
+use Elavora\Api\Framework\Validation\ValidationRule;
 use InvalidArgumentException;
 use LogicException;
 
@@ -22,7 +23,9 @@ use LogicException;
  *
  * Em qualquer nivel do array, o nome de uma classe que implementa DescribesResponse e substituido pelo
  * schema dela: #[Response(['status' => 201, 'data' => Usuario::class])]. Uma lista de itens fica como
- * `[Usuario::class]`. Nomes de classe que nao implementam o contrato (como um DataType) continuam como estao.
+ * `[Usuario::class]`. Qualquer outro nome de classe vira o tipo que a API mostra: um DataType aparece como o
+ * primitivo que ele substitui (`string`, `int`), e uma classe comum pelo nome curto. O nome completo de uma
+ * classe PHP nunca sai na resposta de OPTIONS.
  */
 final class Response implements HttpAttribute
 {
@@ -80,6 +83,10 @@ final class Response implements HttpAttribute
     {
         if (is_string($value) && is_a($value, DescribesResponse::class, true)) {
             return self::expandSchema($value::responseSchema(), $depth + 1);
+        }
+
+        if (is_string($value) && (class_exists($value) || enum_exists($value))) {
+            return ValidationRule::describe($value);
         }
 
         if (is_array($value)) {

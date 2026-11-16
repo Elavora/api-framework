@@ -8,6 +8,7 @@ use Elavora\Api\Framework\Application;
 use Elavora\Api\Framework\Attributes\Details;
 use Elavora\Api\Framework\Attributes\Method;
 use Elavora\Api\Framework\Attributes\Response as ResponseDoc;
+use Elavora\Api\Framework\Contracts\DataType;
 use Elavora\Api\Framework\Contracts\DescribesResponse;
 use Elavora\Api\Framework\Contracts\Responseable;
 use Elavora\Api\Framework\Http\Request;
@@ -23,10 +24,11 @@ use stdClass;
  */
 final class ResponseAttributeTest extends TestCase
 {
+    /** O schema de DocumentedUser depois de expandido: o DataType aparece como o primitivo dele. */
     private const USER_SCHEMA = [
         'id' => 'uuid',
         'name' => 'string',
-        'email' => DocumentedEmail::class,
+        'email' => 'string',
         'organization_id' => 'uuid|null',
     ];
 
@@ -68,11 +70,11 @@ final class ResponseAttributeTest extends TestCase
         self::assertSame(['response' => ['id' => 'uuid', 'buyer' => self::USER_SCHEMA]], $options);
     }
 
-    public function testClassesThatDoNotDescribeTheResponseKeepTheirName(): void
+    public function testDataTypeAppearsAsItsPrimitiveAndOtherClassesByShortName(): void
     {
         $options = (new ResponseDoc(['code' => DocumentedEmail::class, 'other' => stdClass::class]))->options();
 
-        self::assertSame(['response' => ['code' => DocumentedEmail::class, 'other' => stdClass::class]], $options);
+        self::assertSame(['response' => ['code' => 'string', 'other' => 'stdClass']], $options);
     }
 
     public function testClassWithoutTheContractIsRejected(): void
@@ -109,10 +111,24 @@ final class ResponseAttributeTest extends TestCase
             ]),
             $response->body(),
         );
+        self::assertStringNotContainsString('Elavora', $response->body());
     }
 }
 
-final class DocumentedEmail {}
+final readonly class DocumentedEmail implements DataType
+{
+    public function __construct(private mixed $value) {}
+
+    public static function isValid(mixed $value): bool
+    {
+        return is_string($value);
+    }
+
+    public function value(): string
+    {
+        return (string) $this->value;
+    }
+}
 
 final class DocumentedUser implements Responseable, DescribesResponse
 {

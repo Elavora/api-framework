@@ -12,7 +12,7 @@ OPTIONS /auth/register
 {
   "attributes": {
     "methods": ["POST"],
-    "fields": {"name": "App\\DataTypes\\Name", "email": "Elavora\\Api\\DataTypes\\Email"},
+    "fields": {"name": "string", "email": "string"},
     "transaction": true,
     "summary": "Cadastra um usuario",
     "response": {"status": 201, "data": {"id": "uuid", "name": "string"}}
@@ -38,7 +38,78 @@ documentação (`#[Details]` e `#[Response]`).
 | `#[Details]` | as chaves que você informar | metadados livres: resumo, descrição, tags, erros |
 | `#[Response]` | `response` | o formato da resposta (veja abaixo) |
 
-O tipo de um campo é um nome de tipo (`'string'`, `'int'`) ou o nome da classe de um DataType, como `Email::class`.
+## O tipo de um campo
+
+No código, o tipo de um campo é uma regra nomeada (`'int'`, `'email'`) ou a classe de um DataType (`Email::class`).
+Quem consome a API não conhece classes PHP, e o `OPTIONS` é público. Por isso a resposta **nunca mostra o nome de uma
+classe**:
+
+| No attribute | Em `OPTIONS` |
+| --- | --- |
+| `'int'`, `'int-string'`, `'email'`, `'uuid'` (regra nomeada) | como está |
+| `Name::class`, DataType com `value(): string` | `string` |
+| `Quantity::class`, DataType com `value(): int` | `int` |
+| DataType com `value()` de união (`string\|int`) ou `mixed` | `mixed` |
+| DataType que implementa `DescribesType` | o que `documentedType()` devolve |
+| qualquer outra classe | o nome curto, sem namespace (`Money`) |
+
+É a mesma ideia do DataType: ele substitui o primitivo no código e volta a ser o primitivo na saída da API. O
+framework descobre o primitivo pelo tipo de retorno de `value()`. Quando isso não basta (a `value()` devolve uma
+união, ou você quer informar um formato como `email` ou `uuid`), implemente `DescribesType`:
+
+```php
+use Elavora\Api\Framework\Contracts\DescribesType;
+
+final readonly class Email implements DataType, DescribesType
+{
+    public static function documentedType(): string
+    {
+        return 'email';
+    }
+
+    // ...
+}
+```
+
+`documentedType()` devolve um nome neutro: um primitivo ou uma regra nomeada do framework (`email`, `uuid`, `url`,
+`base64`, `json`). Não devolva o nome de uma classe.
+
+### Mais dados sobre o tipo
+
+Quando o tipo tem mais a dizer, `documentedType()` devolve um array. Só `type` é obrigatória, e cada DataType
+declara apenas o que faz sentido para ele. Um genérico fica como `"string"`, um CPF declara máscara e regex, um
+status declara só a lista de opções:
+
+| Chave | Para quê | Exemplo |
+| --- | --- | --- |
+| `type` | primitivo ou regra nomeada | `string` |
+| `format` | formato semântico | `email`, `date`, `uuid` |
+| `mask` | como digitar ou exibir. `0` é dígito, `A` é letra, o resto é literal | `000.000.000-00` |
+| `pattern` | regex sem delimitadores, num subconjunto que PCRE e JavaScript entendem | `^[0-9]{11}$` |
+| `enum` | lista fechada de opções (valores escalares) | `["pending", "paid"]` |
+| `example` | um valor de exemplo | `"12345678901"` |
+| `description` | texto curto | `"Situação do pedido"` |
+
+```php
+public static function documentedType(): array
+{
+    return ['type' => 'string', 'mask' => '000.000.000-00', 'pattern' => '^[0-9]{11}$'];
+}
+```
+
+Em `OPTIONS`, o campo continua sendo uma string e só vira objeto quando declara algo além do `type`:
+
+```json
+{"fields": {"name": "string", "cpf": {"type": "string", "mask": "000.000.000-00", "pattern": "^[0-9]{11}$"}}}
+```
+
+O conjunto de chaves é **fixo**, para toda a API falar o mesmo formato. O framework descarta qualquer outra chave e
+as vazias. Se surgir uma necessidade nova, a mudança é feita neste pacote, não em cada projeto. Os nomes seguem o
+JSON Schema e o OpenAPI (exceto `mask`), então uma ferramenta de documentação converte quase sem tradução.
+
+`mask` e `pattern` só descrevem. Quem valida de verdade é o `isValid()` do DataType.
+
+Isso vale igualmente para a requisição (`fields`, `params`) e para a resposta (`response`).
 
 ## Um endpoint documentado
 
@@ -123,8 +194,9 @@ Regras de expansão:
   dela: `#[ResponseDoc(['status' => 201, 'data' => User::class])]`.
 - **Listas.** `['data' => [User::class]]` expande o item e mantém a lista.
 - **Objetos dentro de objetos.** Se o schema de `Order` tem `'buyer' => User::class`, o `buyer` também é expandido.
-- **DataTypes ficam pelo nome.** `Email::class` não implementa `DescribesResponse`, então continua como nome de
-  classe, igual ao que `#[RequiredFields]` devolve. Quem lê a documentação vê o mesmo tipo na entrada e na saída.
+- **DataTypes saem como o primitivo.** `Email::class` não implementa `DescribesResponse`, então segue a regra de
+  [O tipo de um campo](#o-tipo-de-um-campo): aparece como `string`, não como o nome da classe. Quem lê a documentação
+  vê o mesmo tipo na entrada e na saída.
 - **Nulo.** O framework não tem uma sintaxe para isso. A convenção é escrever o tipo e `|null` no texto:
   `'uuid|null'`. Para um DataType, `Uuid::class . '|null'` funciona dentro de um attribute.
 

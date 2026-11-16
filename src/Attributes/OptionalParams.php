@@ -53,7 +53,7 @@ final class OptionalParams implements RequestValidatorAttribute
     }
 
     /**
-     * @return array{optionalParams: array<string, string>} Metadados dos parametros opcionais.
+     * @return array{optionalParams: array<string, string|array<string, string>>} Metadados dos parametros opcionais.
      */
     public function options(): array
     {
