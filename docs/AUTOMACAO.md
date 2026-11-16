@@ -361,7 +361,7 @@ no Packagist. O contrato completo está no
 
 **`composer.json`:**
 
-- `elavora/code-standards` entra em `require-dev`, com a restrição `^1.1`. Não entra no `require`.
+- `elavora/code-standards` entra em `require-dev`, com a restrição `^2.0`. Não entra no `require`.
 - A restrição precisa começar no minor 1 ou maior. Motivo: o CI roda o `composer lint` com as dependências nas
   versões mínimas permitidas. Com `^1.0`, a mínima é a 1.0.0, que não tem o subcomando `lint`, e o CI falha.
 - O teste confere o major e o minor mínimo, e não o valor exato: a restrição é `^1.` seguido do minor, e
@@ -732,7 +732,7 @@ Por isso os testes conferem o **formato** das referências que o Dependabot atua
 | --- | --- | --- |
 | SHA e comentário do `Elavora/.github` nos chamadores | a [referência central](#formato-das-referências) | qual SHA e qual versão |
 | SHA e comentário das actions de terceiros | a [referência de action](#formato-das-referências) | qual SHA e qual versão |
-| Restrição de `elavora/code-standards` no `composer.json` | a restrição é `^1.` seguido do minor (1 ou maior) e, opcionalmente, do patch (`^1.1`, `^1.2`, `^1.1.2`) | qual minor, a partir do 1, e qual patch |
+| Restrição de `elavora/code-standards` no `composer.json` | a restrição é `^1.` seguido do minor (1 ou maior) e, opcionalmente, do patch (`^2.0`, `^2.0`, `^2.0.2`) | qual minor, a partir do 1, e qual patch |
 | Restrições de `phpstan/phpstan` e `phpunit/phpunit` | o pacote está em `require-dev` | a restrição |
 | Bloco do `.editorconfig`, quando a versão nova do pacote muda o bloco | os marcadores de início e fim | o conteúdo do bloco |
 | `composer.lock` | nada | o conteúdo do lock |
@@ -749,7 +749,7 @@ Exemplos que passam:
 - `Elavora/.github/.github/workflows/release.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0` trocado por
   `Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0`;
 - `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1` trocado por outro SHA com `# v7.1.0`;
-- `"elavora/code-standards": "^1.1"` trocado por `"^1.2"`;
+- `"elavora/code-standards": "^2.0"` trocado por `"^2.1"`;
 - `"phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"` trocado por `"^10.5 || ^11.0 || ^12.0 || ^13.0"`.
 
 Exemplos que falham:
@@ -759,8 +759,8 @@ Exemplos que falham:
   versão);
 - `actions/checkout@3d3c42e # v7.0.1` (SHA curto);
 - `"elavora/code-standards": "^2.0"` (outro major);
-- `"elavora/code-standards": "^1.1 || ^2.0"` (aceita outro major);
-- `"elavora/code-standards": "^1.0"` (minor 0: a 1.0.0 não tem o lint).
+- `"elavora/code-standards": "^2.0 || ^2.0"` (aceita outro major);
+- `"elavora/code-standards": "^2.0"` (minor 0: a 1.0.0 não tem o lint).
 
 Por que o major de `elavora/code-standards` é conferido: um major novo muda as regras de estilo e reformata o código.
 Essa troca precisa de um PR próprio, que atualize também esta documentação e o teste.
