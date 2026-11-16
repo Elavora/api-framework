@@ -156,7 +156,9 @@ $app->middleware(
 
 ## Atributos de controller
 
-O framework inclui atributos para validar a request antes da action e para expor metadados em `OPTIONS`.
+O framework inclui atributos para validar a request antes da action e para expor metadados em `OPTIONS`. Veja
+[Documentação dos endpoints via `OPTIONS`](docs/DOCUMENTACAO-VIA-OPTIONS.md) para documentar a resposta com
+`#[Details]`, `#[Response]` e `DescribesResponse`.
 
 ```php
 use Elavora\Api\Framework\Attributes\Method;
@@ -288,13 +290,15 @@ Leia nesta ordem:
    aceitos no registro de rotas.
 3. [Exemplos de código](docs/EXEMPLOS.md): uma API de tarefas pequena, com controller, rota explícita, validação,
    DataType, atributo próprio, middleware, cache e transação. O código está em `examples/` e é testado.
-4. [Injeção de serviços em controllers](docs/INJECAO-EM-CONTROLLERS.md): como entregar dependências a um controller
+4. [Documentação dos endpoints via `OPTIONS`](docs/DOCUMENTACAO-VIA-OPTIONS.md): o que cada attribute expõe,
+   `#[Details]`, `#[Response]` e `DescribesResponse` para o objeto descrever a própria resposta.
+5. [Injeção de serviços em controllers](docs/INJECAO-EM-CONTROLLERS.md): como entregar dependências a um controller
    com `container()->bind`.
-5. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
-6. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
+6. [Bootstrap compartilhado](docs/BOOTSTRAP.md): inicialização padrão usada pelo API Skeleton.
+7. [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md): devcontainer, como rodar os testes e o que roda
    no CI.
-7. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
-8. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
+8. [Versões e publicação](docs/RELEASE.md): labels, betas, estáveis, Packagist e a transição das tags antigas.
+9. [Automação do repositório](docs/AUTOMACAO.md): os workflows, o Dependabot, as labels e a referência de cada
    arquivo.
 
 ## Licenca
