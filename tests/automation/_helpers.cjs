@@ -5,7 +5,7 @@ const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const OLD_SHA = '1e0f42a92a4aafc35522709c30bc4e83acab82f1';
-const IMAGE = 'ghcr.io/elavora/php-dev:8.3-latest';
+const IMAGE = 'ghcr.io/elavora/php-dev:8.4-latest';
 
 /**
  * Formato das referências (docs/AUTOMACAO.md, "Formato das referências").

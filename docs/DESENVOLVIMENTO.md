@@ -5,7 +5,7 @@
 ## Por que usar a imagem da Elavora
 
 Todo pacote PHP da Elavora usa o mesmo ambiente: a imagem `ghcr.io/elavora/php-dev`, mantida no repositório
-[`Elavora/devcontainers`](https://github.com/Elavora/devcontainers). Ela traz PHP 8.3, Composer, Git, Xdebug e as
+[`Elavora/devcontainers`](https://github.com/Elavora/devcontainers). Ela traz PHP 8.4, Composer, Git, Xdebug e as
 ferramentas de estilo da organização (PHP-CS-Fixer e editorconfig-checker), com o usuário `vscode`, sem privilégios
 de root. A mesma imagem roda na sua máquina, no editor e no CI, então as mesmas versões de ferramenta valem nos três
 lugares.
@@ -13,8 +13,8 @@ lugares.
 Você não precisa instalar PHP nem Composer: só Docker. PHPUnit e PHPStan não vêm na imagem: eles estão no
 `require-dev` deste pacote e são instalados pelo `composer install`.
 
-Este repositório usa a tag **`ghcr.io/elavora/php-dev:8.3-latest`**, que aponta sempre para a versão estável mais
-recente da imagem PHP 8.3. Ela só muda quando sai uma release estável do `Elavora/devcontainers` (pré-releases não a
+Este repositório usa a tag **`ghcr.io/elavora/php-dev:8.4-latest`**, que aponta sempre para a versão estável mais
+recente da imagem PHP 8.4. Ela só muda quando sai uma release estável do `Elavora/devcontainers` (pré-releases não a
 movem), então o ambiente acompanha as releases sem nenhum PR de troca de imagem. O CI usa a imagem padrão do
 pipeline central (ver [O que roda no CI](#o-que-roda-no-ci)).
 
@@ -71,7 +71,7 @@ cobertura, use `XDEBUG_MODE=coverage`.
 Na pasta do repositório, no PowerShell:
 
 ```powershell
-docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.3-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.4-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
 ```
 
 O comando cria `vendor/` e `composer.lock` na pasta (os dois estão no `.gitignore`) e pode atualizar o
@@ -85,7 +85,7 @@ O CI roda os testes com cobertura. O `composer check` roda sem cobertura e não 
 cobertura. Para reproduzir o CI, rode também, no PowerShell:
 
 ```powershell
-docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace -e XDEBUG_MODE=coverage ghcr.io/elavora/php-dev:8.3-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer test -- --coverage-clover=/tmp/clover.xml'
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace -e XDEBUG_MODE=coverage ghcr.io/elavora/php-dev:8.4-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer test -- --coverage-clover=/tmp/clover.xml'
 ```
 
 O comando precisa sair com código 0 e não pode mostrar o aviso `No filter is configured`. A configuração que garante
@@ -136,8 +136,8 @@ Os detalhes de cada arquivo estão em [Automação do repositório](AUTOMACAO.md
 
 Não existe PR de troca de imagem neste repositório:
 
-- **Devcontainer e comandos `docker run`:** usam `8.3-latest`. Quando sai uma release estável da imagem, a tag passa a
-  apontar para ela. O Docker não baixa a versão nova sozinho: rode `docker pull ghcr.io/elavora/php-dev:8.3-latest`
+- **Devcontainer e comandos `docker run`:** usam `8.4-latest`. Quando sai uma release estável da imagem, a tag passa a
+  apontar para ela. O Docker não baixa a versão nova sozinho: rode `docker pull ghcr.io/elavora/php-dev:8.4-latest`
   ou, no VS Code, **Dev Containers: Rebuild Container**.
 - **CI:** o `quality.yml` não passa a entrada `image` e usa o padrão do pipeline central. Esse padrão muda junto com
   o SHA do `Elavora/.github`, que o Dependabot atualiza (ver

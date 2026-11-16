@@ -84,9 +84,9 @@ test.describe('composer.json', () => {
         assert.deepEqual(s.check, ['@lint', '@test', '@analyse']);
     });
 
-    test('branch-alias dev-main é 2.0-dev', () => {
+    test('branch-alias dev-main é 4.0-dev', () => {
         const c = composer();
-        assert.equal(c.extra && c.extra['branch-alias'] && c.extra['branch-alias']['dev-main'], '2.0-dev');
+        assert.equal(c.extra && c.extra['branch-alias'] && c.extra['branch-alias']['dev-main'], '4.0-dev');
     });
 });
 
