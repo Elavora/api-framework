@@ -12,7 +12,7 @@ OPTIONS /auth/register
 {
   "attributes": {
     "methods": ["POST"],
-    "fields": {"name": "string", "email": "string"},
+    "fields": {"name": {"type": "string"}, "email": {"type": "string", "format": "email"}},
     "transaction": true,
     "summary": "Cadastra um usuario",
     "response": {"status": 201, "data": {"id": "uuid", "name": "string"}}
@@ -46,12 +46,12 @@ classe**:
 
 | No attribute | Em `OPTIONS` |
 | --- | --- |
-| `'int'`, `'int-string'`, `'email'`, `'uuid'` (regra nomeada) | como está |
-| `Name::class`, DataType com `value(): string` | `string` |
-| `Quantity::class`, DataType com `value(): int` | `int` |
-| DataType com `value()` de união (`string\|int`) ou `mixed` | `mixed` |
+| `'int'`, `'int-string'`, `'email'`, `'uuid'` (regra nomeada) | `{"type": "int"}`, `{"type": "email"}`... |
+| `Name::class`, DataType com `value(): string` | `{"type": "string"}` |
+| `Quantity::class`, DataType com `value(): int` | `{"type": "int"}` |
+| DataType com `value()` de união (`string|int`) ou `mixed` | `{"type": "mixed"}` ||int`) ou `mixed` | `mixed` |
 | DataType que implementa `DescribesType` | o que `documentedType()` devolve |
-| qualquer outra classe | o nome curto, sem namespace (`Money`) |
+| qualquer outra classe | `{"type": "Money"}` (nome curto, sem namespace) |
 
 É a mesma ideia do DataType: ele substitui o primitivo no código e volta a ser o primitivo na saída da API. O
 framework descobre o primitivo pelo tipo de retorno de `value()`. Quando isso não basta (a `value()` devolve uma
@@ -62,22 +62,22 @@ use Elavora\Api\Framework\Contracts\DescribesType;
 
 final readonly class Email implements DataType, DescribesType
 {
-    public static function documentedType(): string
+    public static function documentedType(): array
     {
-        return 'email';
+        return ['type' => 'string', 'format' => 'email'];
     }
 
     // ...
 }
 ```
 
-`documentedType()` devolve um nome neutro: um primitivo ou uma regra nomeada do framework (`email`, `uuid`, `url`,
+`documentedType()` devolve sempre um array (`['type' => 'email']`) com um nome neutro em `type`: um primitivo ou uma regra nomeada do framework (`email`, `uuid`, `url`,
 `base64`, `json`). Não devolva o nome de uma classe.
 
 ### Mais dados sobre o tipo
 
-Quando o tipo tem mais a dizer, `documentedType()` devolve um array. Só `type` é obrigatória, e cada DataType
-declara apenas o que faz sentido para ele. Um genérico fica como `"string"`, um CPF declara máscara e regex, um
+Além do `type`, o array pode ter mais dados. Só `type` é obrigatória, e cada DataType
+declara apenas o que faz sentido para ele. Um genérico declara só `{"type": "string"}`, um CPF declara máscara e regex, um
 status declara só a lista de opções:
 
 | Chave | Para quê | Exemplo |
@@ -97,10 +97,10 @@ public static function documentedType(): array
 }
 ```
 
-Em `OPTIONS`, o campo continua sendo uma string e só vira objeto quando declara algo além do `type`:
+Todo campo sai em `OPTIONS` como objeto, com ou sem as demais chaves, para a API ter um formato só:
 
 ```json
-{"fields": {"name": "string", "cpf": {"type": "string", "mask": "000.000.000-00", "pattern": "^[0-9]{11}$"}}}
+{"fields": {"name": {"type": "string"}, "cpf": {"type": "string", "mask": "000.000.000-00", "pattern": "^[0-9]{11}$"}}}
 ```
 
 O conjunto de chaves é **fixo**, para toda a API falar o mesmo formato. O framework descarta qualquer outra chave e
@@ -195,7 +195,7 @@ Regras de expansão:
 - **Listas.** `['data' => [User::class]]` expande o item e mantém a lista.
 - **Objetos dentro de objetos.** Se o schema de `Order` tem `'buyer' => User::class`, o `buyer` também é expandido.
 - **DataTypes saem como o primitivo.** `Email::class` não implementa `DescribesResponse`, então segue a regra de
-  [O tipo de um campo](#o-tipo-de-um-campo): aparece como `string`, não como o nome da classe. Quem lê a documentação
+  [O tipo de um campo](#o-tipo-de-um-campo): aparece como `{"type": "string"}`, não como o nome da classe. Quem lê a documentação
   vê o mesmo tipo na entrada e na saída.
 - **Nulo.** O framework não tem uma sintaxe para isso. A convenção é escrever o tipo e `|null` no texto:
   `'uuid|null'`. Para um DataType, `Uuid::class . '|null'` funciona dentro de um attribute.

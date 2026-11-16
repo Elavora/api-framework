@@ -51,58 +51,54 @@ final class ValidationRule
      *
      * O resultado e pensado para quem consome a API, entao nunca e o nome completo de uma classe PHP:
      *
-     * - regra nomeada (`int`, `email`, ...): como veio;
+     * - regra nomeada (`int`, `email`, ...): `['type' => 'int']`;
      * - DataType: o tipo que declara (`DescribesType`) ou o primitivo do retorno de `value()`, ou `mixed`;
      * - outra classe: o nome curto, sem namespace.
      *
-     * E uma string. So vira um array quando o tipo declara algo alem do tipo (chaves fixas de `DescribesType`).
+     * O resultado e sempre um array com `type` e, se o tipo declarar, `format`, `mask`, `pattern`, `enum`, `example` e
+     * `description` (chaves fixas de `DescribesType`).
      *
-     * @return string|array<string, mixed>
+     * @return array<string, mixed>
      */
-    public static function describe(mixed $rule): string|array
+    public static function describe(mixed $rule): array
     {
         if (is_string($rule)) {
-            return class_exists($rule) || enum_exists($rule) ? self::describeClass($rule) : $rule;
+            return class_exists($rule) || enum_exists($rule) ? self::describeClass($rule) : ['type' => $rule];
         }
 
         if (is_object($rule)) {
             return self::describeClass($rule::class);
         }
 
-        return get_debug_type($rule);
+        return ['type' => get_debug_type($rule)];
     }
 
     /**
      * @param class-string $class
-     * @return string|array<string, mixed>
+     * @return array<string, mixed>
      */
-    private static function describeClass(string $class): string|array
+    private static function describeClass(string $class): array
     {
         if (is_a($class, DescribesType::class, true)) {
             return self::normalizeDocumentedType($class::documentedType());
         }
 
         if (is_a($class, DataType::class, true)) {
-            return self::valueType($class);
+            return ['type' => self::valueType($class)];
         }
 
-        return (new ReflectionClass($class))->getShortName();
+        return ['type' => (new ReflectionClass($class))->getShortName()];
     }
 
     /**
      * Mantem so as chaves fixas do contrato (`type`, `format`, `mask`, `pattern`, `enum`, `example`,
-     * `description`) e descarta as vazias, para um tipo nao vazar mais do que deve. Sem nada alem do tipo,
-     * devolve so a string.
+     * `description`) e descarta as vazias, para um tipo nao vazar mais do que deve.
      *
-     * @param string|array<array-key, mixed> $documented
-     * @return string|array<string, mixed>
+     * @param array<array-key, mixed> $documented
+     * @return array<string, mixed>
      */
-    private static function normalizeDocumentedType(string|array $documented): string|array
+    private static function normalizeDocumentedType(array $documented): array
     {
-        if (is_string($documented)) {
-            return $documented;
-        }
-
         $type = isset($documented['type']) && is_string($documented['type']) && $documented['type'] !== ''
             ? $documented['type']
             : 'mixed';
@@ -125,7 +121,7 @@ final class ValidationRule
             $normalized['example'] = $documented['example'];
         }
 
-        return count($normalized) === 1 ? $type : $normalized;
+        return $normalized;
     }
 
     /**

@@ -53,7 +53,7 @@ final class OptionalFields implements RequestValidatorAttribute
     }
 
     /**
-     * @return array{optionalFields: array<string, string|array<string, string>>} Metadados dos campos opcionais.
+     * @return array{optionalFields: array<string, array<string, mixed>>} Metadados dos campos opcionais.
      */
     public function options(): array
     {

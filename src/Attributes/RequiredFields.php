@@ -61,7 +61,7 @@ final class RequiredFields implements RequestValidatorAttribute
     }
 
     /**
-     * @return array{fields: array<string, string|array<string, string>>} Metadados dos campos obrigatorios.
+     * @return array{fields: array<string, array<string, mixed>>} Metadados dos campos obrigatorios.
      */
     public function options(): array
     {
@@ -69,14 +69,14 @@ final class RequiredFields implements RequestValidatorAttribute
     }
 
     /**
-     * @return array<string, string|array<string, mixed>>
+     * @return array<string, array<string, mixed>>
      */
     private function describeFields(): array
     {
         $fields = [];
         foreach ($this->fields as $field => $rule) {
             if (is_int($field)) {
-                $fields[(string) $rule] = 'mixed';
+                $fields[(string) $rule] = ['type' => 'mixed'];
                 continue;
             }
 

@@ -28,7 +28,7 @@ final class ResponseAttributeTest extends TestCase
     private const USER_SCHEMA = [
         'id' => 'uuid',
         'name' => 'string',
-        'email' => 'string',
+        'email' => ['type' => 'string'],
         'organization_id' => 'uuid|null',
     ];
 
@@ -74,7 +74,7 @@ final class ResponseAttributeTest extends TestCase
     {
         $options = (new ResponseDoc(['code' => DocumentedEmail::class, 'other' => stdClass::class]))->options();
 
-        self::assertSame(['response' => ['code' => 'string', 'other' => 'stdClass']], $options);
+        self::assertSame(['response' => ['code' => ['type' => 'string'], 'other' => ['type' => 'stdClass']]], $options);
     }
 
     public function testClassWithoutTheContractIsRejected(): void

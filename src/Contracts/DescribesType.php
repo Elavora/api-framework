@@ -12,8 +12,8 @@ namespace Elavora\Api\Framework\Contracts;
  * primitivo pelo tipo de retorno de `value()`. Implemente este contrato quando isso nao basta, ou quando o
  * tipo tem mais a informar.
  *
- * O retorno e uma string com o nome do tipo, ou um array. As chaves abaixo sao as unicas aceitas (qualquer
- * outra e descartada) e so `type` e obrigatoria:
+ * O retorno e sempre um array, o mesmo formato de qualquer campo em `OPTIONS`. As chaves abaixo sao as unicas
+ * aceitas (qualquer outra e descartada) e so `type` e obrigatoria:
  *
  * - `type`: um primitivo (`string`, `int`, `float`, `bool`) ou uma regra nomeada do framework (`email`,
  *   `uuid`, `url`, `base64`, `json`). Nunca o nome de uma classe;
@@ -27,16 +27,15 @@ namespace Elavora\Api\Framework\Contracts;
  *
  * `mask` e `pattern` so descrevem: quem valida de verdade e o `isValid()` do DataType.
  *
- * Na resposta de `OPTIONS`, o tipo continua sendo uma string. Ele so vira objeto quando declara algo alem do
- * `type`. Para nao haver varios formatos, o conjunto de chaves e fixo: precisando de outra, altere este
- * pacote.
+ * Todo campo sai em `OPTIONS` como objeto (`{"type": "string"}`), declare ou nao as demais chaves. Para nao
+ * haver varios formatos, o conjunto de chaves e fixo: precisando de outra, altere este pacote.
  */
 interface DescribesType
 {
     /**
      * Tipo na documentacao.
      *
-     * @return string|array<string, mixed>
+     * @return array<string, mixed>
      */
-    public static function documentedType(): string|array;
+    public static function documentedType(): array;
 }

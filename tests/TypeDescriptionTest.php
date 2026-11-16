@@ -25,26 +25,26 @@ use stdClass;
 final class TypeDescriptionTest extends TestCase
 {
     /**
-     * @return iterable<string, array{mixed, string}>
+     * @return iterable<string, array{mixed, array<string, mixed>}>
      */
     public static function rules(): iterable
     {
-        yield 'regra nomeada fica como esta' => ['int-string', 'int-string'];
-        yield 'regra nomeada de formato' => ['email', 'email'];
-        yield 'DataType de string vira string' => [TypeTextValue::class, 'string'];
-        yield 'DataType de int vira int' => [TypeCountValue::class, 'int'];
-        yield 'DataType com retorno anulavel vira o primitivo' => [TypeNullableValue::class, 'string'];
-        yield 'DataType com value mixed vira mixed' => [TypeAnyValue::class, 'mixed'];
-        yield 'DataType com uniao vira mixed' => [TypeUnionValue::class, 'mixed'];
-        yield 'DescribesType vence a reflexao' => [TypeDeclaredValue::class, 'uuid'];
-        yield 'classe comum vira o nome curto' => [stdClass::class, 'stdClass'];
-        yield 'instancia de DataType' => [new TypeCountValue(1), 'int'];
-        yield 'instancia de classe comum' => [new stdClass(), 'stdClass'];
-        yield 'valor que nao e regra' => [42, 'int'];
+        yield 'regra nomeada fica como esta' => ['int-string', ['type' => 'int-string']];
+        yield 'regra nomeada de formato' => ['email', ['type' => 'email']];
+        yield 'DataType de string vira string' => [TypeTextValue::class, ['type' => 'string']];
+        yield 'DataType de int vira int' => [TypeCountValue::class, ['type' => 'int']];
+        yield 'DataType com retorno anulavel vira o primitivo' => [TypeNullableValue::class, ['type' => 'string']];
+        yield 'DataType com value mixed vira mixed' => [TypeAnyValue::class, ['type' => 'mixed']];
+        yield 'DataType com uniao vira mixed' => [TypeUnionValue::class, ['type' => 'mixed']];
+        yield 'DescribesType vence a reflexao' => [TypeDeclaredValue::class, ['type' => 'uuid']];
+        yield 'classe comum vira o nome curto' => [stdClass::class, ['type' => 'stdClass']];
+        yield 'instancia de DataType' => [new TypeCountValue(1), ['type' => 'int']];
+        yield 'instancia de classe comum' => [new stdClass(), ['type' => 'stdClass']];
+        yield 'valor que nao e regra' => [42, ['type' => 'int']];
     }
 
     #[DataProvider('rules')]
-    public function testDescribe(mixed $rule, string $expected): void
+    public function testDescribe(mixed $rule, array $expected): void
     {
         self::assertSame($expected, ValidationRule::describe($rule));
     }
@@ -65,9 +65,9 @@ final class TypeDescriptionTest extends TestCase
         );
     }
 
-    public function testTypeWithoutExtrasStaysAString(): void
+    public function testTypeWithoutExtrasHasOnlyTheType(): void
     {
-        self::assertSame('int', ValidationRule::describe(TypeOnlyTypeValue::class));
+        self::assertSame(['type' => 'int'], ValidationRule::describe(TypeOnlyTypeValue::class));
     }
 
     public function testDescribeNeverReturnsANamespace(): void
@@ -89,9 +89,9 @@ final class TypeDescriptionTest extends TestCase
             (string) json_encode([
                 'attributes' => [
                     'methods' => ['POST'],
-                    'params' => ['id' => 'uuid'],
-                    'fields' => ['name' => 'string', 'quantity' => 'int'],
-                    'optionalFields' => ['note' => 'string'],
+                    'params' => ['id' => ['type' => 'uuid']],
+                    'fields' => ['name' => ['type' => 'string'], 'quantity' => ['type' => 'int']],
+                    'optionalFields' => ['note' => ['type' => 'string']],
                 ],
             ]),
             $response->body(),
@@ -184,9 +184,9 @@ final readonly class TypeDeclaredValue implements DataType, DescribesType
         return is_string($value);
     }
 
-    public static function documentedType(): string
+    public static function documentedType(): array
     {
-        return 'uuid';
+        return ['type' => 'uuid'];
     }
 
     public function value(): string
