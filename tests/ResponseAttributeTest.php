@@ -112,9 +112,7 @@ final class ResponseAttributeTest extends TestCase
     }
 }
 
-final class DocumentedEmail
-{
-}
+final class DocumentedEmail {}
 
 final class DocumentedUser implements Responseable, DescribesResponse
 {
