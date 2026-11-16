@@ -95,8 +95,8 @@ feita pelo orquestrador no momento do PR de adoção, antes do merge.
 
 Esta seção é o contrato de cada arquivo, conferido pelos testes da automação. Nela:
 
-- **imagem** é `ghcr.io/elavora/php-dev:8.3-latest`, a tag que aponta sempre para a versão estável mais recente da
-  imagem PHP 8.3 (só muda quando sai uma release estável do `Elavora/devcontainers`).
+- **imagem** é `ghcr.io/elavora/php-dev:8.4-latest`, a tag que aponta sempre para a versão estável mais recente da
+  imagem PHP 8.4 (só muda quando sai uma release estável do `Elavora/devcontainers`).
 
 Os SHAs e as versões que aparecem nos exemplos desta seção são os da adoção. O Dependabot troca esses valores, e os
 testes aceitam a troca. Veja
@@ -176,12 +176,12 @@ Nos dois casos:
 ### `.devcontainer/devcontainer.json`
 
 Igual ao `examples/devcontainer.json` da versão `0.3.0` do `Elavora/devcontainers`, trocando a imagem pela
-`8.3-latest`. Conteúdo exato:
+`8.4-latest`. Conteúdo exato:
 
 ```json
 {
-  "name": "Elavora PHP 8.3",
-  "image": "ghcr.io/elavora/php-dev:8.3-latest",
+  "name": "Elavora PHP 8.4",
+  "image": "ghcr.io/elavora/php-dev:8.4-latest",
   "remoteUser": "vscode",
   "postCreateCommand": "git config --global --add safe.directory \"$(pwd)\" && composer install --no-interaction --prefer-dist",
   "customizations": {
@@ -209,9 +209,9 @@ Igual ao `examples/devcontainer.json` da versão `0.3.0` do `Elavora/devcontaine
 ```
 
 - É JSON válido (sem comentários).
-- `image` é exatamente `ghcr.io/elavora/php-dev:8.3-latest`. Não pode ser uma versão fixa (`8.3-0.3.0`,
-  `8.3-0.2.0` ou qualquer `8.3-X.Y.Z`), outra tag móvel (`8.3`, `latest`) nem o nome local `elavora/php-dev:8.3`.
-  Por que a `8.3-latest`: o ambiente acompanha cada release estável da imagem sem PR de troca. Pré-releases não movem
+- `image` é exatamente `ghcr.io/elavora/php-dev:8.4-latest`. Não pode ser uma versão fixa (`8.4-0.3.0`,
+  `8.4-0.2.0` ou qualquer `8.4-X.Y.Z`), outra tag móvel (`8.4`, `latest`) nem o nome local `elavora/php-dev:8.4`.
+  Por que a `8.4-latest`: o ambiente acompanha cada release estável da imagem sem PR de troca. Pré-releases não movem
   a tag, e o contêiner só passa a usar a versão nova quando é reconstruído (ver
   [Atualizações da imagem](DESENVOLVIMENTO.md#atualizações-da-imagem)).
 - `remoteUser` é `vscode`, e `postCreateCommand` contém `composer install`.
@@ -311,7 +311,7 @@ O arquivo termina na linha do `uses:`, com uma quebra de linha no final: não ex
   com o `Elavora/.github`, sem PR neste repositório só para trocar a imagem.
   - No SHA fixado (1.2.0), esse padrão é `ghcr.io/elavora/php-dev:8.3-0.2.0`. Ela foi gerada do mesmo Dockerfile da
     `8.3-0.3.0`, então traz as mesmas ferramentas do devcontainer.
-  - Uma próxima versão do `Elavora/.github` muda o padrão para `8.3-latest`. Quando ela sair, o Dependabot abre o PR
+  - Uma próxima versão do `Elavora/.github` muda o padrão para `8.4-latest`. Quando ela sair, o Dependabot abre o PR
     que sobe o SHA e o comentário de versão (ver [`.github/dependabot.yml`](#githubdependabotyml)), e a partir daí o
     CI usa a mesma tag do devcontainer.
   - Enquanto o SHA for o da 1.2.0, a diferença de tag entre o CI (`8.3-0.2.0`) e o devcontainer (`8.3-latest`) é
@@ -631,7 +631,7 @@ O que cada atualização cobre:
 | `composer` | `phpstan/phpstan`, `phpunit/phpunit` e `elavora/code-standards` (as regras de estilo) |
 | `github-actions` | as actions de terceiros e os workflows reutilizáveis do `Elavora/.github` (o SHA e o comentário `# 1.2.0`) |
 
-**A imagem não precisa de entrada.** O devcontainer usa a tag móvel `8.3-latest`, que já acompanha as releases
+**A imagem não precisa de entrada.** O devcontainer usa a tag móvel `8.4-latest`, que já acompanha as releases
 estáveis, e o CI usa o padrão do pipeline central, que muda junto com o SHA do `Elavora/.github` (coberto pela
 entrada `github-actions`). Além disso, o ecossistema `devcontainers` do Dependabot só atualiza *features* do
 `devcontainer.json`, e este arquivo não usa nenhuma; o ecossistema `docker` só lê `Dockerfile` e arquivos Compose, e

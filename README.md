@@ -17,7 +17,7 @@ composer require elavora/api-framework
 
 Requisitos:
 
-- PHP 8.3 ou superior
+- PHP 8.4 ou superior
 - extensao `json`
 
 ## Aplicacao minima
@@ -239,13 +239,13 @@ Veja [bootstrap compartilhado](docs/BOOTSTRAP.md) para inicializar extensoes ofi
 
 ## Desenvolvimento e testes
 
-O ambiente de desenvolvimento é a imagem `ghcr.io/elavora/php-dev:8.3-latest`, que acompanha a versão estável mais
+O ambiente de desenvolvimento é a imagem `ghcr.io/elavora/php-dev:8.4-latest`, que acompanha a versão estável mais
 recente da imagem. O CI usa a imagem padrão do pipeline central (detalhes em
 [Ambiente de desenvolvimento e testes](docs/DESENVOLVIMENTO.md#o-que-roda-no-ci)). Você só precisa de
 Docker: abra o repositório no VS Code com **Dev Containers: Reopen in Container**, ou rode no PowerShell:
 
 ```powershell
-docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.3-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" -w /workspace ghcr.io/elavora/php-dev:8.4-latest sh -lc 'git config --global --add safe.directory /workspace && composer install --no-interaction --prefer-dist && composer check'
 ```
 
 Scripts Composer disponíveis:
