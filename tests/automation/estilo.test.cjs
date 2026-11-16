@@ -16,10 +16,9 @@ function composer() {
 }
 
 /**
- * Restrição aceita para elavora/code-standards: major 1 e minor 1 ou maior (a 1.0.0 não tem o
- * subcomando lint), com patch opcional. O valor exato não é conferido.
+ * Restrição aceita para elavora/code-standards: major 2 (qualquer minor), com patch opcional. O valor exato não é conferido.
  */
-const CODE_STANDARDS = /^\^1\.[1-9]\d*(?:\.\d+)?$/;
+const CODE_STANDARDS = /^\^2\.\d+(?:\.\d+)?$/;
 
 test.describe('restrição de elavora/code-standards (exemplos da doc)', () => {
     for (const [c, ok] of [
@@ -45,7 +44,7 @@ test.describe('restrição de elavora/code-standards (exemplos da doc)', () => {
 });
 
 test.describe('composer.json', () => {
-    test('elavora/code-standards ^1.N (N >= 1) em require-dev, fora do require', () => {
+    test('elavora/code-standards ^2.N em require-dev, fora do require', () => {
         const c = composer();
         const constraint = (c['require-dev'] || {})['elavora/code-standards'];
         assert.equal(typeof constraint, 'string', 'elavora/code-standards ausente em require-dev');
