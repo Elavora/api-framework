@@ -749,7 +749,7 @@ Exemplos que passam:
 - `Elavora/.github/.github/workflows/release.yml@3e8259291c0d3f7c031695fe63d714169792c454 # 1.2.0` trocado por
   `Elavora/.github/.github/workflows/release.yml@d96e9bb606f84016dd031ad748d009d820fd5487 # 1.3.0`;
 - `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1` trocado por outro SHA com `# v7.1.0`;
-- `"elavora/code-standards": "^2.0"` trocado por `"^2.0"`;
+- `"elavora/code-standards": "^2.0"` trocado por `"^2.1"`;
 - `"phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"` trocado por `"^10.5 || ^11.0 || ^12.0 || ^13.0"`.
 
 Exemplos que falham:
