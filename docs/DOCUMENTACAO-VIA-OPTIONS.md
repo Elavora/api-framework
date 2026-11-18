@@ -49,7 +49,7 @@ classe**:
 | `'int'`, `'int-string'`, `'email'`, `'uuid'` (regra nomeada) | `{"type": "int"}`, `{"type": "email"}`... |
 | `Name::class`, DataType com `value(): string` | `{"type": "string"}` |
 | `Quantity::class`, DataType com `value(): int` | `{"type": "int"}` |
-| DataType com `value()` de união (`string|int`) ou `mixed` | `{"type": "mixed"}` ||int`) ou `mixed` | `mixed` |
+| DataType com `value()` de união (`string\|int`) ou `mixed` | `{"type": "mixed"}` |
 | DataType que implementa `DescribesType` | o que `documentedType()` devolve |
 | qualquer outra classe | `{"type": "Money"}` (nome curto, sem namespace) |
 

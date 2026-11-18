@@ -61,7 +61,7 @@ Tambem e possivel registrar uma rota com metodo dinamico:
 $app->route('POST', '/sessions', [SessionController::class, 'store']);
 ```
 
-Handlers podem retornar `Response`, `array`, `string` ou objetos que implementam `Responseable`.
+Handlers podem retornar `Response|array|string` ou objetos que implementam `Responseable`.
 
 ```php
 use Elavora\Api\Framework\Http\Request;
