@@ -133,6 +133,7 @@ No corpo JSON (`#[RequiredFields]` e `#[OptionalFields]`) as regras continuam es
 é `float` e `"true"` não é `bool`, porque lá o tipo já vem correto.
 
 A regra `'int-string'` foi removida: troque por `'int'`. Uma regra desconhecida nunca valida.
+
 ## Um endpoint documentado
 
 ```php
