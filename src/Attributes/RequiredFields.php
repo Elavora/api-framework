@@ -17,7 +17,7 @@ use Elavora\Api\Framework\Validation\ValidationRule;
  * Aceita uma lista simples de nomes ou um mapa nome => regra.
  * Regras podem ser tipos nomeados, DataTypes ou validadores callable.
  *
- * Exemplo: #[RequiredFields(['name' => 'string', 'email' => 'email'])]
+ * Exemplo: #[RequiredFields(['name' => 'string', 'email' => Email::class])]
  */
 final class RequiredFields implements RequestValidatorAttribute
 {

@@ -20,8 +20,9 @@ final class ValidationRule
     /**
      * Verifica se um valor atende a uma regra.
      *
-     * Regras nomeadas suportadas: int, string, float, numeric, bool, array, object, null, email, url, base64, json e
-     * uuid (e os apelidos integer e boolean).
+     * Regras nomeadas suportadas (so primitivos): int, string, float, numeric, bool, array, object e null (e os apelidos
+     * integer e boolean). Formatos (email, uuid, url...) nao sao regras nomeadas: use um DataType (classe ou instancia)
+     * ou um callable, e o formato fica por conta de `isValid()` do DataType.
      *
      * Por padrao `int`, `float` e `bool` sao estritas (`is_int`, `is_float`, `is_bool`), o que serve ao corpo JSON,
      * onde o tipo ja vem correto. Com `$fromText = true` (valor vindo da query string, que chega sempre como texto),
@@ -171,12 +172,6 @@ final class ValidationRule
             'array' => is_array($value),
             'object' => is_object($value),
             'null' => $value === null,
-            'email' => is_string($value) && filter_var($value, FILTER_VALIDATE_EMAIL) !== false,
-            'url' => is_string($value) && filter_var($value, FILTER_VALIDATE_URL) !== false,
-            'base64' => is_string($value) && base64_decode($value, true) !== false,
-            'json' => is_string($value) && self::isValidJson($value),
-            'uuid' => is_string($value)
-                && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1,
             default => false,
         };
     }
@@ -233,12 +228,5 @@ final class ValidationRule
         }
 
         return is_string($value) && in_array(strtolower($value), ['0', '1', 'true', 'false'], true);
-    }
-
-    private static function isValidJson(string $value): bool
-    {
-        json_decode($value);
-
-        return json_last_error() === JSON_ERROR_NONE;
     }
 }
