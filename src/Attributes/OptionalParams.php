@@ -40,7 +40,7 @@ final class OptionalParams implements RequestValidatorAttribute
             }
 
             $value = $request->query($param);
-            if (!ValidationRule::validate($value, $rule)) {
+            if (!ValidationRule::validate($value, $rule, fromText: true)) {
                 $errors[$param] = 'Invalid parameter type';
             }
         }

@@ -21,14 +21,32 @@ final class ValidationRule
      * Verifica se um valor atende a uma regra.
      *
      * Regras nomeadas suportadas: int, int-string, string, float, numeric, bool,
-     * array, object, null, email, url, base64, json e uuid.
+     * array, object, null, email, url, base64, json e uuid (e os apelidos integer, integer-string e boolean).
+     *
+     * Por padrao `int` e `bool` sao estritas (`is_int`, `is_bool`), o que serve ao corpo JSON, onde o tipo ja vem
+     * correto. Com `$fromText = true` (valor vindo da query string, que chega sempre como texto), `int` e `bool`
+     * tambem aceitam o texto equivalente, veja `isIntLike` e `isBoolLike`. As demais regras nao mudam. A validacao
+     * nunca converte o valor.
      *
      * @param mixed $rule Nome da regra, classe DataType, instancia DataType ou callable.
+     * @param bool $fromText Quando true, `int` e `bool` aceitam tambem o texto (uso em parametros de query).
      */
-    public static function validate(mixed $value, mixed $rule): bool
+    public static function validate(mixed $value, mixed $rule, bool $fromText = false): bool
     {
         if (is_string($rule) && enum_exists($rule) === false && class_exists($rule) === false) {
-            return self::validateNamedRule($value, strtolower($rule));
+            $name = strtolower($rule);
+
+            if ($fromText) {
+                if ($name === 'int' || $name === 'integer') {
+                    return self::isIntLike($value);
+                }
+
+                if ($name === 'bool' || $name === 'boolean') {
+                    return self::isBoolLike($value);
+                }
+            }
+
+            return self::validateNamedRule($value, $name);
         }
 
         if (is_string($rule) && is_subclass_of($rule, DataType::class)) {
@@ -158,6 +176,39 @@ final class ValidationRule
                 && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1,
             default => false,
         };
+    }
+
+    /**
+     * Inteiro de verdade ou texto de inteiro: sinal opcional (`+`/`-`), sem espacos, decimais, notacao cientifica ou
+     * zeros a esquerda (`'007'` e recusado, `'0'`, `'+0'` e `'-0'` passam) e dentro do limite de `int`. Bool e float
+     * nao passam.
+     */
+    private static function isIntLike(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return true;
+        }
+
+        return is_string($value)
+            && preg_match('/^[+-]?(0|[1-9][0-9]*)$/D', $value) === 1
+            && filter_var($value, FILTER_VALIDATE_INT) !== false;
+    }
+
+    /**
+     * Bool do PHP, os inteiros 0 e 1 ou os textos `0`, `1`, `true` e `false` (sem diferenciar maiusculas, sem espacos
+     * nas pontas). Nada de `yes`, `no`, `on` ou `off`.
+     */
+    private static function isBoolLike(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return true;
+        }
+
+        if (is_int($value)) {
+            return $value === 0 || $value === 1;
+        }
+
+        return is_string($value) && in_array(strtolower($value), ['0', '1', 'true', 'false'], true);
     }
 
     private static function isValidJson(string $value): bool

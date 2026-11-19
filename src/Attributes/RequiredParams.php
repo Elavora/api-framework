@@ -47,7 +47,7 @@ final class RequiredParams implements RequestValidatorAttribute
             }
 
             $value = $request->query((string) $param);
-            if ($rule !== 'mixed' && !ValidationRule::validate($value, $rule)) {
+            if ($rule !== 'mixed' && !ValidationRule::validate($value, $rule, fromText: true)) {
                 $errors[$param] = 'Invalid parameter type';
             }
         }
