@@ -374,6 +374,27 @@ final class Router
 
 `Application::route` e os atalhos repassam a mesma exceção.
 
+## Método QUERY
+
+`QUERY` (seguro, idempotente, com corpo) é aceito como os demais métodos.
+
+- Rota explícita: `$app->query($path, $handler)` ou `$app->route('QUERY', $path, $handler)`.
+- `HttpMethod::Query` e `#[Method('QUERY')]` valem como os outros métodos. Um método fora do enum (por exemplo
+  `PROPFIND`) continua lançando `InvalidArgumentException`.
+- O corpo é lido como nos outros métodos (JSON; veja o README sobre formulários). Corpo malformado responde `400`.
+- O `405` e o `Allow` incluem `QUERY` quando a rota o suporta, e `OPTIONS` o lista em `methods`.
+- **Convenção `/controller/action`:** `QUERY` só vale se a action declarar `#[Method]` com `QUERY`. Sem `#[Method]`, a
+  action continua aceitando os demais métodos como antes, mas `QUERY` responde `405` com
+  `Allow: GET, POST, PUT, PATCH, DELETE, HEAD`.
+
+| Action | `QUERY` | `GET` | `POST` |
+| --- | --- | --- | --- |
+| `#[Method('QUERY')]` | executa | `405`, `Allow: QUERY` | `405`, `Allow: QUERY` |
+| `#[Method('GET', 'QUERY')]` | executa | executa | `405`, `Allow: GET, HEAD, QUERY` |
+| sem `#[Method]` | `405` | executa | executa |
+
+O servidor embutido do PHP (`php -S`) responde `501` a `QUERY` antes de chegar ao framework (testado no PHP 8.4).
+
 ## Mudanças de comportamento
 
 Estas mudanças entram como correção de segurança. Quem usava algum destes casos precisa ajustar o projeto:

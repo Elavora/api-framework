@@ -53,6 +53,7 @@ $app->post('/users', [UserController::class, 'store']);
 $app->put('/users', [UserController::class, 'update']);
 $app->patch('/users', [UserController::class, 'patch']);
 $app->delete('/users', [UserController::class, 'destroy']);
+$app->query('/users', [UserController::class, 'search']);
 ```
 
 Tambem e possivel registrar uma rota com metodo dinamico:
@@ -60,6 +61,39 @@ Tambem e possivel registrar uma rota com metodo dinamico:
 ```php
 $app->route('POST', '/sessions', [SessionController::class, 'store']);
 ```
+
+### Consultas com corpo (QUERY)
+
+`QUERY` é um método HTTP seguro e idempotente que aceita corpo, pensado para consultas e filtros que não cabem bem
+na query string (o RFC ainda está em andamento: "The HTTP QUERY Method"). Registre com `$app->query()` ou
+`$app->route('QUERY', ...)` e leia o corpo com `$request->input()`:
+
+```php
+$app->query('/documents', static fn(Request $request): array => [
+    'filter' => $request->input('filter'),
+    'page' => $request->query('page', '1'),
+]);
+```
+
+```js
+await fetch('/documents?page=2', {
+  method: 'QUERY',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ filter: { status: 'open' } }),
+});
+```
+
+- `#[Method('QUERY')]`, `#[RequiredFields]` e `#[OptionalFields]` valem para o corpo; `#[RequiredParams]` e
+  `#[OptionalParams]` continuam valendo para a query string.
+- O corpo da `QUERY` é lido como JSON. Um corpo `application/x-www-form-urlencoded` não é decodificado (o PHP só
+  preenche `$_POST` em `POST`), como em `PUT` e `PATCH`.
+- Numa action por convenção (`/controller/action`), `QUERY` só vale com `#[Method]` listando `QUERY`.
+- `QUERY` aparece no `Allow` do `405` e em `OPTIONS`. O framework não envia `Accept-Query`.
+- O servidor e os proxies precisam deixar o método passar. O servidor embutido do PHP (`php -S`, testado no PHP 8.4)
+  responde `501 Not Implemented` a `QUERY` antes de chegar ao framework. Em Apache, nginx ou proxy/CDN, confira que o
+  método não é filtrado.
+
+Detalhes em [Segurança do roteamento](docs/ROTEAMENTO.md#método-query).
 
 Handlers podem retornar `Response`, `array`, `string` ou objetos que implementam `Responseable`.
 
@@ -113,7 +147,7 @@ expostos, a resposta `404` quando uma regra falha, o log da recusa e os handlers
 `Request` normaliza metodo, path, query string, corpo, headers e request id.
 
 ```php
-$request->method();              // GET, POST, PUT, PATCH, DELETE...
+$request->method();              // GET, POST, PUT, PATCH, DELETE, QUERY...
 $request->path();                // /users
 $request->query('page', '1');    // parametro de query string
 $request->input('email');        // campo do corpo JSON/form

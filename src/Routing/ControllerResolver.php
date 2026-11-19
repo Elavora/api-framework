@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elavora\Api\Framework\Routing;
 
+use Elavora\Api\Framework\Attributes\Method;
 use Elavora\Api\Framework\Container;
 use Elavora\Api\Framework\Contracts\AfterExceptionAttribute;
 use Elavora\Api\Framework\Contracts\AfterResponseAttribute;
@@ -105,6 +106,20 @@ final class ControllerResolver
         }
 
         return $options;
+    }
+
+    /**
+     * Informa se a action declara #[Method], que passa a decidir quais metodos ela aceita.
+     *
+     * @param mixed $handler Par [Controller::class, 'metodo'].
+     */
+    public function declaresMethod(mixed $handler): bool
+    {
+        if (!is_array($handler) || !isset($handler[0], $handler[1]) || !is_string($handler[0])) {
+            return false;
+        }
+
+        return (new ReflectionMethod($handler[0], (string) $handler[1]))->getAttributes(Method::class) !== [];
     }
 
     /**

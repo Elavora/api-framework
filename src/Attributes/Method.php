@@ -25,7 +25,7 @@ final class Method implements RequestValidatorAttribute
     private array $methods;
 
     /**
-     * @param string|HttpMethod ...$methods Metodos HTTP aceitos, como GET, POST, PUT, PATCH ou DELETE.
+     * @param string|HttpMethod ...$methods Metodos HTTP aceitos, como GET, POST, PUT, PATCH, DELETE ou QUERY.
      */
     public function __construct(string|HttpMethod ...$methods)
     {
