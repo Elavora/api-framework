@@ -144,6 +144,17 @@ final class Application
     }
 
     /**
+     * Registra uma rota QUERY (consulta segura e idempotente, com corpo).
+     *
+     * @param mixed $handler Callable ou par [Controller::class, 'metodo'].
+     * @see docs/ROTEAMENTO.md
+     */
+    public function query(string $path, mixed $handler): self
+    {
+        return $this->route(method: HttpMethod::Query, path: $path, handler: $handler);
+    }
+
+    /**
      * Processa uma request e retorna uma resposta.
      */
     public function handle(Request $request): Response

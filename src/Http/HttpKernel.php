@@ -113,6 +113,12 @@ final class HttpKernel
                 );
             }
 
+            if ($request->httpMethod() === HttpMethod::Query
+                && !$this->controllerResolver->declaresMethod($conventionHandler)
+            ) {
+                return $this->queryNotDeclared();
+            }
+
             return Response::fromResult(
                 $this->controllerResolver->invoke($conventionHandler, $request),
             );
@@ -120,6 +126,25 @@ final class HttpKernel
 
         return Response::fromResult(
             $this->controllerResolver->invoke($route->handler(), $request),
+        );
+    }
+
+    /**
+     * QUERY so vale numa action de convencao que declara #[Method] com QUERY; sem o attribute, e 405.
+     *
+     * @throws JsonException
+     */
+    private function queryNotDeclared(): Response
+    {
+        $allowed = array_filter(
+            HttpMethod::cases(),
+            static fn(HttpMethod $method): bool => !in_array($method, [HttpMethod::Query, HttpMethod::Options], true),
+        );
+
+        return Response::json(
+            payload: ['message' => 'Method QUERY is not allowed for this endpoint.'],
+            status: 405,
+            headers: ['Allow' => implode(', ', array_map(static fn(HttpMethod $m): string => $m->value, $allowed))],
         );
     }
 

@@ -18,6 +18,8 @@ enum HttpMethod: string
     case Delete = 'DELETE';
     case Options = 'OPTIONS';
     case Head = 'HEAD';
+    /** Metodo seguro e idempotente que aceita corpo (RFC "The HTTP QUERY Method"). */
+    case Query = 'QUERY';
 
     /**
      * Normaliza uma string ou enum para HttpMethod.
