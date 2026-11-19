@@ -133,6 +133,55 @@ final class QueryMethodTest extends TestCase
         self::assertSame(['QUERY'], $payload['attributes']['methods']);
     }
 
+    public function testOptionsOfExplicitQueryRouteSendsAcceptQuery(): void
+    {
+        $application = Application::create();
+        $application->query('/q', fn(): Response => Response::json([]));
+
+        $response = $application->handle(new Request(method: 'OPTIONS', path: '/q'));
+
+        self::assertSame('"application/json"', $response->headers()['Accept-Query']);
+    }
+
+    public function testOptionsOfConventionQueryActionSendsAcceptQuery(): void
+    {
+        $application = Application::create();
+
+        $both = $application->handle(new Request(method: 'OPTIONS', path: '/queryProbe/both'));
+        $search = $application->handle(new Request(method: 'OPTIONS', path: '/queryProbe/search'));
+
+        self::assertSame('"application/json"', $both->headers()['Accept-Query']);
+        self::assertSame('"application/json"', $search->headers()['Accept-Query']);
+    }
+
+    public function testRoutesWithoutQueryDoNotSendAcceptQuery(): void
+    {
+        $application = Application::create();
+        $application->get('/search', fn(): Response => Response::json([]));
+        $application->post('/search', fn(): Response => Response::json([]));
+
+        $options = $application->handle(new Request(method: 'OPTIONS', path: '/search'));
+        $get = $application->handle(new Request(method: 'GET', path: '/search'));
+        $post = $application->handle(new Request(method: 'POST', path: '/search'));
+        $open = $application->handle(new Request(method: 'OPTIONS', path: '/queryProbe/open'));
+
+        self::assertArrayNotHasKey('Accept-Query', $options->headers());
+        self::assertArrayNotHasKey('Accept-Query', $get->headers());
+        self::assertArrayNotHasKey('Accept-Query', $post->headers());
+        self::assertArrayNotHasKey('Accept-Query', $open->headers());
+    }
+
+    public function testQueryAndGetResponsesDoNotSendAcceptQuery(): void
+    {
+        $application = Application::create();
+
+        $query = $application->handle(new Request(method: 'QUERY', path: '/queryProbe/both'));
+        $get = $application->handle(new Request(method: 'GET', path: '/queryProbe/both'));
+
+        self::assertArrayNotHasKey('Accept-Query', $query->headers());
+        self::assertArrayNotHasKey('Accept-Query', $get->headers());
+    }
+
     public function testMethodAttributeAcceptsQuery(): void
     {
         $attribute = new Method('QUERY');

@@ -19,6 +19,9 @@ use Throwable;
  */
 final class HttpKernel
 {
+    /** Formatos de corpo aceitos em QUERY (Structured Field); hoje so JSON e lido. */
+    private const ACCEPT_QUERY = ['Accept-Query' => '"application/json"'];
+
     /** @var list<callable> */
     private array $middleware = [];
 
@@ -81,11 +84,14 @@ final class HttpKernel
             if ($request->method() === 'OPTIONS' && $allowedMethods !== []) {
                 $routeForOptions = $this->router->firstRouteForPath($request->path());
 
-                return Response::json(payload: [
-                    'attributes' => $routeForOptions === null
-                        ? []
-                        : $this->controllerResolver->options($routeForOptions->handler()),
-                ]);
+                return Response::json(
+                    payload: [
+                        'attributes' => $routeForOptions === null
+                            ? []
+                            : $this->controllerResolver->options($routeForOptions->handler()),
+                    ],
+                    headers: in_array(HttpMethod::Query->value, $allowedMethods, true) ? self::ACCEPT_QUERY : [],
+                );
             }
 
             if ($allowedMethods !== []) {
@@ -106,6 +112,9 @@ final class HttpKernel
                 $headers = isset($attributes['methods']) && is_array($attributes['methods'])
                     ? ['Allow' => implode(', ', $attributes['methods'])]
                     : [];
+                if (in_array(HttpMethod::Query->value, (array) ($attributes['methods'] ?? []), true)) {
+                    $headers += self::ACCEPT_QUERY;
+                }
 
                 return Response::json(
                     payload: ['attributes' => $attributes],

@@ -383,6 +383,10 @@ final class Router
   `PROPFIND`) continua lançando `InvalidArgumentException`.
 - O corpo é lido como nos outros métodos (JSON; veja o README sobre formulários). Corpo malformado responde `400`.
 - O `405` e o `Allow` incluem `QUERY` quando a rota o suporta, e `OPTIONS` o lista em `methods`.
+- **`Accept-Query`:** `OPTIONS` de uma rota que suporta `QUERY` (explícita ou por convenção) responde também
+  `Accept-Query: "application/json"`, a lista dos formatos de corpo aceitos (Structured Field, conforme o rascunho
+  "The HTTP QUERY Method"). Fica fixo em JSON, o único formato lido. Rotas sem `QUERY` não ganham o header, e ele não é
+  enviado no `405` nem nas respostas da própria `QUERY`.
 - **Convenção `/controller/action`:** `QUERY` só vale se a action declarar `#[Method]` com `QUERY`. Sem `#[Method]`, a
   action continua aceitando os demais métodos como antes, mas `QUERY` responde `405` com
   `Allow: GET, POST, PUT, PATCH, DELETE, HEAD`.

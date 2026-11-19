@@ -88,7 +88,7 @@ await fetch('/documents?page=2', {
 - O corpo da `QUERY` é lido como JSON. Um corpo `application/x-www-form-urlencoded` não é decodificado (o PHP só
   preenche `$_POST` em `POST`), como em `PUT` e `PATCH`.
 - Numa action por convenção (`/controller/action`), `QUERY` só vale com `#[Method]` listando `QUERY`.
-- `QUERY` aparece no `Allow` do `405` e em `OPTIONS`. O framework não envia `Accept-Query`.
+- `QUERY` aparece no `Allow` do `405` e em `OPTIONS`. `OPTIONS` de rotas que suportam `QUERY` também envia `Accept-Query: "application/json"` (lista de formatos de corpo aceitos, como Structured Field; só JSON é lido). Rotas sem `QUERY`, e as respostas `405`, `GET`, `POST` e a própria `QUERY`, não levam o header.
 - O servidor e os proxies precisam deixar o método passar. O servidor embutido do PHP (`php -S`, testado no PHP 8.4)
   responde `501 Not Implemented` a `QUERY` antes de chegar ao framework. Em Apache, nginx ou proxy/CDN, confira que o
   método não é filtrado.
