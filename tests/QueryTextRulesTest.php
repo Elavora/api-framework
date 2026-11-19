@@ -31,6 +31,12 @@ final class QueryTextRulesTest extends TestCase
         yield 'menos zero' => ['-0'];
         yield 'maior int' => [(string) PHP_INT_MAX];
         yield 'menor int' => [(string) PHP_INT_MIN];
+        yield 'zeros a esquerda' => ['007'];
+        yield 'zero duplo' => ['00'];
+        yield 'negativo com zeros' => ['-007'];
+        yield 'mais com zeros' => ['+007'];
+        yield 'zeros e maior int' => ['000' . PHP_INT_MAX];
+        yield 'zeros e menor int' => ['-000' . ltrim((string) PHP_INT_MIN, '-')];
     }
 
     /**
@@ -46,12 +52,12 @@ final class QueryTextRulesTest extends TestCase
         yield 'quebra de linha no fim' => ["1\n"];
         yield 'notacao cientifica' => ['1e3'];
         yield 'hexadecimal' => ['0x1A'];
-        yield 'zeros a esquerda' => ['007'];
-        yield 'zero duplo' => ['00'];
         yield 'sinal sozinho' => ['-'];
         yield 'dois sinais' => ['--1'];
         yield 'texto' => ['abc'];
         yield 'estoura o int' => ['9223372036854775808'];
+        yield 'estoura o int com zeros' => ['009223372036854775808'];
+        yield 'estoura o negativo' => ['-9223372036854775809'];
         yield 'float' => [1.0];
         yield 'bool' => [true];
         yield 'null' => [null];

@@ -178,9 +178,9 @@ final class ValidationRule
     }
 
     /**
-     * Inteiro de verdade ou texto de inteiro: sinal opcional (`+`/`-`), sem espacos, decimais, notacao cientifica ou
-     * zeros a esquerda (`'007'` e recusado, `'0'`, `'+0'` e `'-0'` passam) e dentro do limite de `int`. Bool e float
-     * nao passam.
+     * Inteiro de verdade ou texto de inteiro: sinal opcional (`+`/`-`) e digitos, com ou sem zeros a esquerda
+     * (`'007'`, `'00'`, `'-007'`, `'+0'` passam). Recusa vazio, espacos, decimais, notacao cientifica, hexadecimal,
+     * estouro do limite de `int` (zeros a esquerda nao contam), bool e float.
      */
     private static function isIntLike(mixed $value): bool
     {
@@ -188,9 +188,14 @@ final class ValidationRule
             return true;
         }
 
-        return is_string($value)
-            && preg_match('/^[+-]?(0|[1-9][0-9]*)$/D', $value) === 1
-            && filter_var($value, FILTER_VALIDATE_INT) !== false;
+        if (!is_string($value) || preg_match('/^([+-]?)([0-9]+)$/D', $value, $parts) !== 1) {
+            return false;
+        }
+
+        $digits = ltrim($parts[2], '0');
+        $normalized = ($parts[1] === '-' ? '-' : '') . ($digits === '' ? '0' : $digits);
+
+        return filter_var($normalized, FILTER_VALIDATE_INT) !== false;
     }
 
     /**

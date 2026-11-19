@@ -116,8 +116,8 @@ Isso vale igualmente para a requisição (`fields`, `params`) e para a resposta 
 Parâmetros de query string chegam sempre como texto. Por isso, em `#[RequiredParams]` e `#[OptionalParams]`, as regras
 `'int'` e `'bool'` aceitam também o texto equivalente (em `OPTIONS` continuam `{"type": "int"}` e `{"type": "bool"}`):
 
-- `'int'`: um inteiro ou um texto de inteiro, com sinal opcional (`'10'`, `'-5'`, `'+1'`, `'0'`, `'-0'`). Recusa
-  vazio, espaços, decimais (`'1.0'`), notação científica (`'1e3'`), zeros à esquerda (`'007'`), valores acima do limite
+- `'int'`: um inteiro ou um texto de inteiro, com sinal opcional e zeros à esquerda aceitos (`'10'`, `'-5'`, `'+1'`, `'0'`, `'-0'`, `'007'`). Recusa
+  vazio, espaços, decimais (`'1.0'`), notação científica (`'1e3'`), valores acima do limite
   do `int` do PHP, bool e float.
 - `'bool'`: o bool do PHP, os inteiros `0` e `1` e os textos `'0'`, `'1'`, `'true'` e `'false'` (sem diferenciar
   maiúsculas, sem espaços nas pontas). `'yes'`, `'no'`, `'on'` e `'off'` são recusados.
