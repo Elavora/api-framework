@@ -20,8 +20,8 @@ final class ValidationRule
     /**
      * Verifica se um valor atende a uma regra.
      *
-     * Regras nomeadas suportadas: int, int-string, string, float, numeric, bool,
-     * array, object, null, email, url, base64, json e uuid (e os apelidos integer, integer-string e boolean).
+     * Regras nomeadas suportadas: int, string, float, numeric, bool,
+     * array, object, null, email, url, base64, json e uuid (e os apelidos integer e boolean).
      *
      * Por padrao `int` e `bool` sao estritas (`is_int`, `is_bool`), o que serve ao corpo JSON, onde o tipo ja vem
      * correto. Com `$fromText = true` (valor vindo da query string, que chega sempre como texto), `int` e `bool`
@@ -160,7 +160,6 @@ final class ValidationRule
     {
         return match ($rule) {
             'int', 'integer' => is_int($value),
-            'int-string', 'integer-string' => is_string($value) && ctype_digit($value),
             'string' => is_string($value),
             'float' => is_float($value),
             'numeric' => is_numeric($value),

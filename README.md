@@ -170,7 +170,7 @@ use Elavora\Api\Framework\Http\Response;
 final class UserController
 {
     #[Method('POST')]
-    #[RequiredParams(['page' => 'int-string'])]
+    #[RequiredParams(['page' => 'int'])]
     #[RequiredFields(['name' => 'string', 'email' => 'email'])]
     public function store(Request $request): Response
     {

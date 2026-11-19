@@ -195,7 +195,7 @@ final class ApplicationTest extends TestCase
 final class AttributeControllerStub
 {
     #[Method('POST')]
-    #[RequiredParams(['page' => 'int-string'])]
+    #[RequiredParams(['page' => 'int'])]
     #[RequiredFields(['name' => 'string', 'email' => 'email'])]
     public function store(Request $request): Response
     {

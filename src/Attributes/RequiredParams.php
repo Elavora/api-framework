@@ -16,7 +16,7 @@ use Elavora\Api\Framework\Validation\ValidationRule;
  *
  * Aceita uma lista simples de nomes ou um mapa nome => regra.
  *
- * Exemplo: #[RequiredParams(['page' => 'int-string', 'filter'])]
+ * Exemplo: #[RequiredParams(['page' => 'int', 'filter'])]
  */
 final class RequiredParams implements RequestValidatorAttribute
 {

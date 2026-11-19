@@ -133,12 +133,11 @@ final class QueryTextRulesTest extends TestCase
     }
 
     #[DataProvider('validInts')]
-    public function testIntStringIsUnchanged(mixed $value): void
+    public function testRemovedIntStringRuleIsNowUnknownAndRejected(mixed $value): void
     {
-        $expected = is_string($value) && ctype_digit($value);
-
-        self::assertSame($expected, ValidationRule::validate($value, 'int-string', fromText: true));
-        self::assertSame($expected, ValidationRule::validate($value, 'int-string'));
+        self::assertFalse(ValidationRule::validate($value, 'int-string'));
+        self::assertFalse(ValidationRule::validate($value, 'int-string', fromText: true));
+        self::assertFalse(ValidationRule::validate($value, 'integer-string', fromText: true));
     }
 
     public function testOtherRulesIgnoreTheTextFlag(): void
@@ -187,6 +186,5 @@ final class QueryTextRulesTest extends TestCase
     {
         self::assertSame(['type' => 'int'], ValidationRule::describe('int'));
         self::assertSame(['type' => 'bool'], ValidationRule::describe('bool'));
-        self::assertSame(['type' => 'int-string'], ValidationRule::describe('int-string'));
     }
 }
