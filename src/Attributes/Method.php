@@ -6,6 +6,7 @@ namespace Elavora\Api\Framework\Attributes;
 
 use Attribute;
 use Elavora\Api\Framework\Contracts\RequestValidatorAttribute;
+use Elavora\Api\Framework\Http\HttpKernel;
 use Elavora\Api\Framework\Http\HttpMethod;
 use Elavora\Api\Framework\Http\Request;
 use Elavora\Api\Framework\Http\Response;
@@ -55,7 +56,8 @@ final class Method implements RequestValidatorAttribute
         return Response::json(
             payload: ['message' => sprintf('Method %s is not allowed for this endpoint.', $request->method())],
             status: 405,
-            headers: ['Allow' => implode(', ', $allowedMethods)],
+            headers: ['Allow' => implode(', ', $allowedMethods)]
+                + (in_array(HttpMethod::Query, $effectiveMethods, true) ? HttpKernel::ACCEPT_QUERY : []),
         );
     }
 

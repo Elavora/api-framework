@@ -263,4 +263,60 @@ final class QueryMethodTest extends TestCase
         $put = $application->handle(new Request(method: 'PUT', path: '/r'));
         self::assertSame('GET, HEAD, POST', $put->headers()['Allow']);
     }
+
+    public function testExplicitRoute405WithQueryInAllowSendsAcceptQuery(): void
+    {
+        $application = Application::create();
+        $application->get('/search', fn(): Response => Response::json([]));
+        $application->query('/search', fn(): Response => Response::json([]));
+
+        $response = $application->handle(new Request(method: 'POST', path: '/search'));
+
+        self::assertSame(405, $response->status());
+        self::assertSame('"application/json"', $response->headers()['Accept-Query']);
+    }
+
+    public function testExplicitRoute405WithoutQueryInAllowDoesNotSendAcceptQuery(): void
+    {
+        $application = Application::create();
+        $application->get('/search', fn(): Response => Response::json([]));
+
+        $response = $application->handle(new Request(method: 'QUERY', path: '/search'));
+
+        self::assertSame(405, $response->status());
+        self::assertArrayNotHasKey('Accept-Query', $response->headers());
+    }
+
+    public function testConventionAction405WithQueryInAllowSendsAcceptQuery(): void
+    {
+        $application = Application::create();
+
+        $search = $application->handle(new Request(method: 'POST', path: '/queryProbe/search'));
+        $both = $application->handle(new Request(method: 'POST', path: '/queryProbe/both'));
+
+        self::assertSame(405, $search->status());
+        self::assertSame('"application/json"', $search->headers()['Accept-Query']);
+        self::assertSame(405, $both->status());
+        self::assertSame('"application/json"', $both->headers()['Accept-Query']);
+    }
+
+    public function testConventionAction405WithoutQueryInAllowDoesNotSendAcceptQuery(): void
+    {
+        $application = Application::create();
+
+        $queryOnOpen = $application->handle(new Request(method: 'QUERY', path: '/queryProbe/open'));
+
+        self::assertSame(405, $queryOnOpen->status());
+        self::assertArrayNotHasKey('Accept-Query', $queryOnOpen->headers());
+    }
+
+    public function testOptionsStillSendsAcceptQueryAlongside405Behavior(): void
+    {
+        $application = Application::create();
+        $application->query('/q', fn(): Response => Response::json([]));
+
+        $options = $application->handle(new Request(method: 'OPTIONS', path: '/q'));
+
+        self::assertSame('"application/json"', $options->headers()['Accept-Query']);
+    }
 }

@@ -20,7 +20,7 @@ use Throwable;
 final class HttpKernel
 {
     /** Formatos de corpo aceitos em QUERY (Structured Field); hoje so JSON e lido. */
-    private const ACCEPT_QUERY = ['Accept-Query' => '"application/json"'];
+    public const ACCEPT_QUERY = ['Accept-Query' => '"application/json"'];
 
     /** @var list<callable> */
     private array $middleware = [];
@@ -98,7 +98,8 @@ final class HttpKernel
                 return Response::json(
                     payload: ['message' => 'Method Not Allowed'],
                     status: 405,
-                    headers: ['Allow' => implode(', ', $allowedMethods)],
+                    headers: ['Allow' => implode(', ', $allowedMethods)]
+                        + (in_array(HttpMethod::Query->value, $allowedMethods, true) ? self::ACCEPT_QUERY : []),
                 );
             }
 
