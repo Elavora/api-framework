@@ -28,7 +28,7 @@ documentação (`#[Details]` e `#[Response]`).
 
 | Attribute | Chave em `attributes` | Conteúdo |
 | --- | --- | --- |
-| `#[Method]` | `methods` | métodos aceitos (e o header `Allow`, nas rotas por convenção) |
+| `#[Method]` | `methods` | métodos aceitos, como `GET`, `POST` ou `QUERY` (e o header `Allow`, nas rotas por convenção) |
 | `#[RequiredFields]` | `fields` | campo do corpo → tipo |
 | `#[OptionalFields]` | `optionalFields` | campo opcional do corpo → tipo |
 | `#[RequiredParams]` | `params` | parâmetro da URL → tipo |
