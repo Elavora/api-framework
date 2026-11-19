@@ -30,7 +30,7 @@ final class TypeDescriptionTest extends TestCase
     public static function rules(): iterable
     {
         yield 'regra nomeada fica como esta' => ['int', ['type' => 'int']];
-        yield 'regra nomeada de formato' => ['email', ['type' => 'email']];
+        yield 'regra nomeada de primitivo' => ['float', ['type' => 'float']];
         yield 'DataType de string vira string' => [TypeTextValue::class, ['type' => 'string']];
         yield 'DataType de int vira int' => [TypeCountValue::class, ['type' => 'int']];
         yield 'DataType com retorno anulavel vira o primitivo' => [TypeNullableValue::class, ['type' => 'string']];

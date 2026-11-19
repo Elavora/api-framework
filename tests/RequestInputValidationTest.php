@@ -9,9 +9,11 @@ use Elavora\Api\Framework\Attributes\OptionalFields;
 use Elavora\Api\Framework\Attributes\OptionalParams;
 use Elavora\Api\Framework\Attributes\RequiredFields;
 use Elavora\Api\Framework\Attributes\RequiredParams;
+use Elavora\Api\Framework\Contracts\DataType;
 use Elavora\Api\Framework\Http\Request;
 use Elavora\Api\Framework\Http\Response;
 use Elavora\Api\Framework\Validation\ValidationRule;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class RequestInputValidationTest extends TestCase
@@ -130,11 +132,53 @@ final class RequestInputValidationTest extends TestCase
         self::assertNotNull((new RequiredFields(['missing' => 'null']))->validate($request));
         self::assertNotNull((new RequiredParams(['missing' => 'null']))->validate($request));
     }
-
-    public function testJsonRuleAcceptsLiteralNullAndRejectsMalformedJson(): void
+    /**
+     * @return iterable<string, array{string, mixed}>
+     */
+    public static function removedFormatRules(): iterable
     {
-        self::assertTrue(ValidationRule::validate('null', 'json'));
-        self::assertTrue(ValidationRule::validate('{"valid":true}', 'json'));
-        self::assertFalse(ValidationRule::validate('{"invalid":', 'json'));
+        yield 'email' => ['email', 'team@elavora.dev'];
+        yield 'url' => ['url', 'https://elavora.dev'];
+        yield 'base64' => ['base64', 'RWxhdm9yYQ=='];
+        yield 'json' => ['json', '{"valid":true}'];
+        yield 'uuid' => ['uuid', '123e4567-e89b-12d3-a456-426614174000'];
+    }
+
+    #[DataProvider('removedFormatRules')]
+    public function testFormatRulesByNameAreUnknownAndRejected(string $rule, mixed $validValue): void
+    {
+        self::assertFalse(ValidationRule::validate($validValue, $rule));
+        self::assertFalse(ValidationRule::validate($validValue, strtoupper($rule)));
+        self::assertFalse(ValidationRule::validate($validValue, $rule, fromText: true));
+
+        $request = new Request(method: 'POST', path: '/', query: ['value' => $validValue], body: ['value' => $validValue]);
+        self::assertNotNull((new RequiredParams(['value' => $rule]))->validate($request));
+        self::assertNotNull((new OptionalParams(['value' => $rule]))->validate($request));
+        self::assertNotNull((new RequiredFields(['value' => $rule]))->validate($request));
+        self::assertNotNull((new OptionalFields(['value' => $rule]))->validate($request));
+    }
+
+    public function testRuleCanBeAnyDataTypeOrCallable(): void
+    {
+        self::assertTrue(ValidationRule::validate('ok', StubFormat::class));
+        self::assertFalse(ValidationRule::validate('no', StubFormat::class));
+        self::assertTrue(ValidationRule::validate('ok', new StubFormat('ok')));
+        self::assertTrue(ValidationRule::validate('x', static fn(mixed $v): bool => $v === 'x'));
+    }
+
+}
+
+final readonly class StubFormat implements DataType
+{
+    public function __construct(private mixed $value) {}
+
+    public static function isValid(mixed $value): bool
+    {
+        return $value === 'ok';
+    }
+
+    public function value(): string
+    {
+        return (string) $this->value;
     }
 }

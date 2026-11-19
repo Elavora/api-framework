@@ -8,6 +8,7 @@ use Elavora\Api\Framework\Application;
 use Elavora\Api\Framework\Attributes\Method;
 use Elavora\Api\Framework\Attributes\RequiredFields;
 use Elavora\Api\Framework\Attributes\RequiredParams;
+use Elavora\Api\Framework\Contracts\DataType;
 use Elavora\Api\Framework\Contracts\Extension;
 use Elavora\Api\Framework\Exceptions\HttpException;
 use Elavora\Api\Framework\Http\Request;
@@ -196,9 +197,24 @@ final class AttributeControllerStub
 {
     #[Method('POST')]
     #[RequiredParams(['page' => 'int'])]
-    #[RequiredFields(['name' => 'string', 'email' => 'email'])]
+    #[RequiredFields(['name' => 'string', 'email' => StubEmail::class])]
     public function store(Request $request): Response
     {
         return Response::json(['created' => true], status: 201);
+    }
+}
+
+final readonly class StubEmail implements DataType
+{
+    public function __construct(private mixed $value) {}
+
+    public static function isValid(mixed $value): bool
+    {
+        return is_string($value) && filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public function value(): string
+    {
+        return (string) $this->value;
     }
 }
