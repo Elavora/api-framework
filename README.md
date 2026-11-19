@@ -200,12 +200,13 @@ use Elavora\Api\Framework\Attributes\RequiredFields;
 use Elavora\Api\Framework\Attributes\RequiredParams;
 use Elavora\Api\Framework\Http\Request;
 use Elavora\Api\Framework\Http\Response;
+use Elavora\Api\DataTypes\Email; // requer elavora/api-datatype-email
 
 final class UserController
 {
     #[Method('POST')]
     #[RequiredParams(['page' => 'int'])]
-    #[RequiredFields(['name' => 'string', 'email' => 'email'])]
+    #[RequiredFields(['name' => 'string', 'email' => Email::class])]
     public function store(Request $request): Response
     {
         return Response::created(['created' => true]);
@@ -217,8 +218,8 @@ Atributos disponiveis:
 
 - `Action`: autoriza a exposicao da action pelo roteamento por convencao.
 - `Method`: restringe o metodo HTTP aceito.
-- `RequiredFields`: valida campos obrigatorios do corpo.
 - `OptionalFields`: descreve campos opcionais do corpo.
+- `RequiredFields`: valida campos do corpo. A regra e um primitivo pelo nome (`string`, `int`, `float`, `bool`...), um DataType (classe ou instancia) ou um callable; formatos (e-mail, uuid, url...) vem do DataType, nao ha regra nomeada de formato.
 - `RequiredParams`: valida parametros obrigatorios da query string. As regras `int`, `float` e `bool` aceitam o texto (`?limit=10`, `?price=1.5`, `?active=true`); no corpo JSON continuam estritas.
 - `OptionalParams`: descreve parametros opcionais da query string.
 - `Details`: adiciona metadados de descricao.

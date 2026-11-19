@@ -162,8 +162,8 @@ registro, com `InvalidArgumentException`. Os handlers aceitos estão em
 
 ## Validação dos dados
 
-`#[RequiredFields]` recebe o nome de cada campo e a regra dele. A regra pode ser um nome pronto (`string`, `int`,
-`email`, `uuid` e outros) ou uma classe de DataType.
+`#[RequiredFields]` recebe o nome de cada campo e a regra dele. A regra pode ser um primitivo pelo nome (`string`, `int`,
+`float`, `bool`...) ou um DataType (formatos como e-mail e uuid vêm do DataType).
 
 No `store`, o campo `code` usa o DataType `ProjectCode`, e o `title` precisa ser texto. Se algo falhar, a resposta
 é `400` e a action nem roda.

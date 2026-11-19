@@ -40,13 +40,13 @@ documentação (`#[Details]` e `#[Response]`).
 
 ## O tipo de um campo
 
-No código, o tipo de um campo é uma regra nomeada (`'int'`, `'email'`) ou a classe de um DataType (`Email::class`).
+No código, o tipo de um campo é uma regra nomeada de primitivo (`'int'`, `'string'`...) ou um DataType (a classe, como `Email::class`, ou uma instância). O formato (e-mail, uuid, url...) vem do DataType; não existe regra nomeada de formato.
 Quem consome a API não conhece classes PHP, e o `OPTIONS` é público. Por isso a resposta **nunca mostra o nome de uma
 classe**:
 
 | No attribute | Em `OPTIONS` |
 | --- | --- |
-| `'int'`, `'bool'`, `'email'`, `'uuid'` (regra nomeada) | `{"type": "int"}`, `{"type": "bool"}`, `{"type": "email"}`... |
+| `'int'`, `'float'`, `'bool'`, `'string'`... (regra nomeada de primitivo) | `{"type": "int"}`, `{"type": "float"}`, `{"type": "bool"}`... |
 | `Name::class`, DataType com `value(): string` | `{"type": "string"}` |
 | `Quantity::class`, DataType com `value(): int` | `{"type": "int"}` |
 | DataType com `value()` de união (`string\|int`) ou `mixed` | `{"type": "mixed"}` |
@@ -55,7 +55,7 @@ classe**:
 
 É a mesma ideia do DataType: ele substitui o primitivo no código e volta a ser o primitivo na saída da API. O
 framework descobre o primitivo pelo tipo de retorno de `value()`. Quando isso não basta (a `value()` devolve uma
-união, ou você quer informar um formato como `email` ou `uuid`), implemente `DescribesType`:
+união, ou você quer informar um formato como `email` ou `uuid`, que o framework não resolve por nome), implemente `DescribesType`:
 
 ```php
 use Elavora\Api\Framework\Contracts\DescribesType;
@@ -71,8 +71,10 @@ final readonly class Email implements DataType, DescribesType
 }
 ```
 
-`documentedType()` devolve sempre um array (`['type' => 'email']`) com um nome neutro em `type`: um primitivo ou uma regra nomeada do framework (`email`, `uuid`, `url`,
-`base64`, `json`). Não devolva o nome de uma classe.
+`documentedType()` devolve sempre um array (`['type' => 'string', 'format' => 'email']`) com um nome neutro em `type`
+(um primitivo, ou um nome de tipo que o pacote do DataType escolher, como `uuid`). Não devolva o nome de uma classe. O
+framework só valida primitivos por nome (`int`, `float`, `bool`, `string`, `numeric`, `array`, `object`, `null`); a
+validação de um formato é do `isValid()` do DataType, nos pacotes `api-datatype-*`.
 
 ### Mais dados sobre o tipo
 
@@ -132,7 +134,7 @@ convertido e `$request->query()` devolve exatamente o que veio. Converta na acti
 No corpo JSON (`#[RequiredFields]` e `#[OptionalFields]`) as regras continuam estritas: `"10"` não é `int`, `"1.5"` não
 é `float` e `"true"` não é `bool`, porque lá o tipo já vem correto.
 
-A regra `'int-string'` foi removida: troque por `'int'`. Uma regra desconhecida nunca valida.
+As regras `'int-string'`, `'email'`, `'url'`, `'base64'`, `'json'` e `'uuid'` foram removidas: troque `'int-string'` por `'int'` e as de formato pelo DataType correspondente. Uma regra desconhecida nunca valida.
 
 ## Um endpoint documentado
 
