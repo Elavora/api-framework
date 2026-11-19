@@ -129,6 +129,69 @@ final class QueryTextRulesTest extends TestCase
         self::assertFalse(ValidationRule::validate($value, 'bool', fromText: true));
     }
 
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function validFloats(): iterable
+    {
+        yield 'float' => [1.5];
+        yield 'int' => [10];
+        yield 'texto decimal' => ['1.5'];
+        yield 'texto negativo' => ['-2.0'];
+        yield 'texto inteiro' => ['10'];
+        yield 'sem parte inteira' => ['.5'];
+        yield 'sem parte decimal' => ['5.'];
+        yield 'com mais' => ['+1.5'];
+        yield 'notacao cientifica' => ['1e3'];
+        yield 'notacao cientifica com sinal' => ['-1.5E-3'];
+        yield 'zeros a esquerda' => ['007.50'];
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function invalidFloats(): iterable
+    {
+        yield 'vazio' => [''];
+        yield 'espaco antes' => [' 1.5'];
+        yield 'espaco depois' => ['1.5 '];
+        yield 'quebra de linha no fim' => ["1.5\n"];
+        yield 'texto' => ['abc'];
+        yield 'virgula' => ['1,5'];
+        yield 'hexadecimal' => ['0x1A'];
+        yield 'NaN' => ['NaN'];
+        yield 'INF' => ['INF'];
+        yield 'infinito' => ['-INF'];
+        yield 'so o ponto' => ['.'];
+        yield 'so o sinal' => ['-'];
+        yield 'expoente sem digitos' => ['1e'];
+        yield 'dois pontos' => ['1.2.3'];
+        yield 'estoura para infinito' => ['1e999'];
+        yield 'null' => [null];
+        yield 'bool' => [true];
+        yield 'array' => [['1.5']];
+    }
+
+    #[DataProvider('validFloats')]
+    public function testFloatFromTextAccepts(mixed $value): void
+    {
+        self::assertTrue(ValidationRule::validate($value, 'float', fromText: true));
+        self::assertTrue(ValidationRule::validate($value, 'FLOAT', fromText: true));
+    }
+
+    #[DataProvider('invalidFloats')]
+    public function testFloatFromTextRejects(mixed $value): void
+    {
+        self::assertFalse(ValidationRule::validate($value, 'float', fromText: true));
+    }
+
+    public function testFloatIsStrictWithoutTheTextFlag(): void
+    {
+        self::assertTrue(ValidationRule::validate(1.5, 'float'));
+        self::assertFalse(ValidationRule::validate('1.5', 'float'));
+        self::assertFalse(ValidationRule::validate(10, 'float'));
+    }
+
     public function testStrictModeIsTheDefault(): void
     {
         self::assertTrue(ValidationRule::validate(10, 'int'));
@@ -149,25 +212,26 @@ final class QueryTextRulesTest extends TestCase
     public function testOtherRulesIgnoreTheTextFlag(): void
     {
         self::assertTrue(ValidationRule::validate('10', 'string', fromText: true));
-        self::assertFalse(ValidationRule::validate('1.5', 'float', fromText: true));
         self::assertTrue(ValidationRule::validate('1.5', 'numeric', fromText: true));
     }
 
     public function testQueryParamsAcceptTextAndKeepTheValue(): void
     {
-        $request = new Request(method: 'GET', path: '/', query: ['limit' => '10', 'active' => 'TRUE']);
+        $request = new Request(method: 'GET', path: '/', query: ['limit' => '10', 'price' => '1.5', 'active' => 'TRUE']);
 
-        self::assertNull((new OptionalParams(['limit' => 'int', 'active' => 'bool']))->validate($request));
-        self::assertNull((new RequiredParams(['limit' => 'int', 'active' => 'bool']))->validate($request));
+        self::assertNull((new OptionalParams(['limit' => 'int', 'price' => 'float', 'active' => 'bool']))->validate($request));
+        self::assertNull((new RequiredParams(['limit' => 'int', 'price' => 'float', 'active' => 'bool']))->validate($request));
         self::assertSame('10', $request->query('limit'));
         self::assertSame('TRUE', $request->query('active'));
     }
 
     public function testQueryParamsRejectInvalidText(): void
     {
-        $request = new Request(method: 'GET', path: '/', query: ['limit' => '1.5', 'active' => 'yes']);
+        $request = new Request(method: 'GET', path: '/', query: ['limit' => '1.5', 'price' => '1,5', 'active' => 'yes']);
 
         self::assertSame(400, (new OptionalParams(['limit' => 'int']))->validate($request)?->status());
+        self::assertSame(400, (new OptionalParams(['price' => 'float']))->validate($request)?->status());
+        self::assertSame(400, (new RequiredParams(['price' => 'float']))->validate($request)?->status());
         self::assertSame(400, (new OptionalParams(['active' => 'bool']))->validate($request)?->status());
         self::assertSame(400, (new RequiredParams(['limit' => 'int']))->validate($request)?->status());
         self::assertSame(400, (new RequiredParams(['active' => 'bool']))->validate($request)?->status());
@@ -175,11 +239,14 @@ final class QueryTextRulesTest extends TestCase
 
     public function testJsonBodyStaysStrict(): void
     {
-        $request = new Request(method: 'POST', path: '/', body: ['limit' => '10', 'active' => 'true', 'flag' => 1]);
+        $request = new Request(method: 'POST', path: '/', body: ['limit' => '10', 'price' => '1.5', 'active' => 'true', 'flag' => 1, 'whole' => 10]);
 
         self::assertNotNull((new RequiredFields(['limit' => 'int']))->validate($request));
         self::assertNotNull((new RequiredFields(['active' => 'bool']))->validate($request));
         self::assertNotNull((new RequiredFields(['flag' => 'bool']))->validate($request));
+        self::assertNotNull((new RequiredFields(['price' => 'float']))->validate($request));
+        self::assertNotNull((new RequiredFields(['whole' => 'float']))->validate($request));
+        self::assertNotNull((new OptionalFields(['price' => 'float']))->validate($request));
         self::assertNotNull((new OptionalFields(['limit' => 'int']))->validate($request));
         self::assertNotNull((new OptionalFields(['active' => 'bool']))->validate($request));
 

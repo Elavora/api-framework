@@ -111,23 +111,28 @@ JSON Schema e o OpenAPI (exceto `mask`), então uma ferramenta de documentação
 
 Isso vale igualmente para a requisição (`fields`, `params`) e para a resposta (`response`).
 
-### `int` e `bool` em parâmetros de query
+### `int`, `float` e `bool` em parâmetros de query
 
-Parâmetros de query string chegam sempre como texto. Por isso, em `#[RequiredParams]` e `#[OptionalParams]`, as regras
-`'int'` e `'bool'` aceitam também o texto equivalente (em `OPTIONS` continuam `{"type": "int"}` e `{"type": "bool"}`):
+Parâmetros de query string chegam sempre como texto. Por isso, em `#[RequiredParams]` e `#[OptionalParams]`, vale o
+princípio **tenta converter o texto para o tipo; se a conversão falhar, o valor é inválido**. As regras `'int'`,
+`'float'` e `'bool'` aceitam o texto equivalente (em `OPTIONS` continuam `{"type": "int"}`, `{"type": "float"}` e
+`{"type": "bool"}`):
 
-- `'int'`: um inteiro ou um texto de inteiro, com sinal opcional e zeros à esquerda aceitos (`'10'`, `'-5'`, `'+1'`, `'0'`, `'-0'`, `'007'`). Recusa
-  vazio, espaços, decimais (`'1.0'`), notação científica (`'1e3'`), valores acima do limite
-  do `int` do PHP, bool e float.
+- `'int'`: um inteiro ou um texto de inteiro, com sinal opcional e zeros à esquerda (`'10'`, `'-5'`, `'+1'`, `'0'`,
+  `'-0'`, `'007'`, `'-007'`). Recusa vazio, espaços, decimais (`'1.0'`), notação científica (`'1e3'`), hexadecimal,
+  valores acima do limite do `int` do PHP, bool, float, null e array.
+- `'float'`: o float do PHP, o int do PHP (conversível, `10`) ou um texto que vira float: `'1.5'`, `'-2.0'`, `'10'`,
+  `'.5'`, `'5.'`, `'+1.5'`, `'1e3'`. Recusa vazio, espaços nas pontas, `'abc'`, `'1,5'`, `'0x1A'`, `'NaN'`, `'INF'`,
+  valores que estouram para infinito (`'1e999'`), null, bool e array.
 - `'bool'`: o bool do PHP, os inteiros `0` e `1` e os textos `'0'`, `'1'`, `'true'` e `'false'` (sem diferenciar
   maiúsculas, sem espaços nas pontas). `'yes'`, `'no'`, `'on'` e `'off'` são recusados.
 
-Só a validação aceita o texto: o valor não é convertido e `$request->query()` devolve exatamente o que veio. Converta
-na action (`(int) $request->query('limit')`). No corpo JSON (`#[RequiredFields]` e `#[OptionalFields]`) as regras
-continuam estritas: `"10"` não é `int` e `"true"` não é `bool`, porque lá o tipo já vem correto.
+`'string'` já aceita o texto, e `array`, `object` e `null` não mudam. Só a validação aceita o texto: o valor não é
+convertido e `$request->query()` devolve exatamente o que veio. Converta na action (`(int) $request->query('limit')`).
+No corpo JSON (`#[RequiredFields]` e `#[OptionalFields]`) as regras continuam estritas: `"10"` não é `int`, `"1.5"` não
+é `float` e `"true"` não é `bool`, porque lá o tipo já vem correto.
 
 A regra `'int-string'` foi removida: troque por `'int'`. Uma regra desconhecida nunca valida.
-
 ## Um endpoint documentado
 
 ```php

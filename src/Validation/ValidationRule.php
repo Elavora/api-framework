@@ -20,16 +20,16 @@ final class ValidationRule
     /**
      * Verifica se um valor atende a uma regra.
      *
-     * Regras nomeadas suportadas: int, string, float, numeric, bool,
-     * array, object, null, email, url, base64, json e uuid (e os apelidos integer e boolean).
+     * Regras nomeadas suportadas: int, string, float, numeric, bool, array, object, null, email, url, base64, json e
+     * uuid (e os apelidos integer e boolean).
      *
-     * Por padrao `int` e `bool` sao estritas (`is_int`, `is_bool`), o que serve ao corpo JSON, onde o tipo ja vem
-     * correto. Com `$fromText = true` (valor vindo da query string, que chega sempre como texto), `int` e `bool`
-     * tambem aceitam o texto equivalente, veja `isIntLike` e `isBoolLike`. As demais regras nao mudam. A validacao
-     * nunca converte o valor.
+     * Por padrao `int`, `float` e `bool` sao estritas (`is_int`, `is_float`, `is_bool`), o que serve ao corpo JSON,
+     * onde o tipo ja vem correto. Com `$fromText = true` (valor vindo da query string, que chega sempre como texto),
+     * elas tentam converter o texto: se a conversao funciona o valor e valido, se falha e invalido (veja `isIntLike`,
+     * `isFloatLike` e `isBoolLike`). As demais regras nao mudam. A validacao nunca converte o valor.
      *
      * @param mixed $rule Nome da regra, classe DataType, instancia DataType ou callable.
-     * @param bool $fromText Quando true, `int` e `bool` aceitam tambem o texto (uso em parametros de query).
+     * @param bool $fromText Quando true, `int`, `float` e `bool` aceitam tambem o texto (uso em parametros de query).
      */
     public static function validate(mixed $value, mixed $rule, bool $fromText = false): bool
     {
@@ -39,6 +39,10 @@ final class ValidationRule
             if ($fromText) {
                 if ($name === 'int' || $name === 'integer') {
                     return self::isIntLike($value);
+                }
+
+                if ($name === 'float') {
+                    return self::isFloatLike($value);
                 }
 
                 if ($name === 'bool' || $name === 'boolean') {
@@ -196,6 +200,22 @@ final class ValidationRule
         $normalized = ($parts[1] === '-' ? '-' : '') . ($digits === '' ? '0' : $digits);
 
         return filter_var($normalized, FILTER_VALIDATE_INT) !== false;
+    }
+
+    /**
+     * Float do PHP, int do PHP (conversivel para float) ou texto que o PHP converte para float: sinal opcional,
+     * digitos com ou sem parte decimal (`'1.5'`, `'.5'`, `'5.'`, `'10'`) e expoente (`'1e3'`). Recusa vazio, espacos,
+     * virgula, hexadecimal, `NaN`/`INF`, estouro para infinito, null, bool e array.
+     */
+    private static function isFloatLike(mixed $value): bool
+    {
+        if (is_float($value) || is_int($value)) {
+            return true;
+        }
+
+        return is_string($value)
+            && preg_match('/^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?$/D', $value) === 1
+            && is_finite((float) $value);
     }
 
     /**
