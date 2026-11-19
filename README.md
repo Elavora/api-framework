@@ -204,7 +204,7 @@ use Elavora\Api\Framework\Http\Response;
 final class UserController
 {
     #[Method('POST')]
-    #[RequiredParams(['page' => 'int-string'])]
+    #[RequiredParams(['page' => 'int'])]
     #[RequiredFields(['name' => 'string', 'email' => 'email'])]
     public function store(Request $request): Response
     {
@@ -219,7 +219,7 @@ Atributos disponiveis:
 - `Method`: restringe o metodo HTTP aceito.
 - `RequiredFields`: valida campos obrigatorios do corpo.
 - `OptionalFields`: descreve campos opcionais do corpo.
-- `RequiredParams`: valida parametros obrigatorios da query string.
+- `RequiredParams`: valida parametros obrigatorios da query string. As regras `int`, `float` e `bool` aceitam o texto (`?limit=10`, `?price=1.5`, `?active=true`); no corpo JSON continuam estritas.
 - `OptionalParams`: descreve parametros opcionais da query string.
 - `Details`: adiciona metadados de descricao.
 - `Response`: adiciona metadados de resposta esperada.

@@ -16,7 +16,7 @@ use Elavora\Api\Framework\Validation\ValidationRule;
  *
  * Parametros ausentes sao ignorados. Parametros presentes sao validados pela regra informada.
  *
- * Exemplo: #[OptionalParams(['search' => 'string', 'limit' => 'int-string'])]
+ * Exemplo: #[OptionalParams(['search' => 'string', 'limit' => 'int'])]
  */
 final class OptionalParams implements RequestValidatorAttribute
 {
@@ -40,7 +40,7 @@ final class OptionalParams implements RequestValidatorAttribute
             }
 
             $value = $request->query($param);
-            if (!ValidationRule::validate($value, $rule)) {
+            if (!ValidationRule::validate($value, $rule, fromText: true)) {
                 $errors[$param] = 'Invalid parameter type';
             }
         }
