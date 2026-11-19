@@ -46,10 +46,10 @@ classe**:
 
 | No attribute | Em `OPTIONS` |
 | --- | --- |
-| `'int'`, `'int-string'`, `'email'`, `'uuid'` (regra nomeada) | `{"type": "int"}`, `{"type": "email"}`... |
+| `'int'`, `'bool'`, `'email'`, `'uuid'` (regra nomeada) | `{"type": "int"}`, `{"type": "bool"}`, `{"type": "email"}`... |
 | `Name::class`, DataType com `value(): string` | `{"type": "string"}` |
 | `Quantity::class`, DataType com `value(): int` | `{"type": "int"}` |
-| DataType com `value()` de união (`string|int`) ou `mixed` | `{"type": "mixed"}` ||int`) ou `mixed` | `mixed` |
+| DataType com `value()` de união (`string\|int`) ou `mixed` | `{"type": "mixed"}` |
 | DataType que implementa `DescribesType` | o que `documentedType()` devolve |
 | qualquer outra classe | `{"type": "Money"}` (nome curto, sem namespace) |
 
@@ -110,6 +110,23 @@ JSON Schema e o OpenAPI (exceto `mask`), então uma ferramenta de documentação
 `mask` e `pattern` só descrevem. Quem valida de verdade é o `isValid()` do DataType.
 
 Isso vale igualmente para a requisição (`fields`, `params`) e para a resposta (`response`).
+
+### `int` e `bool` em parâmetros de query
+
+Parâmetros de query string chegam sempre como texto. Por isso, em `#[RequiredParams]` e `#[OptionalParams]`, as regras
+`'int'` e `'bool'` aceitam também o texto equivalente (em `OPTIONS` continuam `{"type": "int"}` e `{"type": "bool"}`):
+
+- `'int'`: um inteiro ou um texto de inteiro, com sinal opcional (`'10'`, `'-5'`, `'+1'`, `'0'`, `'-0'`). Recusa
+  vazio, espaços, decimais (`'1.0'`), notação científica (`'1e3'`), zeros à esquerda (`'007'`), valores acima do limite
+  do `int` do PHP, bool e float.
+- `'bool'`: o bool do PHP, os inteiros `0` e `1` e os textos `'0'`, `'1'`, `'true'` e `'false'` (sem diferenciar
+  maiúsculas, sem espaços nas pontas). `'yes'`, `'no'`, `'on'` e `'off'` são recusados.
+
+Só a validação aceita o texto: o valor não é convertido e `$request->query()` devolve exatamente o que veio. Converta
+na action (`(int) $request->query('limit')`). No corpo JSON (`#[RequiredFields]` e `#[OptionalFields]`) as regras
+continuam estritas: `"10"` não é `int` e `"true"` não é `bool`, porque lá o tipo já vem correto.
+
+A regra `'int-string'` foi removida: troque por `'int'`. Uma regra desconhecida nunca valida.
 
 ## Um endpoint documentado
 

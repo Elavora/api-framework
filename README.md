@@ -185,7 +185,7 @@ Atributos disponiveis:
 - `Method`: restringe o metodo HTTP aceito.
 - `RequiredFields`: valida campos obrigatorios do corpo.
 - `OptionalFields`: descreve campos opcionais do corpo.
-- `RequiredParams`: valida parametros obrigatorios da query string.
+- `RequiredParams`: valida parametros obrigatorios da query string. As regras `int` e `bool` aceitam o texto (`?limit=10`, `?active=true`); no corpo JSON continuam estritas.
 - `OptionalParams`: descreve parametros opcionais da query string.
 - `Details`: adiciona metadados de descricao.
 - `Response`: adiciona metadados de resposta esperada.
