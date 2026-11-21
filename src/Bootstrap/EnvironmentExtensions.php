@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Elavora\Api\Framework\Bootstrap;
 
 use Elavora\Api\Framework\Contracts\Extension;
+use Elavora\Api\Framework\Logging\AccessLog;
+use Elavora\Api\Framework\Logging\AccessLogExtension;
 use RuntimeException;
 
 /** Defaults de ambiente dos modulos oficiais; nenhum pacote opcional e obrigatorio. */
@@ -169,6 +171,18 @@ final class EnvironmentExtensions
                     'username' => $read('MONGO_LOG_USERNAME') ?: null,
                     'password' => $read('MONGO_LOG_PASSWORD') ?: null,
                 ],
+            );
+        }
+
+        // Log de acesso e opt-in. Fica por ultimo na lista do ambiente, mas e o primeiro middleware registrado
+        // pelo bootstrap, portanto o mais externo do pipeline.
+        $accessLog = $read('ACCESS_LOG');
+        if ($accessLog !== false && filter_var($accessLog, FILTER_VALIDATE_BOOLEAN)) {
+            $accessLogExclude = $read('ACCESS_LOG_EXCLUDE');
+            $extensions[] = new AccessLogExtension(
+                $accessLogExclude === false
+                    ? AccessLog::DEFAULT_EXCLUDE
+                    : AccessLog::parseExclude($accessLogExclude),
             );
         }
 
