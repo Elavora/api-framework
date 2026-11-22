@@ -41,6 +41,8 @@ $app->emit($response);
 
 - `Elavora\Api\Framework\Application`
 - `Elavora\Api\Framework\Container`
+- `Elavora\Api\Framework\Contracts\Storage`
+- `Elavora\Api\Framework\Contracts\InspectsObjects`
 - `Elavora\Api\Framework\Attributes\Cache`
 - `Elavora\Api\Framework\Attributes\Details`
 - `Elavora\Api\Framework\Attributes\Method`
@@ -144,6 +146,41 @@ public function token(): string;     // identificador opaco, só o adaptador int
 - `queue` vazia lança `InvalidArgumentException` com `A fila da reserva nao pode ser vazia.`
 - `token` vazio lança `InvalidArgumentException` com `O token da reserva nao pode ser vazio.`
 - O `token` é opaco: o consumidor só o devolve ao adaptador (`acknowledge()`, `extend()`), sem interpretá-lo.
+
+## Storage e InspectsObjects
+
+`Elavora\Api\Framework\Contracts\Storage` define `put`, `get`, `delete` e `temporaryUrl`, sem depender do provider.
+Ele **não** diz se um objeto existe nem qual o tamanho dele. Para isso existe o contrato opcional
+`Elavora\Api\Framework\Contracts\InspectsObjects`, usado, por exemplo, para conferir um upload direto (o cliente envia
+o arquivo para a URL pré-assinada) antes de registrar o arquivo:
+
+```php
+interface InspectsObjects
+{
+    public function exists(string $key): bool;
+
+    public function size(string $key): ?int;
+}
+```
+
+- `exists($key)`: `true` se o objeto existe, `false` se não existe. Só o "não existe" vira `false`; qualquer outra
+  falha do provider (acesso negado, erro de rede etc.) **não** é escondida e sobe como exceção.
+- `size($key)`: o tamanho do objeto em bytes, ou `null` se ele não existe. Um objeto vazio tem tamanho `0`, não `null`.
+- Uma chave inválida lança `InvalidArgumentException`, como nos métodos do `Storage`.
+- Os dois métodos só consultam: não criam, não alteram e não baixam o conteúdo do objeto.
+- O contrato é separado do `Storage` para não quebrar quem já o implementa. Uma classe pode implementar os dois
+  (`final class MeuStorage implements Storage, InspectsObjects`). Quem consome faz a checagem de tipo:
+
+```php
+$storage = $application->container()->get(Storage::class);
+
+if ($storage instanceof InspectsObjects && $storage->size($key) === $declaredSize) {
+    // o arquivo chegou e o tamanho confere
+}
+```
+
+- `elavora/api-storage-local` (`LocalStorage`) e `elavora/api-storage-s3` (`S3Storage`) implementam os dois contratos
+  a partir da versão que exige este contrato (framework `^6.4`).
 
 ## Dependencias de runtime
 
