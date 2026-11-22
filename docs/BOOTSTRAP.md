@@ -31,6 +31,11 @@ projeto consumidor e determina o caminho padrao de storage/logs/app.log.
 Os defaults preservam o Skeleton anterior: CACHE_DRIVER seleciona apcu/redis,
 DB_DRIVER seleciona mysql/postgresql, LOG_DRIVER seleciona stdout/file/mongodb e ACCESS_LOG liga o [log de acesso](#log-de-acesso).
 A fila Redis e registrada quando seu pacote esta instalado, mesmo sem cache.
+`QUEUE_VISIBILITY_TIMEOUT` (segundos, padrao `300`) e repassada a fila como `visibility_timeout`: e o prazo
+em que uma mensagem reservada por um adaptador `AcknowledgesJobs` espera o `ack` antes de voltar a fila
+(veja o [guia de uso](USO.md#fila-com-confirmação-acknowledgesjobs)). Vazia ou ausente vale `300`. Um valor que nao
+seja inteiro maior que zero lanca `RuntimeException` com `QUEUE_VISIBILITY_TIMEOUT deve ser um inteiro maior que zero.`
+A chave `visibility_timeout` e sempre passada ao construtor da extensao da fila, como int.
 Pacotes opcionais continuam fora de require; selecionar um driver sem instalar
 seu pacote gera uma mensagem com a dependencia necessaria.
 

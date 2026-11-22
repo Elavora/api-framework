@@ -46,6 +46,9 @@ $app->emit($response);
 - `Elavora\Api\Framework\Attributes\Method`
 - `Elavora\Api\Framework\Http\Request`
 - `Elavora\Api\Framework\Http\Response`
+- `Elavora\Api\Framework\Contracts\Queue`
+- `Elavora\Api\Framework\Contracts\AcknowledgesJobs`
+- `Elavora\Api\Framework\Queue\ReservedJob`
 
 ## Cache de respostas (`#[Cache]`)
 
@@ -89,6 +92,58 @@ Comportamento incorreto que existia antes da correção, como contraexemplo: o h
 entrada era regravada a cada acerto e o TTL recomeçava. Com tráfego mais frequente que `N` segundos a entrada nunca
 expirava, e a action nunca rodava de novo. No exemplo acima haveria um `set` por request (21 em vez de 3, até os 20 s) e o miss
 das 10 s e das 20 s nunca aconteceria.
+
+## Fila com confirmação (`AcknowledgesJobs`)
+
+O contrato `Queue` (`push()` e `pop()`) entrega a mensagem e esquece dela: se o consumidor cair no meio do
+processamento, a mensagem se perde. O contrato opcional `Elavora\Api\Framework\Contracts\AcknowledgesJobs` descreve
+adaptadores que **reservam** a mensagem, em vez de removê-la, e só a descartam quando o consumidor confirma (`ack`).
+Quem não confirma dentro do prazo de visibilidade tem a mensagem devolvida à fila. É uma interface **à parte**:
+`Queue` não mudou, e um adaptador pode implementar só `Queue`, ou `Queue` e `AcknowledgesJobs`. O consumidor
+descobre o suporte com `$queue instanceof AcknowledgesJobs`.
+
+A garantia é **pelo menos uma vez**: se o consumidor cair depois de processar e antes do `ack`, a mensagem volta e
+roda de novo. Os handlers devem ser idempotentes.
+
+```php
+namespace Elavora\Api\Framework\Contracts;
+
+interface AcknowledgesJobs
+{
+    /** @param list<string> $queues Filas em ordem de prioridade (a primeira é a mais prioritária). */
+    public function reserve(array $queues): ?ReservedJob;
+
+    public function acknowledge(ReservedJob $job): void;
+
+    public function extend(ReservedJob $job, ?int $seconds = null): void;
+
+    public function recoverExpired(string $queue): int;
+}
+```
+
+(`ReservedJob` é `Elavora\Api\Framework\Queue\ReservedJob`.)
+
+| Método | Regra |
+|---|---|
+| `reserve($queues)` | Procura nas filas, na ordem recebida, e reserva a primeira mensagem que encontrar. Só olha a fila seguinte quando a anterior está vazia. Devolve `null` quando todas estão vazias. Antes de reservar, o adaptador devolve à fila as reservas expiradas das filas listadas. A lista vazia lança `InvalidArgumentException` (`A lista de filas nao pode ser vazia.`) |
+| `acknowledge($job)` | Confirma o processamento e descarta a reserva. Confirmar uma reserva que já expirou, já foi confirmada ou já foi devolvida à fila não lança erro e não faz nada |
+| `extend($job, $seconds)` | Renova o prazo de visibilidade (heartbeat), para jobs longos. `$seconds` é o novo prazo, contado a partir de agora; `null` usa o prazo padrão do adaptador. `$seconds` menor que 1 lança `InvalidArgumentException` (`O prazo de visibilidade deve ser maior que zero.`). Reserva que não existe mais: não faz nada |
+| `recoverExpired($queue)` | Devolve à fila as reservas cujo prazo passou sem `ack` e devolve quantas devolveu. As devolvidas voltam para o **início** da fila (são as mais antigas) |
+
+O prazo padrão de visibilidade vem de `QUEUE_VISIBILITY_TIMEOUT` (veja o [Bootstrap](BOOTSTRAP.md)).
+
+### `ReservedJob` (classe final, imutável)
+
+```php
+public function __construct(string $queue, array $payload, string $token);
+public function queue(): string;     // fila de onde a mensagem saiu
+public function payload(): array;    // dados da mensagem, como em Queue::pop()
+public function token(): string;     // identificador opaco, só o adaptador interpreta
+```
+
+- `queue` vazia lança `InvalidArgumentException` com `A fila da reserva nao pode ser vazia.`
+- `token` vazio lança `InvalidArgumentException` com `O token da reserva nao pode ser vazio.`
+- O `token` é opaco: o consumidor só o devolve ao adaptador (`acknowledge()`, `extend()`), sem interpretá-lo.
 
 ## Dependencias de runtime
 
