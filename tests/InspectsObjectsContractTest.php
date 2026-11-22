@@ -32,7 +32,7 @@ final class InspectsObjectsContractTest extends TestCase
     public function testDefinesExistsAndSizeOnly(): void
     {
         $methods = array_map(
-            static fn ($method): string => $method->getName(),
+            static fn($method): string => $method->getName(),
             (new ReflectionClass(InspectsObjects::class))->getMethods(),
         );
         sort($methods);
