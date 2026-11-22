@@ -36,7 +36,7 @@ final class RedisExtensionEnvironmentTest extends TestCase
     {
         parent::setUp();
         foreach ([
-            'CACHE_DRIVER', 'CACHE_PREFIX', 'CACHE_TTL', 'QUEUE_PREFIX',
+            'CACHE_DRIVER', 'CACHE_PREFIX', 'CACHE_TTL', 'QUEUE_PREFIX', 'QUEUE_VISIBILITY_TIMEOUT',
             'REDIS_HOST', 'REDIS_PORT', 'REDIS_PASSWORD', 'REDIS_DATABASE',
             'DB_DRIVER', 'LOG_DRIVER',
         ] as $variable) {
@@ -89,5 +89,50 @@ final class RedisExtensionEnvironmentTest extends TestCase
         self::assertNull(RedisExtensionConfigurationSpy::$configs['cache:test:']['database']);
         self::assertNull(RedisExtensionConfigurationSpy::$configs['queue:test:']['password']);
         self::assertNull(RedisExtensionConfigurationSpy::$configs['queue:test:']['database']);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testVisibilityTimeoutDefaultsTo300AndIsPassedAsInt(): void
+    {
+        self::assertTrue(class_alias(
+            RedisExtensionConfigurationSpy::class,
+            'Elavora\Api\Extension\QueueRedis\RedisQueueExtension',
+        ));
+
+        EnvironmentExtensions::load('/project');
+        self::assertSame(300, RedisExtensionConfigurationSpy::$configs['api:queue:']['visibility_timeout']);
+
+        putenv('QUEUE_VISIBILITY_TIMEOUT=');
+        EnvironmentExtensions::load('/project');
+        self::assertSame(300, RedisExtensionConfigurationSpy::$configs['api:queue:']['visibility_timeout']);
+
+        putenv('QUEUE_VISIBILITY_TIMEOUT=3600');
+        EnvironmentExtensions::load('/project');
+        self::assertSame(3600, RedisExtensionConfigurationSpy::$configs['api:queue:']['visibility_timeout']);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidVisibilityTimeouts')]
+    public function testInvalidVisibilityTimeoutThrows(string $value): void
+    {
+        self::assertTrue(class_alias(
+            RedisExtensionConfigurationSpy::class,
+            'Elavora\Api\Extension\QueueRedis\RedisQueueExtension',
+        ));
+
+        putenv('QUEUE_VISIBILITY_TIMEOUT=' . $value);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('QUEUE_VISIBILITY_TIMEOUT deve ser um inteiro maior que zero.');
+
+        EnvironmentExtensions::load('/project');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function invalidVisibilityTimeouts(): array
+    {
+        return ['zero' => ['0'], 'negativo' => ['-5'], 'texto' => ['abc'], 'decimal' => ['1.5']];
     }
 }
