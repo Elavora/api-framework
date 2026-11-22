@@ -90,6 +90,14 @@ final class EnvironmentExtensions
 
         $redisQueueExtension = 'Elavora\Api\Extension\QueueRedis\RedisQueueExtension';
         if (class_exists($redisQueueExtension)) {
+            $visibilityTimeout = $read('QUEUE_VISIBILITY_TIMEOUT');
+            if ($visibilityTimeout === false || $visibilityTimeout === '') {
+                $visibilityTimeout = '300';
+            }
+            if (preg_match('/^[1-9][0-9]*$/', $visibilityTimeout) !== 1) {
+                throw new RuntimeException('QUEUE_VISIBILITY_TIMEOUT deve ser um inteiro maior que zero.');
+            }
+
             $extensions[] = $createExtension(
                 $redisQueueExtension,
                 'Instale elavora/api-queue-redis para registrar a fila Redis.',
@@ -99,6 +107,7 @@ final class EnvironmentExtensions
                     'password' => $redisPassword,
                     'database' => $redisDatabase,
                     'prefix' => $read('QUEUE_PREFIX') ?: 'api:queue:',
+                    'visibility_timeout' => (int) $visibilityTimeout,
                 ],
             );
         }
