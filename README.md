@@ -227,6 +227,14 @@ Atributos disponiveis:
 - `Cache`: usa um `CacheStore` registrado no container.
 - `Transaction`: usa um `TransactionManager` registrado no container.
 
+## Storage e verificação de objetos
+
+O contrato `Storage` cobre `put`, `get`, `delete` e `temporaryUrl`. Para saber se um objeto existe e qual o tamanho
+dele (por exemplo, ao concluir um upload direto por URL pré-assinada), há o contrato opcional `InspectsObjects`, com
+`exists(string $key): bool` e `size(string $key): ?int`. Ele é separado do `Storage` de propósito: quem já implementa
+o `Storage` não quebra. Os pacotes `elavora/api-storage-local` e `elavora/api-storage-s3` implementam os dois. Os
+detalhes estão em [Guia de uso](docs/USO.md#storage-e-inspectsobjects).
+
 ## Container e extensoes
 
 O container permite registrar instancias usadas por controllers, atributos e extensoes.
